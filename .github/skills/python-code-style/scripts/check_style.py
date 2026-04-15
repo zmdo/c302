@@ -5,18 +5,18 @@
 #   print 调用、通配符导入等常见规范问题。
 #
 # 类与方法索引：
-#   StyleIssue                       (L49)   — 表示一个代码规范问题
-#     __init__                       (L59)   — 初始化问题实例
-#     __str__                        (L73)   — 字符串表示
-#   check_file_header                (L77)   — 检查文件头部注释
-#   check_docstrings                 (L100)  — 检查公开函数的 docstring
-#   check_type_annotations           (L137)  — 检查类型注解覆盖率
-#   check_print_usage                (L182)  — 检查 print() 使用
-#   check_star_import                (L213)  — 检查通配符导入
-#   check_single_quotes              (L228)  — 检查引号风格
-#   check_file                       (L274)  — 对单个文件执行检查
-#   check_directory                  (L302)  — 递归检查目录
-#   main                             (L328)  — 脚本入口
+#   StyleIssue                           (L49)   — 表示一个代码规范问题
+#     __init__                           (L59)   — __init__ 函数
+#     __str__                            (L73)   — __str__ 函数
+#   check_file_header                    (L77)   — 检查文件头注释是否包含必要字段
+#   check_docstrings                     (L119)  — 检查公开函数和类是否有 docstring
+#   check_type_annotations               (L156)  — 检查公开函数是否有参数和返回值类型注解
+#   check_print_usage                    (L201)  — 检查是否使用了 print() 调用（测试文件和脚本除外）
+#   check_star_import                    (L232)  — 检查是否使用了 from X import * 通配符导入
+#   check_single_quotes                  (L247)  — 检查是否使用了单引号字符串（规范要求双引号）
+#   check_file                           (L293)  — 对单个 Python 文件执行全部检查
+#   check_directory                      (L321)  — 递归检查目录下所有 Python 文件
+#   main                                 (L347)  — 脚本入口
 #
 # 更新日志：
 #   2026-03-28  Copilot  初始创建
@@ -82,8 +82,27 @@ def check_file_header(filepath: str, lines: list[str]) -> list[StyleIssue]:
     :return: 问题列表
     """
     issues: list[StyleIssue] = []
-    # 扫描前 50 行以覆盖包含较长索引块的文件头
-    header_block = "\n".join(lines[:50])
+    # 动态提取 # =====...===== 包裹的头部注释块
+    # 而非固定行数，以适应索引和更新日志不断增长的情况
+    header_lines: list[str] = []
+    sep_count = 0
+    for line in lines:
+        stripped = line.rstrip()
+        # 检测分隔线 # ====...====（至少 10 个 =）
+        if stripped.startswith("#") and stripped.count("=") >= 10:
+            sep_count += 1
+            header_lines.append(stripped)
+            # 遇到第二条分隔线，头部结束
+            if sep_count >= 2:
+                break
+            continue
+        # 在分隔线之间，只收集 # 开头的注释行
+        if sep_count == 1 and stripped.startswith("#"):
+            header_lines.append(stripped)
+        # 遇到非注释行且已进入头部，说明头部异常结束
+        elif sep_count == 1 and stripped and not stripped.startswith("#"):
+            break
+    header_block = "\n".join(header_lines)
 
     if "功能描述" not in header_block:
         issues.append(StyleIssue(filepath, 1, "H001", "缺少文件头「功能描述」字段"))
