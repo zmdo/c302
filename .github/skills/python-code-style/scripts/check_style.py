@@ -4,8 +4,23 @@
 #   检查文件头注释、公开函数 docstring、类型注解、字符串风格、
 #   print 调用、通配符导入等常见规范问题。
 #
+# 类与方法索引：
+#   StyleIssue                       (L49)   — 表示一个代码规范问题
+#     __init__                       (L59)   — 初始化问题实例
+#     __str__                        (L73)   — 字符串表示
+#   check_file_header                (L77)   — 检查文件头部注释
+#   check_docstrings                 (L98)   — 检查公开函数的 docstring
+#   check_type_annotations           (L135)  — 检查类型注解覆盖率
+#   check_print_usage                (L180)  — 检查 print() 使用
+#   check_star_import                (L208)  — 检查通配符导入
+#   check_single_quotes              (L223)  — 检查引号风格
+#   check_file                       (L269)  — 对单个文件执行检查
+#   check_directory                  (L297)  — 递归检查目录
+#   main                             (L323)  — 脚本入口
+#
 # 更新日志：
 #   2026-03-28  Copilot  初始创建
+#   2026-04-16  Copilot  新增类与方法索引
 #
 # 当前维护者：Copilot
 # =============================================================================

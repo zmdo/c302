@@ -1,6 +1,6 @@
 ---
 name: python-code-style
-description: "Review and enforce Python code against SP-CODE-2026-001 coding standard. Check file headers (功能描述/更新日志/当前维护者), reST docstrings, mandatory inline comments, type annotations, naming conventions, import order, string style, logging usage, and unit test coverage. Use when the user asks to review Python code style, enforce coding standards, check code compliance, or refactor code to meet the project's Python conventions. Also use when writing new Python files to ensure they conform from the start. Every Python function/method MUST have comments and corresponding unit tests."
+description: "Review and enforce Python code against SP-CODE-2026-001 coding standard. Check file headers (功能描述/类与方法索引/更新日志/当前维护者), reST docstrings, mandatory inline comments, type annotations, naming conventions, import order, string style, logging usage, and unit test coverage. Use when the user asks to review Python code style, enforce coding standards, check code compliance, or refactor code to meet the project's Python conventions. Also use when writing new Python files to ensure they conform from the start. Every Python function/method MUST have comments and corresponding unit tests."
 license: MIT
 compatibility: "c302（C. elegans 神经网络建模框架，OpenWorm 子项目）。Python 3.10+，遵循 SP-CODE-2026-001 编码规范。"
 metadata:
@@ -22,7 +22,7 @@ allowed-tools: Read Edit Terminal
 
 ## Core Standard: SP-CODE-2026-001
 
-The full coding standard is at `plans/规范文件/SP-CODE-2026-001_Python代码规范.md`. Load it for detailed rules.
+The full coding standard is at `references/SP-CODE-2026-001_Python代码规范.md`. Load it for detailed rules.
 
 Key rules summarized below:
 
@@ -35,12 +35,30 @@ Every Python source file must start with a header block:
 # 功能描述：
 #   简要描述模块职责与使用场景，2～5 行。
 #
+# 类与方法索引：
+#   MyClass                          (L25)   — 负责处理数据加载与缓存
+#     __init__                       (L30)   — 初始化加载器配置
+#     load_data                      (L45)   — 从指定路径加载数据集
+#     _parse_row                     (L78)   — 解析单行数据为字典
+#   helper_func                      (L120)  — 辅助函数，格式化输出字符串
+#   CONSTANT_NAME                    (L5)    — 模块级常量（可选，仅列出关键常量）
+#
 # 更新日志：
 #   YYYY-MM-DD  维护者  改动内容
 #
 # 当前维护者：维护者名称
 # =============================================================================
 ```
+
+#### 类与方法索引规则
+
+- **必须列出**文件中所有的类、函数和方法（含私有方法）
+- 类下的方法使用 **2 空格缩进**表示层级关系
+- 每一项后标注 `(L行号)` 表示定义所在行
+- 行号后用 `—` 加**一句话**描述其作用
+- 如果文件只有函数没有类，直接平铺列出
+- 当文件内容发生变更时（新增/删除/移动），必须同步更新索引中的行号和条目
+- 模块级常量可选列出，仅在常量数量少且含义重要时列出
 
 ### Docstrings (reST Style)
 
@@ -162,12 +180,13 @@ python skills/python-code-style/scripts/check_style.py <file_or_directory>
 ```
 
 The script checks:
-1. File header presence (功能描述 / 更新日志 / 当前维护者)
-2. Public function docstring presence
-3. Type annotation coverage on function signatures
-4. Single-quote vs double-quote usage
-5. `print()` usage in non-test files
-6. `import *` usage
+1. File header presence (功能描述 / 类与方法索引 / 更新日志 / 当前维护者)
+2. Class & method index presence and completeness
+3. Public function docstring presence
+4. Type annotation coverage on function signatures
+5. Single-quote vs double-quote usage
+6. `print()` usage in non-test files
+7. `import *` usage
 
 For detailed coding rules, load `references/sp-code-2026-001-summary.md`.
 
@@ -188,7 +207,8 @@ Analyze the script output. Each issue lists the file, line, and rule violated.
 ### Step 4: Fix Issues
 
 Apply fixes following the standard:
-- Missing file header → Add standard header block
+- Missing file header → Add standard header block (including class/method index)
+- Missing/outdated class & method index → Regenerate index with correct line numbers and descriptions
 - Missing docstring → Add reST-style docstring
 - Missing type annotations → Add parameter and return types
 - Single quotes → Replace with double quotes
@@ -211,6 +231,8 @@ Run the check script again to confirm all issues are resolved.
 ## Gotchas
 
 - The file header uses `# =====...=====` separators (at least 10 `=` chars), not `"""` docstrings
+- **类与方法索引是强制的**：头部必须包含文件内所有类、函数、方法的分层索引，并标注行号和一句话描述
+- 修改代码后必须同步更新索引中的行号，否则视为不合规
 - Docstrings use reST (`:param:`, `:return:`) not Google or NumPy style
 - Type annotations must use Python 3.10+ syntax (`list[str]` not `List[str]`, `str | None` not `Optional[str]`)
 - Comments are in Chinese but keywords like `:param:`, `TODO`, `FIXME` stay in English
