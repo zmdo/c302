@@ -6,19 +6,19 @@
 #   （仅保留 pre=神经元 且 post=体壁肌肉 的连接，过滤更严格）。
 #
 # 类与方法索引：
-#   get_all_muscle_prefixes              (L53)   — get_all_muscle_prefixes 函数
-#   get_body_wall_muscle_prefixes        (L57)   — get_body_wall_muscle_prefixes 函数
-#   is_muscle                            (L61)   — is_muscle 函数
-#   is_body_wall_muscle                  (L67)   — is_body_wall_muscle 函数
-#   is_neuron                            (L73)   — is_neuron 函数
-#   remove_leading_index_zero            (L78)   — Returns neuron name with an index without leading zero. E.g. VB01 -> VB1.
-#   get_old_muscle_name                  (L88)   — get_old_muscle_name 函数
-#   get_syntype                          (L104)  — get_syntype 函数
-#   get_synclass                         (L114)  — get_synclass 函数
-#   parse_row                            (L126)  — parse_row 函数
-#   read_data                            (L135)  — Args:
-#   read_muscle_data                     (L178)  — Returns:
-#   main                                 (L222)  — main 函数
+#   get_all_muscle_prefixes              (L53)   — 返回所有已知肌肉前缀列表（含体壁肌肉和咽部肌肉）
+#   get_body_wall_muscle_prefixes        (L60)   — 返回体壁肌肉专属前缀列表
+#   is_muscle                            (L67)   — 判断给定细胞名称是否为肌肉细胞
+#   is_body_wall_muscle                  (L78)   — 判断给定细胞名称是否为体壁肌肉
+#   is_neuron                            (L89)   — 判断给定细胞名称是否为神经元
+#   remove_leading_index_zero            (L99)   — Returns neuron name with an index without leading zero. E.g. VB01 -> VB1.
+#   get_old_muscle_name                  (L109)  — 将 herm_full_edgelist_MODIFIED 格式的肌肉名称转换为标准命名格式
+#   get_syntype                          (L130)  — 将 CSV 中的穑触类型字符串映射为 ConnectionInfo 标准形式
+#   get_synclass                         (L146)  — 根据穑触前细胞名称和穑触类型推断神经递质分类
+#   parse_row                            (L164)  — 解析 CSV 中的单行数据，返回连接信息元组
+#   read_data                            (L178)  — Args:
+#   read_muscle_data                     (L221)  — Returns:
+#   main                                 (L265)  — main 函数
 #
 # 更新日志：
 #   2026-04-16  zmdo  添加中文注释（计划1 阶段二）
@@ -51,26 +51,49 @@ filename = "%sherm_full_edgelist_MODIFIED.csv" % spreadsheet_location
 
 
 def get_all_muscle_prefixes():
+    """返回所有已知肌肉前缀列表（含体壁肌肉和咽部肌肉）。
+
+    :return: 肌肉前缀字符串列表
+    """
     return ["pm", "vm", "um", "dBWM", "vBWM"]
 
 
 def get_body_wall_muscle_prefixes():
+    """返回体壁肌肉专属前缀列表。
+
+    :return: 体壁肌肉前缀字符串列表
+    """
     return ["dBWM", "vBWM"]
 
 
 def is_muscle(cell):
+    """判断给定细胞名称是否为肌肉细胞。
+
+    :param cell: 细胞名称字符串
+    :return: True 表示为肌肉细胞
+    """
     # 匹配 pm/vm/um/dBWM/vBWM 前缀的肌肉名称
     known_muscle_prefixes = get_all_muscle_prefixes()
     return cell.startswith(tuple(known_muscle_prefixes))
 
 
 def is_body_wall_muscle(cell):
+    """判断给定细胞名称是否为体壁肌肉。
+
+    :param cell: 细胞名称字符串
+    :return: True 表示为体壁肌肉
+    """
     # 匹配 dBWM/vBWM 体壁肌肉前缀（舃/腹侧）
     known_muscle_prefixes = get_body_wall_muscle_prefixes()
     return cell.startswith(tuple(known_muscle_prefixes))
 
 
 def is_neuron(cell):
+    """判断给定细胞名称是否为神经元。
+
+    :param cell: 细胞名称字符串
+    :return: True 表示为神经元
+    """
     # CSV 格式中神经元名以大写字母开头，肌肉细胞以小写前缀开头
     return cell[0].isupper()
 
@@ -86,6 +109,11 @@ def remove_leading_index_zero(cell):
 
 
 def get_old_muscle_name(muscle):
+    """将 herm_full_edgelist_MODIFIED 格式的肌肉名称转换为标准命名格式。
+
+    :param muscle: 原始肌肉名称，如 'vBWML05'
+    :return: 标准名称，如 'MVL05'；无法匹配时返回 None
+    """
     # 将 vBWML01 / dBWMR23 转换为标准名称 MVL01 / MDR23
     # 返回值格式与 ConnectomeReader.PREFERRED_MUSCLE_NAMES 中的名称一致
     index = int(muscle[5:])
@@ -102,6 +130,12 @@ def get_old_muscle_name(muscle):
 
 
 def get_syntype(syntype):
+    """将 CSV 中的穑触类型字符串映射为 ConnectionInfo 标准形式。
+
+    :param syntype: CSV 中的穑触类型，如 'electrical' 或 'chemical'
+    :return: 标准化穑触类型字符串
+    :raises NotImplementedError: 无法解析的穑触类型时抛出
+    """
     # 将 CSV 中的穑触类型字符串转换为 ConnectionInfo 中使用的标准形式
     if syntype == "electrical":
         return "GapJunction"
@@ -112,6 +146,12 @@ def get_syntype(syntype):
 
 
 def get_synclass(cell, syntype):
+    """根据穑触前细胞名称和穑触类型推断神经递质分类。
+
+    :param cell: 穑触前细胞名称
+    :param syntype: 穑触类型（由 get_syntype 处理后的标准形式）
+    :return: 神经递质分类字符串，如 'Generic_GJ'、'GABA'、'Acetylcholine'
+    """
     # 简化处理：通过神经元名称前缀推断神经递质类型
     # DD/VD 类运动神经元发出 GABA，其他使用乙酰胆碱
     # dirty hack
@@ -124,6 +164,11 @@ def get_synclass(cell, syntype):
 
 
 def parse_row(row):
+    """解析 CSV 中的单行数据，返回连接信息元组。
+
+    :param row: csv.DictReader 返回的字典行
+    :return: 元组 (pre, post, num, syntype, synclass)
+    """
     pre = str.strip(row["Source"])
     post = str.strip(row["Target"])
     num = int(row["Weight"])

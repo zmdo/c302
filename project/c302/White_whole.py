@@ -5,7 +5,7 @@
 #   以供比较 notebook 使用。数据源：White et al. 1986 完整成虫连接组（whole）。
 #
 # 类与方法索引：
-#   main1                                (L29)   — main1 函数
+#   main1                                (L29)   — 读取 White_whole 连接组数据并打印统计摘要
 #
 # 更新日志：
 #   2026-04-16  zmdo  添加中文注释（计划1 阶段二）
@@ -27,6 +27,7 @@ read_muscle_data = White_whole.read_muscle_data
 
 
 def main1():
+    """读取 White_whole 连接组数据并打印统计摘要。"""
     cells, neuron_conns = read_data(include_nonconnected_cells=True)
     neurons2muscles, muscles, muscle_conns = read_muscle_data()
     analyse_connections(cells, neuron_conns, neurons2muscles, muscles, muscle_conns)

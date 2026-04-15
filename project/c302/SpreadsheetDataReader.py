@@ -6,9 +6,9 @@
 #   read_muscle_data() 接口。支持两种 XLS 数据源（神经元连接/肌肉连接）。
 #
 # 类与方法索引：
-#   read_data                            (L43)   — read_data 函数
-#   read_muscle_data                     (L103)  — read_muscle_data 函数
-#   main                                 (L132)  — main 函数
+#   read_data                            (L43)   — 从 XLS 文件读取神经元连接数据
+#   read_muscle_data                     (L111)  — 从 CElegansNeuronTables.xls 第 1 工作表读取神经肌肉连接数据
+#   main                                 (L147)  — main 函数
 #
 # 更新日志：
 #   2026-04-16  zmdo  添加中文注释（计划1 阶段二）
@@ -41,6 +41,14 @@ READER_DESCRIPTION = (
 
 
 def read_data(include_nonconnected_cells=False, neuron_connect=False):
+    """从 XLS 文件读取神经元连接数据。
+
+    :param include_nonconnected_cells: 为 True 时将已知无连接神经元也加入返回列表
+    :param neuron_connect: 为 True 时使用 NeuronConnectFormatted.xlsx；否则使用 CElegansNeuronTables.xls
+    :return: 元组 (cells, conns)
+             - cells: 神经元名称列表
+             - conns: ConnectionInfo 连接对象列表
+    """
     # 支持两种 XLS 数据源：
     # - neuron_connect=True  使用 NeuronConnectFormatted.xlsx（仅神经元间连接）
     # - neuron_connect=False 使用 CElegansNeuronTables.xls（神经元+肌肉连接）
@@ -101,6 +109,13 @@ def read_data(include_nonconnected_cells=False, neuron_connect=False):
 
 
 def read_muscle_data():
+    """从 CElegansNeuronTables.xls 第 1 工作表读取神经肌肉连接数据。
+
+    :return: 元组 (neurons, muscles, conns)
+             - neurons: 有肌肉连接的运动神经元名称列表
+             - muscles: 肌肉细胞名称列表
+             - conns: 神经肌肉 ConnectionInfo 连接对象列表
+    """
     conns = []
     neurons = []
     muscles = []

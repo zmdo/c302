@@ -4,19 +4,21 @@
 #   覆盖正常注释变更、代码变更检测、空文件、Unicode、语法错误等边界用例。
 #
 # 类与方法索引：
-#   TestStripComments                    (L33)   — 测试 strip_comments 函数的各种场景
-#     test_removes_inline_comment        (L36)   — 验证行内注释被正确去除
-#     test_removes_standalone_comment_line (L44)   — 验证独立注释行被去除
-#     test_preserves_hash_in_string      (L51)   — 验证字符串中的 # 不被误删
-#     test_empty_file                    (L58)   — 验证空文件不报错
-#   TestNormalizeCode                    (L64)   — 测试 normalize_code 函数的格式化一致性
-#     test_equivalent_after_comment_removal (L67)   — 验证注释行导致的空行差异不影响归一化结果
-#   TestVerifyFile                       (L75)   — 测试 verify_file 函数的验证逻辑
-#     _write_temp                        (L78)   — 创建临时文件并写入内容，返回路径
-#     test_comment_only_change_passes    (L86)   — 仅注释变更时验证应通过
-#     test_translate_comment_passes      (L92)   — 英文注释翻译为中文时验证应通过
-#     test_code_change_fails             (L98)   — 代码变更时验证应失败
-#     test_identical_files_pass          (L104)  — 完全相同的文件应通过验证
+#   TestStripComments                    (L35)   — 测试 strip_comments 函数的各种场景
+#     test_removes_inline_comment        (L38)   — 验证行内注释被正确去除
+#     test_removes_standalone_comment_line (L46)   — 验证独立注释行被去除
+#     test_preserves_hash_in_string      (L53)   — 验证字符串中的 # 不被误删
+#     test_empty_file                    (L60)   — 验证空文件不报错
+#   TestNormalizeCode                    (L66)   — 测试 normalize_code 函数的格式化一致性
+#     test_equivalent_after_comment_removal (L69)   — 验证注释行导致的空行差异不影响归一化结果
+#   TestVerifyFile                       (L77)   — 测试 verify_file 函数的验证逻辑
+#     _write_temp                        (L80)   — 创建临时文件并写入内容，返回路径
+#     test_comment_only_change_passes    (L88)   — 仅注释变更时验证应通过
+#     test_translate_comment_passes      (L94)   — 英文注释翻译为中文时验证应通过
+#     test_code_change_fails             (L100)  — 代码变更时验证应失败
+#     test_identical_files_pass          (L106)  — 完全相同的文件应通过验证
+#     test_add_docstring_passes          (L112)  — 新增 docstring 时验证应通过（docstring 属于允许变更范围）
+#     test_translate_docstring_passes    (L119)  — 将英文 docstring 翻译为中文时验证应通过
 #
 # 更新日志：
 #   2026-04-16  zmdo  初始版本
@@ -105,6 +107,19 @@ class TestVerifyFile(unittest.TestCase):
         """完全相同的文件应通过验证。"""
         orig = self._write_temp("x = 1\ny = 2\n")
         mod = self._write_temp("x = 1\ny = 2\n")
+        self.assertTrue(verify_file(str(orig), str(mod)))
+
+    def test_add_docstring_passes(self) -> None:
+        """新增 docstring 时验证应通过（docstring 属于允许变更范围）。"""
+        orig = self._write_temp("def foo():\n    return 1\n")
+        # 为函数新增 docstring，可执行逻辑不变
+        mod = self._write_temp('def foo():\n    """函数说明。"""\n    return 1\n')
+        self.assertTrue(verify_file(str(orig), str(mod)))
+
+    def test_translate_docstring_passes(self) -> None:
+        """将英文 docstring 翻译为中文时验证应通过。"""
+        orig = self._write_temp('def foo():\n    """English doc."""\n    return 1\n')
+        mod = self._write_temp('def foo():\n    """中文说明。"""\n    return 1\n')
         self.assertTrue(verify_file(str(orig), str(mod)))
 
 

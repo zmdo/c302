@@ -4,12 +4,17 @@
 #   通过去除注释后格式化再比较 SHA-256 哈希值来判断代码是否等价。
 #
 # 类与方法索引：
-#   strip_comments                       (L32)   — 去除 Python 源码中所有注释，保留其他所有 token
-#   normalize_code                       (L50)   — 通过 ast.parse + ast.unparse 格式化代码，消除空白差异
-#   hash_code                            (L64)   — 计算代码字符串的 SHA-256 哈希值
-#   verify_file                          (L74)   — 验证两个文件是否代码等价（仅注释不同）
-#   verify_directory                     (L112)  — 批量验证目录下所有 .py 文件的代码等价性
-#   main                                 (L133)  — CLI 入口：接收原始路径和修改后路径，执行验证
+#   StripDocstrings                      (L37)   — AST 转换器：移除模块、类、函数中的 docstring，以便对比时忽略 docstring 变更
+#     _strip_body                        (L40)   — 若 body 首个语句为字符串常量（docstring），则移除它
+#     visit_Module                       (L58)   — 处理模块级 docstring
+#     visit_FunctionDef                  (L68)   — 处理普通函数/方法的 docstring
+#     visit_ClassDef                     (L81)   — 处理类的 docstring
+#   strip_comments                       (L92)   — 去除 Python 源码中所有注释，保留其他所有 token
+#   normalize_code                       (L110)  — 通过 ast.parse + StripDocstrings + ast.unparse 格式化代码，消除空白与 docstring 差异
+#   hash_code                            (L128)  — 计算代码字符串的 SHA-256 哈希值
+#   verify_file                          (L138)  — 验证两个文件是否代码等价（仅注释不同）
+#   verify_directory                     (L176)  — 批量验证目录下所有 .py 文件的代码等价性
+#   main                                 (L197)  — CLI 入口：接收原始路径和修改后路径，执行验证
 #
 # 更新日志：
 #   2026-04-16  zmdo  初始版本
@@ -27,6 +32,61 @@ from pathlib import Path
 
 # 配置 logger，仅输出消息本身（不附加时间戳或级别前缀），用于 CLI 工具输出
 logger = logging.getLogger(__name__)
+
+
+class StripDocstrings(ast.NodeTransformer):
+    """AST 转换器：移除模块、类、函数中的 docstring，以便对比时忽略 docstring 变更。"""
+
+    def _strip_body(self, body: list) -> list:
+        """若 body 首个语句为字符串常量（docstring），则移除它。
+
+        :param body: AST 语句列表
+        :return: 去除 docstring 后的语句列表；若 body 因此变空则插入 pass 防止非法 AST
+        """
+        # 判断首句是否为 Expr(Constant(str)) 形式的 docstring
+        if (
+            body
+            and isinstance(body[0], ast.Expr)
+            and isinstance(body[0].value, ast.Constant)
+            and isinstance(body[0].value.value, str)
+        ):
+            remaining = body[1:]
+            # 若去掉 docstring 后 body 为空，插入 pass 语句防止生成非法 AST
+            return remaining if remaining else [ast.Pass()]
+        return body
+
+    def visit_Module(self, node: ast.Module) -> ast.Module:
+        """处理模块级 docstring。
+
+        :param node: 模块 AST 节点
+        :return: 移除 docstring 后的模块节点
+        """
+        node.body = self._strip_body(node.body)
+        self.generic_visit(node)
+        return node
+
+    def visit_FunctionDef(self, node: ast.FunctionDef) -> ast.FunctionDef:
+        """处理普通函数/方法的 docstring。
+
+        :param node: 函数定义 AST 节点
+        :return: 移除 docstring 后的函数节点
+        """
+        node.body = self._strip_body(node.body)
+        self.generic_visit(node)
+        return node
+
+    # 异步函数与普通函数处理方式相同
+    visit_AsyncFunctionDef = visit_FunctionDef
+
+    def visit_ClassDef(self, node: ast.ClassDef) -> ast.ClassDef:
+        """处理类的 docstring。
+
+        :param node: 类定义 AST 节点
+        :return: 移除 docstring 后的类节点
+        """
+        node.body = self._strip_body(node.body)
+        self.generic_visit(node)
+        return node
 
 
 def strip_comments(source: str) -> str:
@@ -48,14 +108,18 @@ def strip_comments(source: str) -> str:
 
 
 def normalize_code(source: str) -> str:
-    """通过 ast.parse + ast.unparse 格式化代码，消除空白差异。
+    """通过 ast.parse + StripDocstrings + ast.unparse 格式化代码，消除空白与 docstring 差异。
 
     :param source: 去除注释后的 Python 源码字符串
     :return: 格式化后的代码字符串；解析失败时返回原字符串
     """
     try:
+        tree = ast.parse(source)
+        # 移除所有 docstring，使 docstring 的新增/修改不触发代码变更警告
+        tree = StripDocstrings().visit(tree)
+        ast.fix_missing_locations(tree)
         # ast.unparse 将语法树重新序列化，消除注释行造成的空行差异
-        return ast.unparse(ast.parse(source))
+        return ast.unparse(tree)
     except SyntaxError:
         # 解析失败时直接使用去注释后的原始文本
         return source

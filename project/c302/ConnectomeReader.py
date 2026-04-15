@@ -7,22 +7,22 @@
 #   ConnectionInfo 数据类用于统一表示突触连接记录。
 #
 # 类与方法索引：
-#   convert_to_preferred_muscle_name     (L450)  — convert_to_preferred_muscle_name 函数
-#   get_all_muscle_prefixes              (L465)  — get_all_muscle_prefixes 函数
-#   get_body_wall_muscle_prefixes        (L469)  — get_body_wall_muscle_prefixes 函数
-#   is_muscle                            (L473)  — is_muscle 函数
-#   is_body_wall_muscle                  (L479)  — is_body_wall_muscle 函数
-#   is_neuron                            (L485)  — is_neuron 函数
-#   remove_leading_index_zero            (L490)  — Returns neuron name with an index without leading zero. E.g. VB01 -> VB1.
-#   ConnectionInfo                       (L501)  — ConnectionInfo 类
-#     __init__                           (L502)  — __init__ 函数
-#     __str__                            (L509)  — __str__ 函数
-#     short                              (L518)  — short 函数
-#     __eq__                             (L525)  — __eq__ 函数
-#     __lt__                             (L534)  — __lt__ 函数
-#     __repr__                           (L540)  — __repr__ 函数
-#   check_neurons                        (L544)  — check_neurons 函数
-#   analyse_connections                  (L561)  — analyse_connections 函数
+#   convert_to_preferred_muscle_name     (L450)  — 将非标准体壁肌肉名称转换为标准命名格式
+#   get_all_muscle_prefixes              (L470)  — 返回所有已知肌肉名称前缀列表（含体壁肌肉和咽部肌肉）
+#   get_body_wall_muscle_prefixes        (L478)  — 返回体壁肌肉专属前缀列表，不含咽部肌肉前缀（pm/vm/um）
+#   is_muscle                            (L486)  — 判断给定细胞名称是否为肌肉细胞（含体壁肌肉和咽部肌肉）
+#   is_body_wall_muscle                  (L497)  — 判断给定细胞名称是否为体壁肌肉（排除咽部肌肉）
+#   is_neuron                            (L508)  — 判断给定细胞是否为神经元（非体壁肌肉即视为神经元）
+#   remove_leading_index_zero            (L518)  — Returns neuron name with an index without leading zero. E.g. VB01 -> VB1.
+#   ConnectionInfo                       (L529)  — 表示两个细胞之间的一条突触连接记录
+#     __init__                           (L536)  — __init__ 函数
+#     __str__                            (L543)  — __str__ 函数
+#     short                              (L552)  — 返回连接的简短文字描述（不含突触计数）
+#     __eq__                             (L563)  — __eq__ 函数
+#     __lt__                             (L572)  — __lt__ 函数
+#     __repr__                           (L578)  — __repr__ 函数
+#   check_neurons                        (L582)  — 将细胞列表与标准神经元名称集合做三路比对，返回比对结果
+#   analyse_connections                  (L607)  — 打印连接组完整统计摘要，用于调试和验证数据读取器输出的完整性
 #
 # 更新日志：
 #   2026-04-16  zmdo  添加中文注释（计划1 阶段二）
@@ -448,6 +448,11 @@ PREFERRED_MUSCLE_NAMES = [
 
 
 def convert_to_preferred_muscle_name(muscle):
+    """将非标准体壁肌肉名称转换为标准命名格式。
+
+    :param muscle: 原始肌肉名称字符串，如 'BWM-VL01'
+    :return: 标准格式名称，如 'MVL01'；无法识别时返回原名加 '???'
+    """
     if muscle.startswith("BWM-VL"):
         return "MVL%s" % muscle[6:]
     elif muscle.startswith("BWM-VR"):
@@ -463,26 +468,49 @@ def convert_to_preferred_muscle_name(muscle):
 
 
 def get_all_muscle_prefixes():
+    """返回所有已知肌肉名称前缀列表（含体壁肌肉和咽部肌肉）。
+
+    :return: 肌肉前缀字符串列表
+    """
     return ["pm", "vm", "um", "BWM-D", "BWM-V", "LegacyBodyWallMuscles", "vBWM", "dBWM"]
 
 
 def get_body_wall_muscle_prefixes():
+    """返回体壁肌肉专属前缀列表，不含咽部肌肉前缀（pm/vm/um）。
+
+    :return: 体壁肌肉前缀字符串列表
+    """
     return ["BWM-D", "BWM-V", "LegacyBodyWallMuscles", "vBWM", "dBWM"]
 
 
 def is_muscle(cell):
+    """判断给定细胞名称是否为肌肉细胞（含体壁肌肉和咽部肌肉）。
+
+    :param cell: 细胞名称字符串
+    :return: True 表示为肌肉细胞，False 表示不是
+    """
     # 检查细胞名称前缀是否属于已知肌肉前缀列表（pm/vm/um/BWM-D/BWM-V 等）
     known_muscle_prefixes = get_all_muscle_prefixes()
     return cell.startswith(tuple(known_muscle_prefixes))
 
 
 def is_body_wall_muscle(cell):
+    """判断给定细胞名称是否为体壁肌肉（排除咽部肌肉）。
+
+    :param cell: 细胞名称字符串
+    :return: True 表示为体壁肌肉，False 表示不是
+    """
     # 仅匹配体壁肌肉前缀（BWM-D/BWM-V/vBWM/dBWM），排除咽部肌肉（pm/vm/um）
     known_muscle_prefixes = get_body_wall_muscle_prefixes()
     return cell.startswith(tuple(known_muscle_prefixes))
 
 
 def is_neuron(cell):
+    """判断给定细胞是否为神经元（非体壁肌肉即视为神经元）。
+
+    :param cell: 细胞名称字符串
+    :return: True 表示为神经元，False 表示为体壁肌肉
+    """
     # 非体壁肌肉即视为神经元，利用 is_body_wall_muscle 的互补逻辑快速判断
     return not is_body_wall_muscle(cell)
 
@@ -499,6 +527,12 @@ def remove_leading_index_zero(cell):
 
 
 class ConnectionInfo:
+    """表示两个细胞之间的一条突触连接记录。
+
+    封装突触前/后细胞名称、突触数量、类型和神经递质分类，
+    是 c302 各数据读取器统一返回的连接数据结构。
+    """
+
     def __init__(self, pre_cell, post_cell, number, syntype, synclass):
         self.pre_cell = pre_cell  # 突触前细胞名称（发送信号方）
         self.post_cell = post_cell  # 突触后细胞名称（接收信号方）
@@ -516,6 +550,10 @@ class ConnectionInfo:
         )
 
     def short(self):
+        """返回连接的简短文字描述（不含突触计数）。
+
+        :return: 格式为 'Connection from X to Y (syntype)' 的字符串
+        """
         return "Connection from %s to %s (%s)" % (
             self.pre_cell,
             self.post_cell,
@@ -542,6 +580,14 @@ class ConnectionInfo:
 
 
 def check_neurons(cells):
+    """将细胞列表与标准神经元名称集合做三路比对，返回比对结果。
+
+    :param cells: 待校验的细胞名称列表
+    :return: 三元组 (preferred, not_in_preferred, missing_preferred)
+             - preferred: 在标准集中找到的名称
+             - not_in_preferred: 不在标准集中的名称（可能为肌肉或未知细胞）
+             - missing_preferred: 标准集中未出现的神经元名称
+    """
     # 校验神经元名称：将输入列表与 PREFERRED_NEURON_NAMES 标准集做三路比较
     preferred = []  # 在标准集中找到的神经元
     not_in_preferred = []  # 不在标准集中的名称（可能是肌肉或未知细胞）
@@ -559,6 +605,14 @@ def check_neurons(cells):
 
 
 def analyse_connections(cells, neuron_conns, neurons2muscles, muscles, muscle_conns):
+    """打印连接组完整统计摘要，用于调试和验证数据读取器输出的完整性。
+
+    :param cells: 神经元名称列表
+    :param neuron_conns: 神经元间 ConnectionInfo 连接列表
+    :param neurons2muscles: 有肌肉连接的运动神经元名称列表
+    :param muscles: 肌肉细胞名称列表
+    :param muscle_conns: 神经肌肉 ConnectionInfo 连接列表
+    """
     # 打印连接组统计摘要，用于调试和验证数据读取器输出的完整性
     print_("Found %s cells: %s\n" % (len(cells), sorted(cells)))
     # assert(len(cells) == 302)

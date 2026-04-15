@@ -5,13 +5,13 @@
 #   缓存结果，提供与其他数据读取器一致的 read_data() 和 read_muscle_data() 接口。
 #
 # 类与方法索引：
-#   OpenWormReader                       (L48)   — OpenWormReader 类
-#     __init__                           (L50)   — __init__ 函数
-#     get_cells_in_model                 (L54)   — get_cells_in_model 函数
-#     read_data                          (L62)   — read_data 函数
-#     read_muscle_data                   (L80)   — read_muscle_data 函数
-#     _read_connections                  (L84)   — _read_connections 函数
-#   format_muscle_name                   (L162)  — format_muscle_name 函数
+#   OpenWormReader                       (L48)   — 封装 owmeta Bundle 查询接口的连接组数据读取器
+#     __init__                           (L56)   — __init__ 函数
+#     get_cells_in_model                 (L60)   — 提取 owmeta 神经网络对象中所有神经元的名称集合
+#     read_data                          (L73)   — 读取神经元间连接数据
+#     read_muscle_data                   (L98)   — 读取神经肌肉连接数据
+#     _read_connections                  (L109)  — 内部方法：执行 owmeta Bundle 查询并返回连接列表
+#   format_muscle_name                   (L192)  — 将 owmeta 返回的肌肉名称转换为 c302 标准命名格式
 #
 # 更新日志：
 #   2026-04-16  zmdo  添加中文注释（计划1 阶段二）
@@ -46,12 +46,23 @@ LOGGER = logging.getLogger(__name__)
 
 
 class OpenWormReader(object):
+    """封装 owmeta Bundle 查询接口的连接组数据读取器。
+
+    实现与其他数据读取器相同的 read_data/read_muscle_data 接口，
+    将 owmeta 语义知识图谱查询结果转换为 ConnectionInfo 对象列表。
+    """
+
     # 封装 owmeta Bundle 查询接口，实现和其他数据读取器相同的 read_data/read_muscle_data 接口
     def __init__(self):
         # 缓存标志：True 表示已执行过 Bundle 查询，后续调用直接使用缓存数据
         self.cached = False
 
     def get_cells_in_model(self, net):
+        """提取 owmeta 神经网络对象中所有神经元的名称集合。
+
+        :param net: owmeta NeuronNetwork 对象
+        :return: 神经元名称字符串集合
+        """
         # 提取神经网络中所有神经元的名称集合
         cell_names = set()
         for n in net.neurons():
@@ -60,6 +71,13 @@ class OpenWormReader(object):
         return cell_names
 
     def read_data(self, include_nonconnected_cells=False):
+        """读取神经元间连接数据。
+
+        :param include_nonconnected_cells: 为 True 时将无连接神经元也加入返回列表
+        :return: 元组 (cells, conns)
+                 - cells: 神经元名称列表
+                 - conns: ConnectionInfo 连接对象列表
+        """
         print_("Initialising OpenWormReader")
 
         try:
@@ -78,10 +96,22 @@ class OpenWormReader(object):
             return pre + post, conns
 
     def read_muscle_data(self):
+        """读取神经肌肉连接数据。
+
+        :return: 元组 (neurons, muscles, conns)
+                 - neurons: 有肌肉连接的运动神经元名称列表
+                 - muscles: 肌肉细胞名称列表
+                 - conns: 神经肌肉 ConnectionInfo 连接对象列表
+        """
         cell_names, neurons, muscles, conns = self._read_connections("muscle")
         return neurons, muscles, conns
 
     def _read_connections(self, termination=None):
+        """内部方法：执行 owmeta Bundle 查询并返回连接列表。
+
+        :param termination: 过滤类型，'neuron' / 'muscle' / None（全部）
+        :return: 元组 (cell_names_list, pre_cell_names, post_cell_names, conns)
+        """
         # 如果没有缓存，执行 Bundle 查询并缓存结果
         if not self.cached:
             with Bundle("openworm/owmeta-data", version=6) as bnd:
@@ -160,6 +190,11 @@ class OpenWormReader(object):
 
 
 def format_muscle_name(muscle_name):
+    """将 owmeta 返回的肌肉名称转换为 c302 标准命名格式。
+
+    :param muscle_name: owmeta 返回的原始肌肉名称
+    :return: c302 标准格式的肌肉名称；无法解析时返回原名
+    """
     md = MUSCLE_RE.fullmatch(muscle_name)
     if md:
         return muscle_name
