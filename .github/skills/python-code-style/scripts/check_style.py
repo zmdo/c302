@@ -9,14 +9,14 @@
 #     __init__                       (L59)   — 初始化问题实例
 #     __str__                        (L73)   — 字符串表示
 #   check_file_header                (L77)   — 检查文件头部注释
-#   check_docstrings                 (L98)   — 检查公开函数的 docstring
-#   check_type_annotations           (L135)  — 检查类型注解覆盖率
-#   check_print_usage                (L180)  — 检查 print() 使用
-#   check_star_import                (L208)  — 检查通配符导入
-#   check_single_quotes              (L223)  — 检查引号风格
-#   check_file                       (L269)  — 对单个文件执行检查
-#   check_directory                  (L297)  — 递归检查目录
-#   main                             (L323)  — 脚本入口
+#   check_docstrings                 (L100)  — 检查公开函数的 docstring
+#   check_type_annotations           (L137)  — 检查类型注解覆盖率
+#   check_print_usage                (L182)  — 检查 print() 使用
+#   check_star_import                (L213)  — 检查通配符导入
+#   check_single_quotes              (L228)  — 检查引号风格
+#   check_file                       (L274)  — 对单个文件执行检查
+#   check_directory                  (L302)  — 递归检查目录
+#   main                             (L328)  — 脚本入口
 #
 # 更新日志：
 #   2026-03-28  Copilot  初始创建
@@ -32,7 +32,7 @@ Python 代码规范检查脚本。
     python check_style.py <file_or_directory> [--verbose]
 
 检查项：
-    1. 文件头注释（功能描述 / 更新日志 / 当前维护者）
+    1. 文件头注释（功能描述 / 类与方法索引 / 更新日志 / 当前维护者）
     2. 公开函数/方法有 docstring
     3. 函数参数与返回值有类型注解
     4. 使用双引号字符串（而非单引号）
@@ -82,11 +82,13 @@ def check_file_header(filepath: str, lines: list[str]) -> list[StyleIssue]:
     :return: 问题列表
     """
     issues: list[StyleIssue] = []
-    # 仅检查前 20 行
-    header_block = "\n".join(lines[:20])
+    # 扫描前 50 行以覆盖包含较长索引块的文件头
+    header_block = "\n".join(lines[:50])
 
     if "功能描述" not in header_block:
         issues.append(StyleIssue(filepath, 1, "H001", "缺少文件头「功能描述」字段"))
+    if "类与方法索引" not in header_block:
+        issues.append(StyleIssue(filepath, 1, "H004", "缺少文件头「类与方法索引」字段"))
     if "更新日志" not in header_block:
         issues.append(StyleIssue(filepath, 1, "H002", "缺少文件头「更新日志」字段"))
     if "当前维护者" not in header_block:
@@ -187,8 +189,11 @@ def check_print_usage(filepath: str, lines: list[str]) -> list[StyleIssue]:
     issues: list[StyleIssue] = []
     fname = Path(filepath).name
 
-    # 跳过测试文件和本脚本
+    # 跳过测试文件和 CLI 脚本
     if fname.startswith("test_") or fname == "check_style.py":
+        return issues
+    # 跳过 scripts 目录下的工具脚本（CLI 工具合理使用 print）
+    if "/scripts/" in filepath or "\\scripts\\" in filepath:
         return issues
 
     pattern = re.compile(r"^\s*print\s*\(")

@@ -188,6 +188,34 @@ The script checks:
 6. `print()` usage in non-test files
 7. `import *` usage
 
+### Index Auto-Generation
+
+Generate or update the class/method index automatically:
+
+```bash
+# 预览索引（不修改文件）
+python skills/python-code-style/scripts/gen_index.py <file_or_directory>
+
+# 就地更新文件头部索引
+python skills/python-code-style/scripts/gen_index.py <file_or_directory> --write
+```
+
+The script:
+- Parses AST to extract all class/function/method definitions with line numbers
+- Uses docstring first lines as descriptions
+- Replaces existing index block or inserts a new one after 功能描述 section
+- May need **two runs** on self-referencing files (index entry count change shifts line numbers)
+
+### Index Verification
+
+Verify that header index matches actual code:
+
+```bash
+python skills/python-code-style/scripts/check_index.py <file_or_directory>
+```
+
+Reports: missing entries, extra entries, line number drift, hierarchy errors.
+
 For detailed coding rules, load `references/sp-code-2026-001-summary.md`.
 
 ## Workflow
@@ -216,7 +244,21 @@ Apply fixes following the standard:
 - **Missing comments** → Add inline comments for all key logic blocks
 - **Missing unit tests** → Create `tests/test_{module}.py` with positive + edge case tests
 
-### Step 5: Verify Unit Tests
+### Step 5: Update & Verify Index (每次修改后必做)
+
+After ANY code modification (add/delete/move functions, classes, or methods), run:
+
+```bash
+# 自动更新索引
+python skills/python-code-style/scripts/gen_index.py <modified_files> --write
+
+# 检查索引是否正确
+python skills/python-code-style/scripts/check_index.py <modified_files>
+```
+
+**重要：** 如果 gen_index 更新后 check_index 仍报错，再执行一次 gen_index + check_index（索引条目数变化会导致行号偏移，需迭代收敛）。
+
+### Step 6: Verify Unit Tests
 
 Run `pytest` on the corresponding test file to ensure tests pass:
 
@@ -224,7 +266,7 @@ Run `pytest` on the corresponding test file to ensure tests pass:
 pytest tests/test_{module_name}.py -v
 ```
 
-### Step 6: Re-check
+### Step 7: Re-check
 
 Run the check script again to confirm all issues are resolved.
 
@@ -232,7 +274,8 @@ Run the check script again to confirm all issues are resolved.
 
 - The file header uses `# =====...=====` separators (at least 10 `=` chars), not `"""` docstrings
 - **类与方法索引是强制的**：头部必须包含文件内所有类、函数、方法的分层索引，并标注行号和一句话描述
-- 修改代码后必须同步更新索引中的行号，否则视为不合规
+- **每次修改代码后必须执行** `gen_index.py --write` + `check_index.py` 确保索引与代码一致
+- 自引用文件可能需要执行两次 gen_index 才能收敛（索引条目数变化会导致行号偏移）
 - Docstrings use reST (`:param:`, `:return:`) not Google or NumPy style
 - Type annotations must use Python 3.10+ syntax (`list[str]` not `List[str]`, `str | None` not `Optional[str]`)
 - Comments are in Chinese but keywords like `:param:`, `TODO`, `FIXME` stay in English
