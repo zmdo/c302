@@ -2,10 +2,8 @@
 
 ############################################################
 
-#    A simple script to read the values in CElegansNeuronTables.xls.
-
-#    This is one of a number of interchangeable "Readers" which can
-#    be used to get connection data for c302
+#    读取 CElegansNeuronTables.xls 中神经元连接数据的简单脚本。
+#    该模块是多个可互换“数据读取器”之一，可为 c302 提供连接数据
 
 ############################################################
 
@@ -17,6 +15,7 @@ from c302 import print_
 from xlrd import open_workbook
 import os
 
+# XLS 数据文件目录：和模块文件处于同一 data/ 子目录
 spreadsheet_location = os.path.dirname(os.path.abspath(__file__)) + "/data/"
 
 
@@ -26,7 +25,9 @@ READER_DESCRIPTION = (
 
 
 def read_data(include_nonconnected_cells=False, neuron_connect=False):
-    # reading the NeuronConnectFormatted.xls file if neuron_connect = True
+    # 支持两种 XLS 数据源：
+    # - neuron_connect=True  使用 NeuronConnectFormatted.xlsx（仅神经元间连接）
+    # - neuron_connect=False 使用 CElegansNeuronTables.xls（神经元+肌肉连接）
     if neuron_connect:
         conns = []
         cells = []
@@ -39,6 +40,7 @@ def read_data(include_nonconnected_cells=False, neuron_connect=False):
             post = str(rb.sheet_by_index(0).cell(row, 1).value)
             syntype = rb.sheet_by_index(0).cell(row, 2).value
             num = int(rb.sheet_by_index(0).cell(row, 3).value)
+            # 判断突触类型：包含 'EJ'则为缝隙连接（电穑触），否则为化学穑触
             synclass = "Generic_GJ" if "EJ" in syntype else "Chemical_Synapse"
 
             conns.append(ConnectionInfo(pre, post, num, syntype, synclass))
@@ -52,11 +54,14 @@ def read_data(include_nonconnected_cells=False, neuron_connect=False):
     else:
         conns = []
         cells = []
+        # CElegansNeuronTables.xls 表格结构：第 0 工作表为神经元连接，
+        # 列顺序：0=pre 1=post 2=syntype 3=num 4=synclass
         filename = "%sCElegansNeuronTables.xls" % spreadsheet_location
         rb = open_workbook(filename)
 
         print_("Opened Excel file: " + filename)
 
+        # CANL/CANR/VC6 在数据文件中没有连接记录，需要单独添加以包含它们
         known_nonconnected_cells = ["CANL", "CANR", "VC6"]
 
         for row in range(1, rb.sheet_by_index(0).nrows):
@@ -84,6 +89,7 @@ def read_muscle_data():
     neurons = []
     muscles = []
 
+    # 肌肉连接存在于同一 XLS 文件的第 1 工作表（索引 1）
     filename = "%sCElegansNeuronTables.xls" % spreadsheet_location
     rb = open_workbook(filename)
 
@@ -94,7 +100,7 @@ def read_muscle_data():
     for row in range(1, sheet.nrows):
         pre = str(sheet.cell(row, 0).value)
         post = str(sheet.cell(row, 1).value)
-        syntype = "Send"
+        syntype = "Send"  # 肌肉连接均为化学穑触（Send）
         num = int(sheet.cell(row, 2).value)
         synclass = sheet.cell(row, 3).value.replace(",", "plus").replace(" ", "_")
 

@@ -2,12 +2,14 @@
 
 ############################################################
 
-#    Utilities for reading/writing/parsing NeuroML 2 files
+#    用于读取、写入和解析 NeuroML 2 文件的工具集
 
 ############################################################
 
 from c302 import print_
 
+# 302 个标准神经元名称列表，来源于 White et al. 1986 论文和 WormAtlas 数据库
+# 用于 check_neurons() 校验数据读取器返回的神经元名称是否与该标准集一致
 PREFERRED_NEURON_NAMES = [
     "ADAL",
     "ADAR",
@@ -312,6 +314,8 @@ PREFERRED_NEURON_NAMES = [
     "VD8",
     "VD9",
 ]
+# 线虫标准体壁肌肉名称列表，共 96 块（含 MANAL 和 MVULVA）
+# 命名格式：MD/MV（背/腹）+ L/R（左/右）+ 两位数序号，例如 MDL01、MVR23
 PREFERRED_MUSCLE_NAMES = [
     "MANAL",
     "MDL01",
@@ -437,16 +441,19 @@ def get_body_wall_muscle_prefixes():
 
 
 def is_muscle(cell):
+    # 检查细胞名称前缀是否属于已知肌肉前缀列表（pm/vm/um/BWM-D/BWM-V 等）
     known_muscle_prefixes = get_all_muscle_prefixes()
     return cell.startswith(tuple(known_muscle_prefixes))
 
 
 def is_body_wall_muscle(cell):
+    # 仅匹配体壁肌肉前缀（BWM-D/BWM-V/vBWM/dBWM），排除咽部肌肉（pm/vm/um）
     known_muscle_prefixes = get_body_wall_muscle_prefixes()
     return cell.startswith(tuple(known_muscle_prefixes))
 
 
 def is_neuron(cell):
+    # 非体壁肌肉即视为神经元，利用 is_body_wall_muscle 的互补逻辑快速判断
     return not is_body_wall_muscle(cell)
 
 
@@ -454,6 +461,8 @@ def remove_leading_index_zero(cell):
     """
     Returns neuron name with an index without leading zero. E.g. VB01 -> VB1.
     """
+    # 规范化神经元编号：不同数据源对编号补零的处理不一致（如 VB01 vs VB1），
+    # 统一去掉倒数第二位的前导零以匹配 PREFERRED_NEURON_NAMES 中的标准形式
     if is_neuron(cell) and cell[-2:].startswith("0"):
         return "%s%s" % (cell[:-2], cell[-1:])
     return cell
@@ -461,11 +470,11 @@ def remove_leading_index_zero(cell):
 
 class ConnectionInfo:
     def __init__(self, pre_cell, post_cell, number, syntype, synclass):
-        self.pre_cell = pre_cell
-        self.post_cell = post_cell
-        self.number = number
-        self.syntype = syntype
-        self.synclass = synclass
+        self.pre_cell = pre_cell  # 突触前细胞名称（发送信号方）
+        self.post_cell = post_cell  # 突触后细胞名称（接收信号方）
+        self.number = number  # 突触数量，表示该对细胞间的突触计数（连接权重）
+        self.syntype = syntype  # 突触类型：'Send'（化学突触）或 'GapJunction'（电突触）
+        self.synclass = synclass  # 突触分类：神经递质类别，如 'Acetylcholine'、'GABA'、'Generic_GJ'
 
     def __str__(self):
         return "Connection from %s to %s (%i times, type: %s, neurotransmitter: %s)" % (
@@ -503,14 +512,16 @@ class ConnectionInfo:
 
 
 def check_neurons(cells):
-    preferred = []
-    not_in_preferred = []
-    missing_preferred = [n for n in PREFERRED_NEURON_NAMES]
+    # 校验神经元名称：将输入列表与 PREFERRED_NEURON_NAMES 标准集做三路比较
+    preferred = []  # 在标准集中找到的神经元
+    not_in_preferred = []  # 不在标准集中的名称（可能是肌肉或未知细胞）
+    missing_preferred = [n for n in PREFERRED_NEURON_NAMES]  # 标准集中尚未出现的神经元
     for c in cells:
         if c not in PREFERRED_NEURON_NAMES:
             not_in_preferred.append(c)
         else:
             preferred.append(c)
+        # 从缺失列表中移除已出现的神经元，剩余即为数据中未覆盖的标准神经元
         if c in missing_preferred:
             missing_preferred.remove(c)
 
@@ -518,10 +529,12 @@ def check_neurons(cells):
 
 
 def analyse_connections(cells, neuron_conns, neurons2muscles, muscles, muscle_conns):
+    # 打印连接组统计摘要，用于调试和验证数据读取器输出的完整性
     print_("Found %s cells: %s\n" % (len(cells), sorted(cells)))
     # assert(len(cells) == 302)
     # print_("Expected number of cells correct if include_nonconnected_cells=True")
 
+    # 校验神经元名称，找出非标准名称和标准集中缺失的神经元
     preferred, not_in_preferred, missing_preferred = check_neurons(cells)
 
     print_(
@@ -535,8 +548,9 @@ def analyse_connections(cells, neuron_conns, neurons2muscles, muscles, muscle_co
         print_("   %s" % c)
 
     print_("   ...\n")
-    nts = {}
-    nts_tot = {}
+    # 按神经递质类别统计神经元间连接条数和序列突触总数
+    nts = {}  # 每种神经递质类型的连接条数
+    nts_tot = {}  # 每种神经递质类型的穑触总数
     for c in neuron_conns:
         nt = c.synclass
         if nt not in nts:
@@ -555,6 +569,7 @@ def analyse_connections(cells, neuron_conns, neurons2muscles, muscles, muscle_co
     print_("   ---  Muscles  ---")
     print_("")
 
+    # 打印肌肉细胞统计，包括未识别的肌肉和神经肌肉连接情况
     print_("Found %s muscles: %s\n" % (len(muscles), sorted(muscles)))
     not_in_preferred = []
     for m in muscles:
@@ -600,6 +615,7 @@ def analyse_connections(cells, neuron_conns, neurons2muscles, muscles, muscle_co
 
     core_set = ["AVBL", "PVCL", "VA6", "VB6", "VD6", "DB4", "DD4"]
     # core_set = ['VA6', 'VD6']
+    # 对小型核心神经元子集进行连接详细列印，便于调试网络拓扑
     print_("\n\nConnections between cells in the subset %s:\n" % (core_set))
 
     for c in neuron_conns:

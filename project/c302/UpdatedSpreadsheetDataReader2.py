@@ -2,10 +2,10 @@
 
 ############################################################
 
-#    A simple script to read the values in herm_full_edgelist.csv.
+#    读取 herm_full_edgelist_MODIFIED.csv 中神经元连接数据的简单脚本。
+#    与 UpdatedSpreadsheetDataReader 相比，使用的 CSV 为手动修改版（MODIFIED）。
 
-#    This is on of a number of interchangeable "Readers" which can
-#    be used to get connection data for c302
+#    该模块是多个可互换“数据读取器”之一，可为 c302 提供连接数据
 
 ############################################################
 
@@ -18,7 +18,9 @@ import os
 
 from c302 import print_
 
+# CSV 数据文件目录：和模块文件处于同一 data/ 子目录
 spreadsheet_location = os.path.dirname(os.path.abspath(__file__)) + "/data/"
+# MODIFIED 版本是在原始 herm_full_edgelist.csv 基础上手动调整的修正版本
 filename = "%sherm_full_edgelist_MODIFIED.csv" % spreadsheet_location
 
 
@@ -31,16 +33,19 @@ def get_body_wall_muscle_prefixes():
 
 
 def is_muscle(cell):
+    # 匹配 pm/vm/um/dBWM/vBWM 前缀的肌肉名称
     known_muscle_prefixes = get_all_muscle_prefixes()
     return cell.startswith(tuple(known_muscle_prefixes))
 
 
 def is_body_wall_muscle(cell):
+    # 匹配 dBWM/vBWM 体壁肌肉前缀（舃/腹侧）
     known_muscle_prefixes = get_body_wall_muscle_prefixes()
     return cell.startswith(tuple(known_muscle_prefixes))
 
 
 def is_neuron(cell):
+    # CSV 格式中神经元名以大写字母开头，肌肉细胞以小写前缀开头
     return cell[0].isupper()
 
 
@@ -48,12 +53,15 @@ def remove_leading_index_zero(cell):
     """
     Returns neuron name with an index without leading zero. E.g. VB01 -> VB1.
     """
+    # 规范化神经元编号：去掉倒数第二位的前导零，使其与 PREFERRED_NEURON_NAMES 一致
     if is_neuron(cell) and cell[-2:].startswith("0"):
         return "%s%s" % (cell[:-2], cell[-1:])
     return cell
 
 
 def get_old_muscle_name(muscle):
+    # 将 vBWML01 / dBWMR23 转换为标准名称 MVL01 / MDR23
+    # 返回值格式与 ConnectomeReader.PREFERRED_MUSCLE_NAMES 中的名称一致
     index = int(muscle[5:])
     if index < 10:
         index = "0%s" % index
@@ -68,6 +76,7 @@ def get_old_muscle_name(muscle):
 
 
 def get_syntype(syntype):
+    # 将 CSV 中的穑触类型字符串转换为 ConnectionInfo 中使用的标准形式
     if syntype == "electrical":
         return "GapJunction"
     elif syntype == "chemical":
@@ -77,6 +86,8 @@ def get_syntype(syntype):
 
 
 def get_synclass(cell, syntype):
+    # 简化处理：通过神经元名称前缀推断神经递质类型
+    # DD/VD 类运动神经元发出 GABA，其他使用乙酰胆碱
     # dirty hack
     if syntype == "GapJunction":
         return "Generic_GJ"
@@ -117,13 +128,14 @@ def read_data(include_nonconnected_cells=False):
             pre, post, num, syntype, synclass = parse_row(row)
 
             if not is_neuron(pre) or not is_neuron(post):
-                continue  # pre or post is not a neuron
+                continue  # 跳过：pre 或 post 不是神经元（可能是肌肉细胞）
 
             pre = remove_leading_index_zero(pre)
             post = remove_leading_index_zero(post)
 
             conns.append(ConnectionInfo(pre, post, num, syntype, synclass))
             # print ConnectionInfo(pre, post, num, syntype, synclass)
+            # 将神经元加入并去重，保证神经元列表不重复
             if pre not in cells:
                 cells.append(pre)
             if post not in cells:
@@ -159,6 +171,7 @@ def read_muscle_data():
             if (
                 not is_neuron(pre) and not is_body_wall_muscle(pre)
             ) or not is_body_wall_muscle(post):
+                # 跳过：只保留 pre=神经元 且 post=体壁肌肉 的连接
                 # Don't add connections unless pre=neuron and post=body_wall_muscle
                 continue
 

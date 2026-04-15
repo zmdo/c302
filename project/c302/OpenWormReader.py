@@ -17,8 +17,8 @@ except Exception:
 
 ############################################################
 
-#   A simple script to read the values in owmeta
-#   Originally written by Mark Watts (github.com/mwatts15)
+#   读取 owmeta 项目数据库中神经元连接数据的简单脚本
+#   原作者：Mark Watts（github.com/mwatts15）
 
 ############################################################
 
@@ -26,10 +26,13 @@ LOGGER = logging.getLogger(__name__)
 
 
 class OpenWormReader(object):
+    # 封装 owmeta Bundle 查询接口，实现和其他数据读取器相同的 read_data/read_muscle_data 接口
     def __init__(self):
+        # 缓存标志：True 表示已执行过 Bundle 查询，后续调用直接使用缓存数据
         self.cached = False
 
     def get_cells_in_model(self, net):
+        # 提取神经网络中所有神经元的名称集合
         cell_names = set()
         for n in net.neurons():
             cell_names.add(str(n.name()))
@@ -59,10 +62,11 @@ class OpenWormReader(object):
         return neurons, muscles, conns
 
     def _read_connections(self, termination=None):
+        # 如果没有缓存，执行 Bundle 查询并缓存结果
         if not self.cached:
             with Bundle("openworm/owmeta-data", version=6) as bnd:
                 ctx = bnd(Context)(ident="http://openworm.org/data").stored
-                # Extract the network object from the worm object.
+                # 从虫对象获取神经网络对象
                 net = ctx(Worm).query().neuron_network()
 
                 syn = net.synapse.expr
@@ -71,17 +75,20 @@ class OpenWormReader(object):
 
                 (pre | post).rdf_type(multiple=True)
 
+                # 预加载所有需要的属性，降低后续遍历时的查询次数
                 (pre | post).name()
                 pre()
                 post()
                 syn.syntype()
                 syn.synclass()
                 syn.number()
+                # 将所有穑触对象转换为 Python对象列表并缓存
                 self.connlist = syn.to_objects()
 
                 self.cell_names = self.get_cells_in_model(net)
             self.cached = True
 
+        # 根据 termination 过滤连接类型：neuron-only、muscle-only 或全部
         if termination == "neuron":
             term_type = set([Neuron.rdf_type])
         elif termination == "muscle":
@@ -105,6 +112,7 @@ class OpenWormReader(object):
                     post_name = format_muscle_name(post_name)
 
                 if not synclass:
+                    # 缺少 synclass时依其他字段猜测，保证生成模型时有有效的 synclass
                     # Hack/guess
                     if syntype and syntype.lower() == "gapjunction":
                         synclass = "Generic_GJ"
@@ -144,8 +152,9 @@ def format_muscle_name(muscle_name):
             return muscle_name
 
 
+# 模块级单例实例，使其接口与其他数据读取器一致（直接调用模块级函数）
 READER = OpenWormReader()
-
+# 为和其他读取器保持相同接口而创建模块级别名
 read_data = READER.read_data
 read_muscle_data = READER.read_muscle_data
 
