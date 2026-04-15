@@ -36,5 +36,5 @@ jobs:
         omv list -V
         if [[ ${OMV_ENGINE} == "NON_OMV_TESTS" ]]; then echo "Continuing with tests not under OMV..."; else exit $OMV_SUCCESS; fi
         echo "Installing..."
-        pip install .
+        pip install ./project
         pip list
