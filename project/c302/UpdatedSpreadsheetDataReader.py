@@ -1,4 +1,30 @@
 # -*- coding: utf-8 -*-
+# =============================================================================
+# 功能描述：
+#   从 herm_full_edgelist.csv（OpenWorm 项目线虫雌雄同体全连接组数据）读取
+#   神经元连接数据的更新版数据读取器。提供更细粒度的突触类型推断逻辑
+#   （get_syntype/get_synclass）和肌肉名称格式转换功能。
+#
+# 类与方法索引：
+#   get_all_muscle_prefixes              (L51)   — get_all_muscle_prefixes 函数
+#   get_body_wall_muscle_prefixes        (L55)   — get_body_wall_muscle_prefixes 函数
+#   is_muscle                            (L59)   — is_muscle 函数
+#   is_body_wall_muscle                  (L65)   — is_body_wall_muscle 函数
+#   is_neuron                            (L71)   — is_neuron 函数
+#   remove_leading_index_zero            (L76)   — Returns neuron name with an index without leading zero. E.g. VB01 -> VB1.
+#   get_old_muscle_name                  (L86)   — get_old_muscle_name 函数
+#   get_syntype                          (L102)  — get_syntype 函数
+#   get_synclass                         (L112)  — get_synclass 函数
+#   parse_row                            (L124)  — parse_row 函数
+#   read_data                            (L133)  — Args:
+#   read_muscle_data                     (L176)  — Returns:
+#   main                                 (L217)  — main 函数
+#
+# 更新日志：
+#   2026-04-16  zmdo  添加中文注释（计划1 阶段二）
+#
+# 当前维护者：zmdo
+# =============================================================================
 
 ############################################################
 

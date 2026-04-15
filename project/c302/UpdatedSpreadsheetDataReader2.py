@@ -1,4 +1,30 @@
 # -*- coding: utf-8 -*-
+# =============================================================================
+# 功能描述：
+#   与 UpdatedSpreadsheetDataReader 功能相同，但使用手动修正版数据文件
+#   herm_full_edgelist_MODIFIED.csv，并对肌肉连接过滤规则做了调整
+#   （仅保留 pre=神经元 且 post=体壁肌肉 的连接，过滤更严格）。
+#
+# 类与方法索引：
+#   get_all_muscle_prefixes              (L53)   — get_all_muscle_prefixes 函数
+#   get_body_wall_muscle_prefixes        (L57)   — get_body_wall_muscle_prefixes 函数
+#   is_muscle                            (L61)   — is_muscle 函数
+#   is_body_wall_muscle                  (L67)   — is_body_wall_muscle 函数
+#   is_neuron                            (L73)   — is_neuron 函数
+#   remove_leading_index_zero            (L78)   — Returns neuron name with an index without leading zero. E.g. VB01 -> VB1.
+#   get_old_muscle_name                  (L88)   — get_old_muscle_name 函数
+#   get_syntype                          (L104)  — get_syntype 函数
+#   get_synclass                         (L114)  — get_synclass 函数
+#   parse_row                            (L126)  — parse_row 函数
+#   read_data                            (L135)  — Args:
+#   read_muscle_data                     (L178)  — Returns:
+#   main                                 (L222)  — main 函数
+#
+# 更新日志：
+#   2026-04-16  zmdo  添加中文注释（计划1 阶段二）
+#
+# 当前维护者：zmdo
+# =============================================================================
 
 ############################################################
 

@@ -1,4 +1,34 @@
 # -*- coding: utf-8 -*-
+# =============================================================================
+# 功能描述：
+#   线虫（C. elegans）连接组数据的读取与解析工具集。
+#   提供 302 个标准神经元名称列表、96 个体壁肌肉名称列表，
+#   以及判断细胞类型、校验神经元名称、统计连接关系的辅助函数。
+#   ConnectionInfo 数据类用于统一表示突触连接记录。
+#
+# 类与方法索引：
+#   convert_to_preferred_muscle_name     (L450)  — convert_to_preferred_muscle_name 函数
+#   get_all_muscle_prefixes              (L465)  — get_all_muscle_prefixes 函数
+#   get_body_wall_muscle_prefixes        (L469)  — get_body_wall_muscle_prefixes 函数
+#   is_muscle                            (L473)  — is_muscle 函数
+#   is_body_wall_muscle                  (L479)  — is_body_wall_muscle 函数
+#   is_neuron                            (L485)  — is_neuron 函数
+#   remove_leading_index_zero            (L490)  — Returns neuron name with an index without leading zero. E.g. VB01 -> VB1.
+#   ConnectionInfo                       (L501)  — ConnectionInfo 类
+#     __init__                           (L502)  — __init__ 函数
+#     __str__                            (L509)  — __str__ 函数
+#     short                              (L518)  — short 函数
+#     __eq__                             (L525)  — __eq__ 函数
+#     __lt__                             (L534)  — __lt__ 函数
+#     __repr__                           (L540)  — __repr__ 函数
+#   check_neurons                        (L544)  — check_neurons 函数
+#   analyse_connections                  (L561)  — analyse_connections 函数
+#
+# 更新日志：
+#   2026-04-16  zmdo  添加中文注释（计划1 阶段二）
+#
+# 当前维护者：zmdo
+# =============================================================================
 
 ############################################################
 

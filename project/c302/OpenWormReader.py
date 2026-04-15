@@ -1,3 +1,23 @@
+# =============================================================================
+# 功能描述：
+#   通过 owmeta 语义知识图谱框架读取线虫神经元连接数据的数据读取器。
+#   原作者：Mark Watts（github.com/mwatts15）。封装 Bundle 查询逻辑并
+#   缓存结果，提供与其他数据读取器一致的 read_data() 和 read_muscle_data() 接口。
+#
+# 类与方法索引：
+#   OpenWormReader                       (L48)   — OpenWormReader 类
+#     __init__                           (L50)   — __init__ 函数
+#     get_cells_in_model                 (L54)   — get_cells_in_model 函数
+#     read_data                          (L62)   — read_data 函数
+#     read_muscle_data                   (L80)   — read_muscle_data 函数
+#     _read_connections                  (L84)   — _read_connections 函数
+#   format_muscle_name                   (L162)  — format_muscle_name 函数
+#
+# 更新日志：
+#   2026-04-16  zmdo  添加中文注释（计划1 阶段二）
+#
+# 当前维护者：zmdo
+# =============================================================================
 import logging
 import re
 
