@@ -1,6 +1,6 @@
 ---
 name: python-code-style
-description: "Review and enforce Python code against SP-CODE-2026-001 coding standard. Check file headers (功能描述/类与方法索引/更新日志/当前维护者), reST docstrings, mandatory inline comments, type annotations, naming conventions, import order, string style, logging usage, and unit test coverage. Use when the user asks to review Python code style, enforce coding standards, check code compliance, or refactor code to meet the project's Python conventions. Also use when writing new Python files to ensure they conform from the start. Every Python function/method MUST have comments and corresponding unit tests."
+description: "基于 SP-CODE-2026-001 编码规范审查和强制执行 Python 代码风格。检查文件头（功能描述/类与方法索引/更新日志/当前维护者）、reST 文档字符串、强制行内注释、类型注解、命名规范、导入顺序、字符串风格、日志使用以及单元测试覆盖。当用户要求审查 Python 代码风格、执行编码规范检查、检查代码合规性或重构代码以符合项目规范时使用。编写新 Python 文件时也应使用以确保从一开始就符合规范。每个 Python 函数/方法必须有注释和对应的单元测试。"
 license: MIT
 compatibility: "c302（C. elegans 神经网络建模框架，OpenWorm 子项目）。Python 3.10+，遵循 SP-CODE-2026-001 编码规范。"
 metadata:
@@ -9,26 +9,26 @@ metadata:
 allowed-tools: Read Edit Terminal
 ---
 
-# Python Code Style Enforcement
+# Python 代码风格强制执行
 
-## When to Use
+## 何时使用
 
-- User asks to review Python code for style compliance
-- User asks to check or enforce coding standards on Python files
-- User is writing new Python modules and needs to follow project conventions
-- User asks to refactor code to match SP-CODE-2026-001
-- User asks "does this code follow the standard?" or similar questions
-- After completing a code refactoring task, to verify compliance
+- 用户要求审查 Python 代码的风格合规性
+- 用户要求检查或执行 Python 文件的编码规范
+- 用户正在编写新的 Python 模块并需要遵循项目规范
+- 用户要求按照 SP-CODE-2026-001 重构代码
+- 用户询问"这段代码符合规范吗？"或类似问题
+- 完成代码重构后，验证合规性
 
-## Core Standard: SP-CODE-2026-001
+## 核心规范：SP-CODE-2026-001
 
-The full coding standard is at `references/SP-CODE-2026-001_Python代码规范.md`. Load it for detailed rules.
+完整编码规范位于 `references/SP-CODE-2026-001_Python代码规范.md`，需要详细规则时加载该文件。
 
-Key rules summarized below:
+以下为关键规则摘要：
 
-### File Header (Required)
+### 文件头（必须）
 
-Every Python source file must start with a header block:
+每个 Python 源文件必须以头部注释块开头：
 
 ```python
 # =============================================================================
@@ -60,9 +60,9 @@ Every Python source file must start with a header block:
 - 当文件内容发生变更时（新增/删除/移动），必须同步更新索引中的行号和条目
 - 模块级常量可选列出，仅在常量数量少且含义重要时列出
 
-### Docstrings (reST Style)
+### 文档字符串（reST 风格）
 
-All public modules, classes, functions, and methods must have docstrings using reStructuredText format:
+所有公开模块、类、函数和方法必须使用 reStructuredText 格式的文档字符串：
 
 ```python
 def example(param1: str, param2: int) -> bool:
@@ -75,29 +75,29 @@ def example(param1: str, param2: int) -> bool:
     """
 ```
 
-### Type Annotations
+### 类型注解
 
-- All function parameters and return values must have type annotations
-- Use Python 3.10+ built-in generics: `list[str]`, `dict[str, Any]`, `str | None`
-- Functions with no return value: `-> None`
+- 所有函数参数和返回值必须有类型注解
+- 使用 Python 3.10+ 内置泛型语法：`list[str]`、`dict[str, Any]`、`str | None`
+- 无返回值的函数标注：`-> None`
 
-### Naming
+### 命名规范
 
-| Type | Style | Example |
-|------|-------|---------|
-| Module/Package | `snake_case` | `data_loader.py` |
-| Class | `PascalCase` | `AgentRunner` |
-| Function/Method | `snake_case` | `run_agent()` |
-| Constant | `UPPER_SNAKE_CASE` | `MAX_RETRY` |
-| Private | `_prefix` | `_internal_state` |
+| 类型 | 风格 | 示例 |
+|------|------|------|
+| 模块/包 | `snake_case` | `data_loader.py` |
+| 类 | `PascalCase` | `AgentRunner` |
+| 函数/方法 | `snake_case` | `run_agent()` |
+| 常量 | `UPPER_SNAKE_CASE` | `MAX_RETRY` |
+| 私有 | `_前缀` | `_internal_state` |
 
-### Strings
+### 字符串
 
-- Use **double quotes** `"` for all strings
-- Use **f-strings** for interpolation
-- No `%` formatting or `+` concatenation
+- 统一使用**双引号** `"` 包裹字符串
+- 使用 **f-string** 进行字符串插值
+- 禁止使用 `%` 格式化或 `+` 拼接
 
-### Comments（强制）
+### 注释（强制）
 
 注释是**强制性要求**，不可省略。每一段逻辑都必须附带注释。
 
@@ -107,28 +107,28 @@ def example(param1: str, param2: int) -> bool:
 - **循环**：`for/while` 循环必须注释说明遍历目的
 - **异常处理**：`try/except` 块必须注释说明捕获原因和处理策略
 - **复杂表达式**：列表推导、生成器表达式、三元运算等必须附注释
-- All comments in **Chinese**, keywords in English (`:param:`, `TODO`, `FIXME`, etc.)
-- Inline comments: 2 spaces before `#`, 1 space after
-- Explain **why**, not **what**
+- 注释统一使用**中文**，关键词保持英文（`:param:`、`TODO`、`FIXME` 等）
+- 行内注释：`#` 前 2 个空格，`#` 后 1 个空格
+- 注释要说明**为什么**，而非**是什么**
 - **缺少注释视为不合规**，与缺少 docstring 同等严重
 
-### Imports
+### 导入顺序
 
-Order: stdlib → third-party → internal, with blank lines between groups.
+顺序：标准库 → 第三方库 → 内部模块，组间空一行。
 
-### Logging
+### 日志规范
 
-- Use `logging` module, never `print()` in production code
-- Use lazy formatting: `logger.info("处理 %d 条记录", count)`
+- 使用 `logging` 模块，生产代码禁止使用 `print()`
+- 使用延迟格式化：`logger.info("处理 %d 条记录", count)`
 
-### Forbidden Practices
+### 禁止事项
 
-- No `from module import *`
-- No bare `except:`
-- No mutable default arguments
-- No `print()` for logging
+- 禁止 `from module import *`
+- 禁止裸 `except:`
+- 禁止可变默认参数
+- 禁止在生产代码中使用 `print()` 输出日志
 
-### Unit Tests（强制）
+### 单元测试（强制）
 
 单元测试是**强制性要求**，每个 Python 模块必须有对应的测试文件。
 
@@ -171,115 +171,115 @@ def test_example_empty_string() -> None:
     assert result is False
 ```
 
-## Automated Check Script
+## 自动检查脚本
 
-Run the checking script to perform basic compliance validation:
+运行检查脚本进行基础合规性验证：
 
 ```bash
-python skills/python-code-style/scripts/check_style.py <file_or_directory>
+python .github/skills/python-code-style/scripts/check_style.py <文件或目录>
 ```
 
-The script checks:
-1. File header presence (功能描述 / 类与方法索引 / 更新日志 / 当前维护者)
-2. Class & method index presence and completeness
-3. Public function docstring presence
-4. Type annotation coverage on function signatures
-5. Single-quote vs double-quote usage
-6. `print()` usage in non-test files
-7. `import *` usage
+脚本检查项：
+1. 文件头字段是否齐全（功能描述 / 类与方法索引 / 更新日志 / 当前维护者）
+2. 类与方法索引是否存在且完整
+3. 公开函数是否有 docstring
+4. 函数签名是否有类型注解
+5. 是否使用了单引号（应使用双引号）
+6. 非测试文件是否使用了 `print()`
+7. 是否使用了 `import *`
 
-### Index Auto-Generation
+### 索引自动生成
 
-Generate or update the class/method index automatically:
+自动生成或更新类与方法索引：
 
 ```bash
 # 预览索引（不修改文件）
-python skills/python-code-style/scripts/gen_index.py <file_or_directory>
+python .github/skills/python-code-style/scripts/gen_index.py <文件或目录>
 
 # 就地更新文件头部索引
-python skills/python-code-style/scripts/gen_index.py <file_or_directory> --write
+python .github/skills/python-code-style/scripts/gen_index.py <文件或目录> --write
 ```
 
-The script:
-- Parses AST to extract all class/function/method definitions with line numbers
-- Uses docstring first lines as descriptions
-- Replaces existing index block or inserts a new one after 功能描述 section
-- May need **two runs** on self-referencing files (index entry count change shifts line numbers)
+脚本功能：
+- 通过 AST 解析提取所有类/函数/方法定义及其行号
+- 使用 docstring 首行作为描述
+- 替换现有索引块，或在功能描述段落后插入新索引
+- 自引用文件可能需要运行**两次**才能收敛（索引条目数变化会导致行号偏移）
 
-### Index Verification
+### 索引验证
 
-Verify that header index matches actual code:
+验证头部索引是否与实际代码一致：
 
 ```bash
-python skills/python-code-style/scripts/check_index.py <file_or_directory>
+python .github/skills/python-code-style/scripts/check_index.py <文件或目录>
 ```
 
-Reports: missing entries, extra entries, line number drift, hierarchy errors.
+报告内容：缺失条目、多余条目、行号偏差、层级错误。
 
-For detailed coding rules, load `references/sp-code-2026-001-summary.md`.
+详细编码规则请加载 `references/sp-code-2026-001-summary.md`。
 
-## Workflow
+## 工作流程
 
-### Step 1: Identify Target Files
+### 步骤 1：确定目标文件
 
-Determine which Python files need checking — single file, directory, or all backend code.
+确定需要检查的 Python 文件——单个文件、目录或全部后端代码。
 
-### Step 2: Run Automated Check
+### 步骤 2：运行自动检查
 
-Execute the check script on the target files to get a compliance report.
+对目标文件执行检查脚本，获取合规性报告。
 
-### Step 3: Review Results
+### 步骤 3：审查结果
 
-Analyze the script output. Each issue lists the file, line, and rule violated.
+分析脚本输出，每个问题列出文件、行号和违反的规则。
 
-### Step 4: Fix Issues
+### 步骤 4：修复问题
 
-Apply fixes following the standard:
-- Missing file header → Add standard header block (including class/method index)
-- Missing/outdated class & method index → Regenerate index with correct line numbers and descriptions
-- Missing docstring → Add reST-style docstring
-- Missing type annotations → Add parameter and return types
-- Single quotes → Replace with double quotes
-- `print()` → Replace with `logging`
-- **Missing comments** → Add inline comments for all key logic blocks
-- **Missing unit tests** → Create `tests/test_{module}.py` with positive + edge case tests
+按照规范进行修复：
+- 缺少文件头 → 添加标准头部注释块（含类与方法索引）
+- 类与方法索引缺失或过时 → 重新生成索引，确保行号和描述正确
+- 缺少 docstring → 添加 reST 风格的文档字符串
+- 缺少类型注解 → 补充参数和返回值类型
+- 使用了单引号 → 替换为双引号
+- 使用了 `print()` → 替换为 `logging`
+- **缺少注释** → 为所有关键逻辑块添加行内注释
+- **缺少单元测试** → 创建 `tests/test_{module}.py`，包含正向和边界测试用例
 
-### Step 5: Update & Verify Index (每次修改后必做)
+### 步骤 5：更新并验证索引（每次修改后必做）
 
-After ANY code modification (add/delete/move functions, classes, or methods), run:
+任何代码修改（新增/删除/移动函数、类或方法）后，运行：
 
 ```bash
 # 自动更新索引
-python skills/python-code-style/scripts/gen_index.py <modified_files> --write
+python .github/skills/python-code-style/scripts/gen_index.py <modified_files> --write
 
 # 检查索引是否正确
-python skills/python-code-style/scripts/check_index.py <modified_files>
+python .github/skills/python-code-style/scripts/check_index.py <modified_files>
 ```
 
 **重要：** 如果 gen_index 更新后 check_index 仍报错，再执行一次 gen_index + check_index（索引条目数变化会导致行号偏移，需迭代收敛）。
 
-### Step 6: Verify Unit Tests
+### 步骤 6：验证单元测试
 
-Run `pytest` on the corresponding test file to ensure tests pass:
+对相应测试文件运行 `pytest`，确保测试通过：
 
 ```bash
 pytest tests/test_{module_name}.py -v
 ```
 
-### Step 7: Re-check
+### 步骤 7：二次检查
 
-Run the check script again to confirm all issues are resolved.
+再次运行检查脚本，确认所有问题已解决。
 
-## Gotchas
+## 注意事项
 
-- The file header uses `# =====...=====` separators (at least 10 `=` chars), not `"""` docstrings
+- 文件头使用 `# =====...=====` 分隔线（至少 10 个 `=`），而非 `"""` 文档字符串
 - **类与方法索引是强制的**：头部必须包含文件内所有类、函数、方法的分层索引，并标注行号和一句话描述
 - **每次修改代码后必须执行** `gen_index.py --write` + `check_index.py` 确保索引与代码一致
 - 自引用文件可能需要执行两次 gen_index 才能收敛（索引条目数变化会导致行号偏移）
-- Docstrings use reST (`:param:`, `:return:`) not Google or NumPy style
-- Type annotations must use Python 3.10+ syntax (`list[str]` not `List[str]`, `str | None` not `Optional[str]`)
-- Comments are in Chinese but keywords like `:param:`, `TODO`, `FIXME` stay in English
-- The checking script performs basic static analysis only; it does not replace `ruff` or `mypy`
+- 文档字符串使用 reST 风格（`:param:`、`:return:`），不使用 Google 或 NumPy 风格
+- 类型注解必须使用 Python 3.10+ 语法（`list[str]` 而非 `List[str]`，`str | None` 而非 `Optional[str]`）
+- 注释统一使用中文，但 `:param:`、`TODO`、`FIXME` 等关键词保持英文
+- 检查脚本仅执行基础静态分析，不替代 `ruff` 或 `mypy`
 - **注释是强制的**：没有注释的函数体视为不合规，即使逻辑简单也要注释说明意图
 - **单元测试是强制的**：每个新增/修改的 Python 模块必须有对应 `tests/test_*.py`，没有测试不可提交
 - 测试文件本身也必须遵循 docstring 和注释规范
