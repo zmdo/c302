@@ -4,9 +4,19 @@
 #   覆盖正常注释变更、代码变更检测、空文件、Unicode、语法错误等边界用例。
 #
 # 类与方法索引：
-#   TestStripComments            (L 24) — strip_comments 函数测试
-#   TestNormalizeCode            (L 53) — normalize_code 函数测试
-#   TestVerifyFile               (L 65) — verify_file 函数测试
+#   TestStripComments                    (L33)   — 测试 strip_comments 函数的各种场景
+#     test_removes_inline_comment        (L36)   — 验证行内注释被正确去除
+#     test_removes_standalone_comment_line (L44)   — 验证独立注释行被去除
+#     test_preserves_hash_in_string      (L51)   — 验证字符串中的 # 不被误删
+#     test_empty_file                    (L58)   — 验证空文件不报错
+#   TestNormalizeCode                    (L64)   — 测试 normalize_code 函数的格式化一致性
+#     test_equivalent_after_comment_removal (L67)   — 验证注释行导致的空行差异不影响归一化结果
+#   TestVerifyFile                       (L75)   — 测试 verify_file 函数的验证逻辑
+#     _write_temp                        (L78)   — 创建临时文件并写入内容，返回路径
+#     test_comment_only_change_passes    (L86)   — 仅注释变更时验证应通过
+#     test_translate_comment_passes      (L92)   — 英文注释翻译为中文时验证应通过
+#     test_code_change_fails             (L98)   — 代码变更时验证应失败
+#     test_identical_files_pass          (L104)  — 完全相同的文件应通过验证
 #
 # 更新日志：
 #   2026-04-16  zmdo  初始版本

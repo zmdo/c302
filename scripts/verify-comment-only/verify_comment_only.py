@@ -4,12 +4,12 @@
 #   通过去除注释后格式化再比较 SHA-256 哈希值来判断代码是否等价。
 #
 # 类与方法索引：
-#   strip_comments          (L 30) — 去除 Python 源码中的所有注释 token
-#   normalize_code          (L 47) — 格式化去注释后的代码（通过 ast.unparse）
-#   hash_code               (L 61) — 计算格式化代码的 SHA-256 哈希值
-#   verify_file             (L 72) — 验证单个文件对是否仅有注释变更
-#   verify_directory        (L 101) — 批量验证目录下所有 .py 文件
-#   main                    (L 119) — CLI 入口
+#   strip_comments                       (L32)   — 去除 Python 源码中所有注释，保留其他所有 token
+#   normalize_code                       (L50)   — 通过 ast.parse + ast.unparse 格式化代码，消除空白差异
+#   hash_code                            (L64)   — 计算代码字符串的 SHA-256 哈希值
+#   verify_file                          (L74)   — 验证两个文件是否代码等价（仅注释不同）
+#   verify_directory                     (L112)  — 批量验证目录下所有 .py 文件的代码等价性
+#   main                                 (L133)  — CLI 入口：接收原始路径和修改后路径，执行验证
 #
 # 更新日志：
 #   2026-04-16  zmdo  初始版本
@@ -19,10 +19,14 @@
 import ast
 import hashlib
 import io
+import logging
 import os
 import sys
 import tokenize
 from pathlib import Path
+
+# 配置 logger，仅输出消息本身（不附加时间戳或级别前缀），用于 CLI 工具输出
+logger = logging.getLogger(__name__)
 
 
 def strip_comments(source: str) -> str:
@@ -87,20 +91,20 @@ def verify_file(original_path: str, modified_path: str) -> bool:
     modified_hash = hash_code(modified_norm)
 
     if original_hash == modified_hash:
-        print(f"[OK]   {os.path.basename(modified_path)} — 代码等价，仅注释变更")
+        logger.info("[OK]   %s — 代码等价，仅注释变更", os.path.basename(modified_path))
         return True
     else:
-        print(f"[FAIL] {os.path.basename(modified_path)} — 代码不等价！")
-        print(f"       原始 Hash:  {original_hash}")
-        print(f"       修改后 Hash: {modified_hash}")
-        # 输出差异行以辅助定位
+        logger.error("[FAIL] %s — 代码不等价！", os.path.basename(modified_path))
+        logger.error("       原始 Hash:  %s", original_hash)
+        logger.error("       修改后 Hash: %s", modified_hash)
+        # 输出首个差异行以辅助定位
         orig_lines = original_norm.splitlines()
         mod_lines = modified_norm.splitlines()
         for i, (ol, ml) in enumerate(zip(orig_lines, mod_lines), 1):
             if ol != ml:
-                print(f"       首个差异行 {i}:")
-                print(f"         原始:   {ol!r}")
-                print(f"         修改后: {ml!r}")
+                logger.error("       首个差异行 %d:", i)
+                logger.error("         原始:   %r", ol)
+                logger.error("         修改后: %r", ml)
                 break
         return False
 
@@ -119,7 +123,7 @@ def verify_directory(original_dir: str, modified_dir: str) -> bool:
         rel = py_file.relative_to(modified_dir)
         orig_file = Path(original_dir) / rel
         if not orig_file.exists():
-            print(f"[SKIP] {rel} — 原始文件不存在，跳过")
+            logger.warning("[SKIP] %s — 原始文件不存在，跳过", rel)
             continue
         if not verify_file(str(orig_file), str(py_file)):
             all_passed = False
@@ -128,8 +132,11 @@ def verify_directory(original_dir: str, modified_dir: str) -> bool:
 
 def main() -> None:
     """CLI 入口：接收原始路径和修改后路径，执行验证。"""
+    # 配置 logging 输出到 stdout，格式仅保留消息本身，与原 print 行为一致
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO, format="%(message)s")
+
     if len(sys.argv) != 3:
-        print("用法: python verify_comment_only.py <原始文件或目录> <修改后文件或目录>")
+        logger.error("用法: python verify_comment_only.py <原始文件或目录> <修改后文件或目录>")
         sys.exit(1)
 
     original_path = sys.argv[1]
@@ -141,7 +148,7 @@ def main() -> None:
     elif os.path.isfile(original_path) and os.path.isfile(modified_path):
         success = verify_file(original_path, modified_path)
     else:
-        print("错误：两个路径必须同为文件或同为目录")
+        logger.error("错误：两个路径必须同为文件或同为目录")
         sys.exit(1)
 
     sys.exit(0 if success else 1)
