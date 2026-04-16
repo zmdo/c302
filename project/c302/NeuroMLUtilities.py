@@ -7,7 +7,7 @@
 # 类与方法索引：
 #   getSegmentIds                        (L21)   — 提取细胞形态学中所有片段的 ID 列表
 #   get3DPosition                        (L34)   — 计算细胞指定片段上某点的三维坐标
-#   fract                                (L65)   — 在两点之间进行线性插值
+#   fract                                (L66)   — 在两点之间进行线性插值
 #
 # 更新日志：
 #   2026-04-16  Copilot  添加中文 docstring 和行内注释
@@ -57,6 +57,7 @@ def get3DPosition(cell, segment_index, fraction_along):
     fy = fract(start.y, end.y, fraction_along)
     fz = fract(start.z, end.z, fraction_along)
 
+    # [调试] 可取消注释以检查插值前后坐标与 fraction_along 的关系
     # print "(%f, %f, %f) is %f between (%f, %f, %f) and (%f, %f, %f)"%(fx,fy,fz,fraction_along,start.x,start.y,start.z,end.x,end.y,end.z)
 
     return fx, fy, fz

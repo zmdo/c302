@@ -6,7 +6,7 @@
 #
 # 类与方法索引：
 #   generate_c302_info                   (L19)   — 从 NeuroML 文档生成神经元和肌肉的汇总信息表
-#   _info_set                            (L136)  — 将集合排序后用逗号连接为字符串
+#   _info_set                            (L138)  — 将集合排序后用逗号连接为字符串
 #
 # 更新日志：
 #   2026-04-16  Copilot  添加中文 docstring 和行内注释
@@ -108,6 +108,7 @@ def generate_c302_info(nml_doc, verbose=False):
     for n in all_neuron_info:
         info += "<tr>\n"
         ni = all_neuron_info[n]
+        # [调试] 可取消注释以检查单个神经元信息元组的结构
         # print(ni)
         info += (
             "<td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>Colour: %s</td>"
@@ -129,6 +130,7 @@ def generate_c302_info(nml_doc, verbose=False):
     info += "</table>\n"
 
     with open("examples/summary/summary.md", "w") as f2:
+        # [备选] 以下为同时写出 HTML 包装页的旧写法，当前仅输出 Markdown 摘要
         # f2.write('<html><body>%s</body></html>'%info)
         f2.write("%s" % info)
 

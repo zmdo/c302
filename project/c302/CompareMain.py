@@ -8,10 +8,10 @@
 #   comparitor                           (L28)   — 比较两个 XLS 连接组数据文件的差异
 #   getColumns                           (L106)  — 从制表符分隔的文本文件中读取列数据
 #   getColumnsXls                        (L140)  — 从 XLS 电子表格文件中读取列数据
-#   sortTwoColumns                       (L177)  — 按前两列（From/To 神经元）对字典进行排序
-#   formatNames                          (L186)  — 格式化神经元名称，移除中间的填充零
-#   matchLists                           (L199)  — 比较两个连接列表，提取匹配对并从原列表中移除
-#   typeMapping                          (L322)  — 连接类型映射（未完成）
+#   sortTwoColumns                       (L182)  — 按前两列（From/To 神经元）对字典进行排序
+#   formatNames                          (L191)  — 格式化神经元名称，移除中间的填充零
+#   matchLists                           (L204)  — 比较两个连接列表，提取匹配对并从原列表中移除
+#   typeMapping                          (L332)  — 连接类型映射（未完成）
 #
 # 更新日志：
 #   2026-04-16  Copilot  添加中文 docstring 和行内注释
@@ -148,24 +148,29 @@ def getColumnsXls(fileIn):
     cols = {}
     indexName = {}
     workbook = xlrd.open_workbook(fileIn)
+    # [废弃] 以下为按工作表名称读取的旧写法，当前统一读取第一个工作表
     # worksheet = workbook.sheet_by_name('Sheet1')
     worksheet = workbook.sheet_by_index(0)
     num_rows = worksheet.nrows - 1
+    # [备选] 也可读取工作表的全部列数，当前仅处理前 4 列
     # num_cells = worksheet.ncols
     num_cells = 3
     curr_row = 0
     for c in range(4):
         indexName[c] = str(worksheet.cell_value(curr_row, c))
         cols[indexName[c]] = []
+        # [调试] 可取消注释以检查表头列名是否读取正确
         # print(indexName[c])
     while curr_row < num_rows:
         curr_row += 1
+        # [调试] 以下为逐行读取工作表时的旧调试输出
         # row = worksheet.row(curr_row)
         # print('Row:', curr_row)
         curr_cell = -1
         while curr_cell < num_cells:
             curr_cell += 1
             # Cell Types: 0=Empty, 1=Text, 2=Number, 3=Date, 4=Boolean, 5=Error, 6=Blank
+            # [调试] 可取消注释以检查 xlrd 解析出的单元格类型与内容
             # cell_type = worksheet.cell_type(curr_row, curr_cell)
             cell_value = str(worksheet.cell_value(curr_row, curr_cell))
             # print('	', cell_type, ':', cell_value)
@@ -232,6 +237,7 @@ def matchLists(cols1, cols2, indexName1, indexName2):
         for p1, x1 in enumerate(zip(col1[indexNames1[0]], col1[indexNames1[1]])):
             if x1 == pair:
                 index1 = p1
+        # [废弃] 以下为早期使用列表推导查找匹配索引的旧实现
         # ind = [p for p,x in enumerate(zip(cols1[indexName1[0], cols1[indexName1[1]]])) if x == pair]
         # 若短列表中包含当前连接对...
         if zip(col2[indexNames2[0]], col2[indexNames2[1]]).__contains__(pair):
@@ -242,6 +248,7 @@ def matchLists(cols1, cols2, indexName1, indexName2):
             if not zip(matches[indexNames1[0]], matches[indexNames1[1]]).__contains__(
                 ([pair[0]], [pair[1]])
             ):
+                # [调试] 以下为检查 matches 内容和中间条件分支的旧调试输出
                 # print(matches[indexNames1[0]], matches[indexNames1[1]])
                 for i in range(len(indexNames1)):
                     if col1[indexNames1[i]][index1] == col2[indexNames2[i]][index2]:
@@ -292,10 +299,12 @@ def matchLists(cols1, cols2, indexName1, indexName2):
 
     # ── 第 3 轮：在长列表中查找与已匹配对方向相反的连接（A→B vs B→A） ──
     for pair in zip(col1[indexNames1[0]], col1[indexNames1[1]]):
+        # [废弃] 以下为构造反向连接对的旧辅助变量，当前直接内联比较
         # reversepair = [pair[1],pair[0]]
         for p1, x1 in enumerate(zip(col1[indexNames1[0]], col1[indexNames1[1]])):
             if x1 == pair:
                 index1 = p1
+        # [废弃] 以下为旧版反向匹配条件判断，现已由下方统一逻辑替代
         # if zip(matches[indexNames1[1]],matches[indexNames1[0]]).__contains__(([pair[0]], [pair[1]])):
         for p4, x4 in enumerate(zip(matches[indexNames1[0]], matches[indexNames1[1]])):
             if x4 == ([pair[1]], [pair[0]]):
@@ -303,6 +312,7 @@ def matchLists(cols1, cols2, indexName1, indexName2):
         if zip(matches[indexNames1[0]], matches[indexNames1[1]]).__contains__(
             ([pair[1]], [pair[0]])
         ):
+            # [调试] 以下为检查反向匹配索引和列表长度的旧调试输出
             # print(zip(matches[indexNames1[0]], matches[indexNames1[1]]))
             # print(([pair[1]], [pair[0]]))
             for i in range(len(indexNames1)):
@@ -320,6 +330,7 @@ def matchLists(cols1, cols2, indexName1, indexName2):
 # 'R', 'Rp', 'S', 'Sp' 映射为 'Send'（化学突触）。
 # 'NMJ' 无对应映射。
 def typeMapping(cols1, cols2, indexName1, indexName2):
+    # [备选] 以下为早期预设的连接类型映射表，当前函数仍保留为占位实现
     # list1 = ["GapJunction", "Send"]
     # list2 = ["EJ", "NMJ", "R", "Rp", "S", "Sp"]
     # type1 = cols1[indexName1[2]]
@@ -341,6 +352,7 @@ if __name__ == "__main__":
     fName1 = "CElegansNeuronTables.xls"
     fName2 = "NeuronConnectFormatted.xlsx"
 
+    # [废弃] 以下为开发阶段使用的本地绝对路径，当前已改为仓库相对文件名
     # file1 = "C:\\Users\\Ari\\Documents\\Projects\\OpenWorm\\book1.txt"
     # file2 = "C:\\Users\\Ari\\Documents\\Projects\\OpenWorm\\book2.txt"
     # xfile1 = "C:\\Users\\Ari\\Documents\\Projects\\OpenWorm\\CElegansNeuroML\\CElegansNeuronTables.xls"
