@@ -122,3 +122,14 @@ arm64
 /examples/parametersweep/average_last_1percent_GenericNeuronCellW2D.png
 /examples/parametersweep/heatmap_GenericNeuronCellW2D.png
 openworm/
+
+# project_r1 构建产物与复制数据
+/project_r1/build/
+/project_r1/*.egg-info/
+/project_r1/c302.egg-info/
+/project_r1/data/morphology/
+/project_r1/data/connectome/
+/project_r1/data/xml/
+/project_r1/data/parameters/
+/project_r1/tests/reference_outputs/
+/project_r1/.pytest_cache/
