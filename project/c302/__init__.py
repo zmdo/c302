@@ -7,35 +7,35 @@
 # 类与方法索引：
 #   print_                               (L137)  — 带 ``c302`` 前缀的调试输出，用于区分框架自身的日志信息
 #   load_data_reader                     (L148)  — 动态导入并返回指定名称的数据读取器模块
-#   get_str_from_exponential             (L163)  — 将浮点数格式化为 15 位小数的字符串表示（如 1e-05 → "0.000010000000000")
-#   get_muscle_position                  (L174)  — 根据肌肉名称计算其在虫体中的三维坐标
-#   is_muscle                            (L210)  — 判断细胞名称是否为肌肉（匹配 ``M[VD][LR]<digits>`` 模式）
-#   process_args                         (L219)  — Parse command-line arguments.
-#   get_next_stim_id                     (L381)  — 为指定细胞生成下一个不重复的刺激 ID
-#   get_cell_position                    (L399)  — 从 NeuroML 多室形态文件中读取细胞 soma 位置
-#   append_input_to_nml_input_list       (L419)  — 将刺激输入追加到 NeuroML 网络的 ``InputList`` 中
-#   add_new_sinusoidal_input             (L441)  — 为指定细胞创建正弦波刺激输入
-#   add_new_input                        (L485)  — 为指定细胞创建脉冲刺激输入（``PulseGenerator``）
-#   get_muscle_names                     (L502)  — 生成全部 96 条体壁肌肉的名称列表
-#   merge_with_template                  (L523)  — 使用 Airspeed 模板引擎将变量字典与 LEMS 模板文件合并
-#   write_to_file                        (L535)  — 将生成的 NeuroML 网络和 LEMS 仿真文件写入磁盘
-#   get_projection_id                    (L590)  — 根据突触前/后细胞和突触类型生成标准 Projection ID
-#   get_random_colour_hex                (L609)  — 生成随机十六进制颜色字符串（``#RRGGBB``），用于绘图颜色分配
-#   get_file_name_relative_to_c302       (L625)  — 返回相对于 ``C302_HOME`` 环境变量的文件路径
-#   get_cell_names_and_connection        (L635)  — 读取连接组数据，返回所有细胞名称和突触连接列表
-#   get_cell_muscle_names_and_connection (L658)  — 读取神经元-肌肉连接数据，返回运动神经元、已知肌肉列表和肌肉连接
-#   is_cond_based_cell                   (L691)  — 判断参数层级是否为导电模型（Level C 或 D 系列）
-#   get_cell_id_string                   (L700)  — 构建 NeuroML 中引用细胞实例的路径字符串
-#   regex_match                          (L726)  — 当 pattern 为正则表达式时执行匹配
-#   is_regex_string                      (L736)  — 判断字符串是否为正则表达式格式（同时含 ``^`` 和 ``$``）
-#   elem_in_coll_matches_conn            (L745)  — 检查集合中是否有正则元素匹配给定的连接字符串
-#   _get_cell_info                       (L761)  — 从 owmeta Bundle 或本地缓存获取细胞的详细注释信息
-#   set_param                            (L859)  — 设置或新增生物参数值
-#   mirror_param                         (L879)  — 为双向缝隙连接参数设置镜像值（A-B 和 B-A 使用相同参数）
-#   generate                             (L904)  — c302 网络生成主入口，将连接组数据转化为完整的 NeuroML2 网络
-#   parse_list_arg                       (L2063) — 解析 CLI 列表参数字符串为 Python 列表
-#   parse_dict_arg                       (L2085) — 解析 CLI 字典参数字符串为 Python 字典
-#   main                                 (L2106) — c302 CLI 主入口，解析命令行参数并调用 ``generate()``
+#   get_str_from_exponential             (L161)  — 将浮点数格式化为 15 位小数的字符串表示
+#   get_muscle_position                  (L172)  — 根据肌肉名称计算其在虫体中的三维坐标
+#   is_muscle                            (L208)  — 判断细胞名称是否为肌肉（匹配 ``M[VD][LR]<digits>`` 模式）
+#   process_args                         (L217)  — 解析命令行参数
+#   get_next_stim_id                     (L382)  — 为指定细胞生成下一个不重复的刺激 ID
+#   get_cell_position                    (L400)  — 从 NeuroML 多室形态文件中读取细胞 soma 位置
+#   append_input_to_nml_input_list       (L420)  — 将刺激输入追加到 NeuroML 网络的 ``InputList`` 中
+#   add_new_sinusoidal_input             (L442)  — 为指定细胞创建正弦波刺激输入
+#   add_new_input                        (L486)  — 为指定细胞创建脉冲刺激输入（``PulseGenerator``）
+#   get_muscle_names                     (L503)  — 生成全部 96 条体壁肌肉的名称列表
+#   merge_with_template                  (L524)  — 使用 Airspeed 模板引擎将变量字典与 LEMS 模板文件合并
+#   write_to_file                        (L536)  — 将生成的 NeuroML 网络和 LEMS 仿真文件写入磁盘
+#   get_projection_id                    (L591)  — 根据突触前/后细胞和突触类型生成标准 Projection ID
+#   get_random_colour_hex                (L610)  — 生成随机十六进制颜色字符串（``#RRGGBB``），用于绘图颜色分配
+#   get_file_name_relative_to_c302       (L626)  — 返回相对于 ``C302_HOME`` 环境变量的文件路径
+#   get_cell_names_and_connection        (L636)  — 读取连接组数据，返回所有细胞名称和突触连接列表
+#   get_cell_muscle_names_and_connection (L659)  — 读取神经元-肌肉连接数据，返回运动神经元、已知肌肉列表和肌肉连接
+#   is_cond_based_cell                   (L692)  — 判断参数层级是否为导电模型（Level C 或 D 系列）
+#   get_cell_id_string                   (L701)  — 构建 NeuroML 中引用细胞实例的路径字符串
+#   regex_match                          (L727)  — 当 pattern 为正则表达式时执行匹配
+#   is_regex_string                      (L737)  — 判断字符串是否为正则表达式格式（同时含 ``^`` 和 ``$``）
+#   elem_in_coll_matches_conn            (L746)  — 检查集合中是否有正则元素匹配给定的连接字符串
+#   _get_cell_info                       (L762)  — 从 owmeta Bundle 或本地缓存获取细胞的详细注释信息
+#   set_param                            (L860)  — 设置或新增生物参数值
+#   mirror_param                         (L880)  — 为双向缝隙连接参数设置镜像值（A-B 和 B-A 使用相同参数）
+#   generate                             (L905)  — c302 网络生成主入口，将连接组数据转化为完整的 NeuroML2 网络
+#   parse_list_arg                       (L2064) — 解析 CLI 列表参数字符串为 Python 列表
+#   parse_dict_arg                       (L2086) — 解析 CLI 字典参数字符串为 Python 字典
+#   main                                 (L2107) — c302 CLI 主入口，解析命令行参数并调用 ``generate()``
 #
 # 更新日志：
 #   2026-04-16  Copilot  添加中文 docstring 和行内注释（计划1阶段四）
@@ -215,8 +215,11 @@ def is_muscle(cell_name):
 
 
 def process_args():
-    """
-    Parse command-line arguments.
+    """解析命令行参数。
+
+    定义 c302 CLI 支持的各项参数，并返回解析后的命名空间对象。
+
+    :return: argparse.Namespace 对象
     """
     parser = argparse.ArgumentParser(
         "c302",
