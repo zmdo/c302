@@ -1,16 +1,26 @@
+# =============================================================================
+# 功能描述：
+#   Level B 参数层级定义。在 Level A 基础上增加 activity 变量和真实缝隙
+#   连接（GapJunction），使用自定义 IafActivityCell 组件。
 #
 # 类与方法索引：
-#   ParameterisedModel                   (L30)   — ParameterisedModel 类
-#     __init__                           (L31)   — 初始化 Level B 参数模型，继承 Level A 并添加真实缝隙连接和 activity 变量
-#     set_default_bioparameters          (L44)   — 设置 Level B 的默认生物参数，在 Level A 基础上新增 tau1 和真实电突触参数
-#     create_generic_muscle_cell         (L80)   — 创建带 activity 变量的通用肌肉细胞（``IafActivityCell``）
-#     create_generic_neuron_cell         (L96)   — 创建带 activity 变量的通用神经元细胞（``IafActivityCell``）
-#     create_neuron_to_neuron_syn        (L108)  — 创建神经元间化学突触（``ExpTwoSynapse``）和真实缝隙连接（``GapJunction``）
-#     create_neuron_to_muscle_syn        (L135)  — 创建神经元到肌肉的化学突触（``ExpTwoSynapse``）和缝隙连接（``GapJunction``）
-#     get_elec_syn                       (L158)  — 根据连接类型获取真实缝隙连接（``GapJunction``）对象
-#   IafActivityCell                      (L203)  — IafActivityCell 类
-#     __init__                           (L204)  — 初始化带 activity 变量的积分放电细胞，存储所有膜特性参数
-#     export                             (L226)  — 将细胞定义以 NeuroML XML 格式写入输出流
+#   ParameterisedModel                   (L53)   — ParameterisedModel 类
+#     __init__                           (L54)   — 初始化 Level B 参数模型，继承 Level A 并添加真实缝隙连接和 activity 变量
+#     set_default_bioparameters          (L67)   — 设置 Level B 的默认生物参数，在 Level A 基础上新增 tau1 和真实电突触参数
+#     create_generic_muscle_cell         (L107)  — 创建带 activity 变量的通用肌肉细胞（``IafActivityCell``）
+#     create_generic_neuron_cell         (L123)  — 创建带 activity 变量的通用神经元细胞（``IafActivityCell``）
+#     create_neuron_to_neuron_syn        (L135)  — 创建神经元间化学突触（``ExpTwoSynapse``）和真实缝隙连接（``GapJunction``）
+#     create_neuron_to_muscle_syn        (L162)  — 创建神经元到肌肉的化学突触（``ExpTwoSynapse``）和缝隙连接（``GapJunction``）
+#     get_elec_syn                       (L185)  — 根据连接类型获取真实缝隙连接（``GapJunction``）对象
+#   IafActivityCell                      (L230)  — IafActivityCell 类
+#     __init__                           (L231)  — 初始化带 activity 变量的积分放电细胞，存储所有膜特性参数
+#     export                             (L253)  — 将细胞定义以 NeuroML XML 格式写入输出流
+#
+# 更新日志：
+#   2026-04-16  Copilot  添加中文 docstring 和行内注释（计划1阶段三）
+#
+# 当前维护者：Copilot
+# =============================================================================
 """
 
 Parameters B:

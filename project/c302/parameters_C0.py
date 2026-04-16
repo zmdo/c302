@@ -1,21 +1,32 @@
+# =============================================================================
+# 功能描述：
+#   Level C0 参数层级定义。简化的 Morris-Lecar 类导电模型，无快钾通道、
+#   钙通道无失活门控，化学突触改为模拟型（GradedSynapse），适合非放电
+#   神经元网络。
 #
 # 类与方法索引：
-#   ParameterisedModel                   (L33)   — ParameterisedModel 类
-#     __init__                           (L34)   — 初始化 Level C0 参数模型，使用简化的 Morris-Lecar 类导电模型和模拟突触
-#     set_default_bioparameters          (L51)   — param_C = ParameterisedModel_C()
-#     create_models                      (L151)  — 按顺序创建所有网络组件模型
-#     create_generic_muscle_cell         (L159)  — 创建 C0 层级的简化导电肌肉细胞，含慢钾通道和简化钙通道
-#     create_generic_neuron_cell         (L258)  — 创建 C0 层级的简化导电神经元细胞，含慢钾通道和简化钙通道
-#     create_neuron_to_neuron_syn        (L354)  — 创建神经元间模拟突触（``GradedSynapse``）和缝隙连接（``GapJunction``）
-#     create_neuron_to_muscle_syn        (L389)  — 创建神经元到肌肉的模拟突触（``GradedSynapse``）和缝隙连接
-#     get_elec_syn                       (L420)  — 根据连接类型获取缝隙连接（``GapJunction``）对象
-#     get_exc_syn                        (L453)  — 根据连接类型获取兴奋性模拟突触（``GradedSynapse``）对象
-#     get_inh_syn                        (L528)  — 根据连接类型获取抑制性模拟突触（``GradedSynapse``）对象
-#     create_n_connection_synapse        (L604)  — C0 层级重载此方法以支持 GradedSynapse2（自定义双模拟突触）的注册
-#     is_analog_conn                     (L625)  — C0 层级重载此方法以同时识别 ``GradedSynapse2`` 为模拟连接
-#   GradedSynapse2                       (L636)  — GradedSynapse2 类
-#     __init__                           (L637)  — 初始化自定义双模拟突触（GradedSynapse2），存储突触 ID
-#     export                             (L653)  — 将 GradedSynapse2 以 NeuroML XML 格式写入输出流
+#   ParameterisedModel                   (L62)   — ParameterisedModel 类
+#     __init__                           (L63)   — 初始化 Level C0 参数模型，使用简化的 Morris-Lecar 类导电模型和模拟突触
+#     set_default_bioparameters          (L80)   — param_C = ParameterisedModel_C()
+#     create_models                      (L187)  — 按顺序创建所有网络组件模型
+#     create_generic_muscle_cell         (L195)  — 创建 C0 层级的简化导电肌肉细胞，含慢钾通道和简化钙通道
+#     create_generic_neuron_cell         (L294)  — 创建 C0 层级的简化导电神经元细胞，含慢钾通道和简化钙通道
+#     create_neuron_to_neuron_syn        (L390)  — 创建神经元间模拟突触（``GradedSynapse``）和缝隙连接（``GapJunction``）
+#     create_neuron_to_muscle_syn        (L425)  — 创建神经元到肌肉的模拟突触（``GradedSynapse``）和缝隙连接
+#     get_elec_syn                       (L456)  — 根据连接类型获取缝隙连接（``GapJunction``）对象
+#     get_exc_syn                        (L489)  — 根据连接类型获取兴奋性模拟突触（``GradedSynapse``）对象
+#     get_inh_syn                        (L564)  — 根据连接类型获取抑制性模拟突触（``GradedSynapse``）对象
+#     create_n_connection_synapse        (L640)  — C0 层级重载此方法以支持 GradedSynapse2（自定义双模拟突触）的注册
+#     is_analog_conn                     (L661)  — C0 层级重载此方法以同时识别 ``GradedSynapse2`` 为模拟连接
+#   GradedSynapse2                       (L672)  — GradedSynapse2 类
+#     __init__                           (L673)  — 初始化自定义双模拟突触（GradedSynapse2），存储突触 ID
+#     export                             (L689)  — 将 GradedSynapse2 以 NeuroML XML 格式写入输出流
+#
+# 更新日志：
+#   2026-04-16  Copilot  添加中文 docstring 和行内注释（计划1阶段三）
+#
+# 当前维护者：Copilot
+# =============================================================================
 """
 
 Parameters C0:

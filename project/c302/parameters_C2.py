@@ -1,53 +1,64 @@
+# =============================================================================
+# 功能描述：
+#   Level C2 参数层级定义（开发中）。在 C 基础上增加模拟突触、延迟缝隙
+#   连接（DelayedGapJunction）、本体感觉反馈连接（ProprioGapJunction）
+#   等自定义组件，用于探索运动回路时序传播。
 #
 # 类与方法索引：
-#   ParameterisedModel                   (L40)   — ParameterisedModel 类
-#     __init__                           (L41)   — 初始化 Level C2 参数模型，还在开发中（under development）
-#     set_default_bioparameters          (L61)   — 设置 Level C2 的默认生物参数（仍在调整中）
-#     create_models                      (L609)  — 按顺序创建所有网络组件：偏置电流和浓度模型、肌肉细胞、神经元细胞、
-#     create_generic_muscle_cell         (L620)  — 创建 C2 层级的肌肉细胞（``Cell``），含独立的膜参数（容抗、阈值、漏/慢钾/快钾/钙通道）
-#     create_neuron_to_neuron_syn        (L730)  — 创建神经元间突触：兴奋性模拟突触、抑制性模拟突触、标准缝隙连接和延迟缝隙连接
-#     create_offsetcurrent_concentrationmodel (L775)  — 创建偏置电流和神经元/肌肉独立的钙浓度模型
-#     create_neuron_to_muscle_syn        (L832)  — 创建神经元到肌肉的模拟突触（兴奋性/抑制性）和缝隙连接
-#     create_muscle_to_muscle_syn        (L861)  — 创建肌肉到肌肉的缝隙连接（``GapJunction``）
-#     get_elec_syn                       (L868)  — 根据连接类型和参数覆盖获取电突触对象，支持多种特殊缝隙连接变体
-#     get_exc_syn                        (L1006) — 根据连接类型和参数覆盖获取兴奋性突触对象，支持多种模拟突触变体
-#     get_inh_syn                        (L1201) — 根据连接类型获取抑制性模拟突触（``GradedSynapse``）对象
-#     create_n_connection_synapse        (L1296) — C2 层级重载此方法以支持 ``DelayedGapJunction``、``ProprioGapJunction``、
-#     is_elec_conn                       (L1324) — C2 层级扩展电突触判断，将 ``DelayedGapJunction``、``ProprioGapJunction``、
-#     is_analog_conn                     (L1335) — C2 层级扩展模拟突触判断，将 ``NeuronMuscle``、``GradedSynapse2`` 也视为模拟连接
-#   SwitchedGapJunction                  (L1346) — SwitchedGapJunction 类
-#     __init__                           (L1347) — 初始化开关型缝隙连接（C2 自定义，由开关参数控制导通），存储 ID
-#     export                             (L1356) — 将 SwitchedGapJunction 以 NeuroML XML 格式写入输出流
-#   DelayedGapJunction                   (L1372) — DelayedGapJunction 类
-#     __init__                           (L1373) — 初始化延迟调制缝隙连接，其传递量由 sigmoid 函数在时间轴上调制
-#     export                             (L1391) — 将 DelayedGapJunction 以 NeuroML XML 格式写入输出流
-#     __repr__                           (L1406) — 返回 DelayedGapJunction 的字符串表示
-#   ProprioGapJunction                   (L1417) — ProprioGapJunction 类
-#     __init__                           (L1418) — 初始化本体感觉调制缝隙连接，传递量由本体感觉电导（p_conductance）叠加基础电导
-#     export                             (L1436) — 将 ProprioGapJunction 以 NeuroML XML 格式写入输出流
-#     __repr__                           (L1458) — 返回 ProprioGapJunction 的字符串表示
-#   ProprioGapJunction2                  (L1476) — ProprioGapJunction2 类
-#     __init__                           (L1477) — 初始化增强型本体感觉缝隙连接，支持时间门控（ar/ad/beta）和电压门控（vth）参数
-#     export                             (L1516) — 将 ProprioGapJunction2 以 NeuroML XML 格式写入输出流
-#     __repr__                           (L1543) — 返回 ProprioGapJunction2 的字符串表示
-#   DelayedGradedSynapse                 (L1566) — DelayedGradedSynapse 类
-#     __init__                           (L1567) — 初始化延迟型模拟突触，在标准 GradedSynapse 参数基础上增加时间调制参数
-#     export                             (L1599) — 将 DelayedGradedSynapse 以 NeuroML XML 格式写入输出流
-#     __repr__                           (L1624) — 返回 DelayedGradedSynapse 的字符串表示
-#   NeuronMuscle                         (L1645) — NeuronMuscle 类
-#     __init__                           (L1646) — 初始化肌肉本体感觉反馈类突触，包含激活/失活速率和阈值等参数
-#     export                             (L1667) — 将 NeuronMuscle 以 NeuroML XML 格式写入输出流
-#   MuscleConcentrationModel             (L1691) — MuscleConcentrationModel 类
-#     __init__                           (L1692) — 初始化肌肉钙浓度模型（简化版），包含衰减时间、转换系数等参数
-#     export                             (L1707) — 将 MuscleConcentrationModel 以 NeuroML XML 格式写入输出流
-#     __repr__                           (L1722) — 返回 MuscleConcentrationModel 的字符串表示
-#   MuscleConcentrationModel2            (L1733) — MuscleConcentrationModel2 类
-#     __init__                           (L1734) — 初始化扩展肌肉钙浓度模型，增加 sigmoid 浓度阈值调制参数
-#     export                             (L1780) — 将 MuscleConcentrationModel2 以 NeuroML XML 格式写入输出流
-#     __repr__                           (L1808) — 返回 MuscleConcentrationModel2 的字符串表示
-#   GradedSynapse2                       (L1832) — GradedSynapse2 类
-#     __init__                           (L1833) — 初始化双分量模拟突触（C2 特有），支持激活/失活速率门控
-#     export                             (L1852) — 将 GradedSynapse2 以 NeuroML XML 格式写入输出流
+#   ParameterisedModel                   (L101)  — ParameterisedModel 类
+#     __init__                           (L102)  — 初始化 Level C2 参数模型，还在开发中（under development）
+#     set_default_bioparameters          (L122)  — 设置 Level C2 的默认生物参数（仍在调整中）
+#     create_models                      (L676)  — 按顺序创建所有网络组件：偏置电流和浓度模型、肌肉细胞、神经元细胞、
+#     create_generic_muscle_cell         (L687)  — 创建 C2 层级的肌肉细胞（``Cell``），含独立的膜参数（容抗、阈值、漏/慢钾/快钾/钙通道）
+#     create_neuron_to_neuron_syn        (L797)  — 创建神经元间突触：兴奋性模拟突触、抑制性模拟突触、标准缝隙连接和延迟缝隙连接
+#     create_offsetcurrent_concentrationmodel (L842)  — 创建偏置电流和神经元/肌肉独立的钙浓度模型
+#     create_neuron_to_muscle_syn        (L899)  — 创建神经元到肌肉的模拟突触（兴奋性/抑制性）和缝隙连接
+#     create_muscle_to_muscle_syn        (L928)  — 创建肌肉到肌肉的缝隙连接（``GapJunction``）
+#     get_elec_syn                       (L935)  — 根据连接类型和参数覆盖获取电突触对象，支持多种特殊缝隙连接变体
+#     get_exc_syn                        (L1073) — 根据连接类型和参数覆盖获取兴奋性突触对象，支持多种模拟突触变体
+#     get_inh_syn                        (L1268) — 根据连接类型获取抑制性模拟突触（``GradedSynapse``）对象
+#     create_n_connection_synapse        (L1363) — C2 层级重载此方法以支持 ``DelayedGapJunction``、``ProprioGapJunction``、
+#     is_elec_conn                       (L1391) — C2 层级扩展电突触判断，将 ``DelayedGapJunction``、``ProprioGapJunction``、
+#     is_analog_conn                     (L1402) — C2 层级扩展模拟突触判断，将 ``NeuronMuscle``、``GradedSynapse2`` 也视为模拟连接
+#   SwitchedGapJunction                  (L1413) — SwitchedGapJunction 类
+#     __init__                           (L1414) — 初始化开关型缝隙连接（C2 自定义，由开关参数控制导通），存储 ID
+#     export                             (L1423) — 将 SwitchedGapJunction 以 NeuroML XML 格式写入输出流
+#   DelayedGapJunction                   (L1439) — DelayedGapJunction 类
+#     __init__                           (L1440) — 初始化延迟调制缝隙连接，其传递量由 sigmoid 函数在时间轴上调制
+#     export                             (L1458) — 将 DelayedGapJunction 以 NeuroML XML 格式写入输出流
+#     __repr__                           (L1473) — 返回 DelayedGapJunction 的字符串表示
+#   ProprioGapJunction                   (L1484) — ProprioGapJunction 类
+#     __init__                           (L1485) — 初始化本体感觉调制缝隙连接，传递量由本体感觉电导（p_conductance）叠加基础电导
+#     export                             (L1503) — 将 ProprioGapJunction 以 NeuroML XML 格式写入输出流
+#     __repr__                           (L1525) — 返回 ProprioGapJunction 的字符串表示
+#   ProprioGapJunction2                  (L1543) — ProprioGapJunction2 类
+#     __init__                           (L1544) — 初始化增强型本体感觉缝隙连接，支持时间门控（ar/ad/beta）和电压门控（vth）参数
+#     export                             (L1583) — 将 ProprioGapJunction2 以 NeuroML XML 格式写入输出流
+#     __repr__                           (L1610) — 返回 ProprioGapJunction2 的字符串表示
+#   DelayedGradedSynapse                 (L1633) — DelayedGradedSynapse 类
+#     __init__                           (L1634) — 初始化延迟型模拟突触，在标准 GradedSynapse 参数基础上增加时间调制参数
+#     export                             (L1666) — 将 DelayedGradedSynapse 以 NeuroML XML 格式写入输出流
+#     __repr__                           (L1691) — 返回 DelayedGradedSynapse 的字符串表示
+#   NeuronMuscle                         (L1712) — NeuronMuscle 类
+#     __init__                           (L1713) — 初始化肌肉本体感觉反馈类突触，包含激活/失活速率和阈值等参数
+#     export                             (L1734) — 将 NeuronMuscle 以 NeuroML XML 格式写入输出流
+#   MuscleConcentrationModel             (L1758) — MuscleConcentrationModel 类
+#     __init__                           (L1759) — 初始化肌肉钙浓度模型（简化版），包含衰减时间、转换系数等参数
+#     export                             (L1774) — 将 MuscleConcentrationModel 以 NeuroML XML 格式写入输出流
+#     __repr__                           (L1789) — 返回 MuscleConcentrationModel 的字符串表示
+#   MuscleConcentrationModel2            (L1800) — MuscleConcentrationModel2 类
+#     __init__                           (L1801) — 初始化扩展肌肉钙浓度模型，增加 sigmoid 浓度阈值调制参数
+#     export                             (L1847) — 将 MuscleConcentrationModel2 以 NeuroML XML 格式写入输出流
+#     __repr__                           (L1875) — 返回 MuscleConcentrationModel2 的字符串表示
+#   GradedSynapse2                       (L1899) — GradedSynapse2 类
+#     __init__                           (L1900) — 初始化双分量模拟突触（C2 特有），支持激活/失活速率门控
+#     export                             (L1919) — 将 GradedSynapse2 以 NeuroML XML 格式写入输出流
+#
+# 更新日志：
+#   2026-04-16  Copilot  添加中文 docstring 和行内注释（计划1阶段三）
+#
+# 当前维护者：Copilot
+# =============================================================================
 """
 
 Parameters C2 for c302 still under developemnt!!

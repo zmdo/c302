@@ -1,13 +1,23 @@
+# =============================================================================
+# 功能描述：
+#   Level C1 参数层级定义。保留 C 级完整 HH 离子通道，但化学突触从事件
+#   驱动改为模拟型（GradedSynapse），是 C 和 C0 之间的混合方案。
 #
 # 类与方法索引：
-#   ParameterisedModel                   (L19)   — ParameterisedModel 类
-#     __init__                           (L20)   — 初始化 Level C1 参数模型，使用 HH 型导电细胞和模拟突触（GradedSynapse）
-#     set_default_bioparameters          (L34)   — 设置 Level C1 的默认生物参数，从 C 继承细胞参数，替换突触参数为模拟型
-#     create_neuron_to_neuron_syn        (L77)   — 创建神经元间模拟突触（``GradedSynapse``）和缝隙连接（``GapJunction``）
-#     create_neuron_to_muscle_syn        (L106)  — 创建神经元到肌肉的模拟突触（``GradedSynapse``）和缝隙连接
-#     get_elec_syn                       (L135)  — 根据连接类型获取缝隙连接（``GapJunction``）对象
-#     get_exc_syn                        (L168)  — 根据连接类型获取兴奋性模拟突触（``GradedSynapse``）对象
-#     get_inh_syn                        (L232)  — 根据连接类型获取抑制性模拟突触（``GradedSynapse``）对象
+#   ParameterisedModel                   (L39)   — ParameterisedModel 类
+#     __init__                           (L40)   — 初始化 Level C1 参数模型，使用 HH 型导电细胞和模拟突触（GradedSynapse）
+#     set_default_bioparameters          (L54)   — 设置 Level C1 的默认生物参数，从 C 继承细胞参数，替换突触参数为模拟型
+#     create_neuron_to_neuron_syn        (L101)  — 创建神经元间模拟突触（``GradedSynapse``）和缝隙连接（``GapJunction``）
+#     create_neuron_to_muscle_syn        (L130)  — 创建神经元到肌肉的模拟突触（``GradedSynapse``）和缝隙连接
+#     get_elec_syn                       (L159)  — 根据连接类型获取缝隙连接（``GapJunction``）对象
+#     get_exc_syn                        (L192)  — 根据连接类型获取兴奋性模拟突触（``GradedSynapse``）对象
+#     get_inh_syn                        (L256)  — 根据连接类型获取抑制性模拟突触（``GradedSynapse``）对象
+#
+# 更新日志：
+#   2026-04-16  Copilot  添加中文 docstring 和行内注释（计划1阶段三）
+#
+# 当前维护者：Copilot
+# =============================================================================
 """
 
 Parameters C1:

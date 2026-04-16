@@ -1,17 +1,28 @@
+# =============================================================================
+# 功能描述：
+#   Level D 参数层级定义。使用多室导电模型，需加载 NeuroML 细胞形态文件
+#   （_D.cell.nml），新增胞质电阻率（resistivity）参数，化学突触为事件
+#   驱动 ExpTwoSynapse。
 #
 # 类与方法索引：
-#   ParameterisedModel                   (L41)   — ParameterisedModel 类
-#     __init__                           (L42)   — 初始化 Level D 参数模型，使用多室导电模型和 HH 型离子通道
-#     set_default_bioparameters          (L59)   — 设置 Level D 的默认生物参数，与 C 相似但新增 ``resistivity`` 参数
-#     create_models                      (L151)  — 按顺序创建所有网络组件模型
-#     create_generic_muscle_cell         (L159)  — 创建 D 级单室导电肌肉细胞（``Cell``）
-#     create_neuron_cell                 (L267)  — 从 NeuroML 多室形态文件加载特定神经元细胞，并为其配置生物物理属性
-#     create_offsetcurrent_concentrationmodel (L364)  — 创建偏置电流生成器和钙浓度模型（``FixedFactorConcentrationModel``）
-#     create_neuron_to_neuron_syn        (L381)  — 创建神经元间化学突触（``ExpTwoSynapse``）和缝隙连接（``GapJunction``）
-#     create_neuron_to_muscle_syn        (L404)  — 创建神经元到肌肉的化学突触（``ExpTwoSynapse``）和缝隙连接
-#     get_elec_syn                       (L427)  — 根据连接类型获取缝隙连接（``GapJunction``）对象
-#     get_exc_syn                        (L460)  — 根据连接类型获取兴奋性双指数事件突触（``ExpTwoSynapse``）对象
-#     get_inh_syn                        (L517)  — 根据连接类型获取抑制性双指数事件突触（``ExpTwoSynapse``）对象
+#   ParameterisedModel                   (L66)   — ParameterisedModel 类
+#     __init__                           (L67)   — 初始化 Level D 参数模型，使用多室导电模型和 HH 型离子通道
+#     set_default_bioparameters          (L84)   — 设置 Level D 的默认生物参数，与 C 相似但新增 ``resistivity`` 参数
+#     create_models                      (L180)  — 按顺序创建所有网络组件模型
+#     create_generic_muscle_cell         (L188)  — 创建 D 级单室导电肌肉细胞（``Cell``）
+#     create_neuron_cell                 (L296)  — 从 NeuroML 多室形态文件加载特定神经元细胞，并为其配置生物物理属性
+#     create_offsetcurrent_concentrationmodel (L393)  — 创建偏置电流生成器和钙浓度模型（``FixedFactorConcentrationModel``）
+#     create_neuron_to_neuron_syn        (L410)  — 创建神经元间化学突触（``ExpTwoSynapse``）和缝隙连接（``GapJunction``）
+#     create_neuron_to_muscle_syn        (L433)  — 创建神经元到肌肉的化学突触（``ExpTwoSynapse``）和缝隙连接
+#     get_elec_syn                       (L456)  — 根据连接类型获取缝隙连接（``GapJunction``）对象
+#     get_exc_syn                        (L489)  — 根据连接类型获取兴奋性双指数事件突触（``ExpTwoSynapse``）对象
+#     get_inh_syn                        (L546)  — 根据连接类型获取抑制性双指数事件突触（``ExpTwoSynapse``）对象
+#
+# 更新日志：
+#   2026-04-16  Copilot  添加中文 docstring 和行内注释（计划1阶段三）
+#
+# 当前维护者：Copilot
+# =============================================================================
 """
 
 Parameters D:

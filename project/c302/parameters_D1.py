@@ -1,18 +1,28 @@
+# =============================================================================
+# 功能描述：
+#   Level D1 参数层级定义。多室导电模型（继承自 D），但化学突触改为模拟型
+#   （GradedSynapse / GradedSynapse2），可能是「完整规模」模型的中期目标。
 #
 # 类与方法索引：
-#   ParameterisedModel                   (L21)   — ParameterisedModel 类
-#     __init__                           (L22)   — 初始化 Level D1 参数模型，多室导电模型 + 模拟突触（GradedSynapse）
-#     set_default_bioparameters          (L36)   — 设置 Level D1 的默认生物参数，使用较低内阻（3 kohm_cm vs D 的 12 kohm_cm），
-#     create_neuron_to_neuron_syn        (L147)  — 创建神经元间模拟突触（``GradedSynapse``）和缝隙连接（``GapJunction``）
-#     create_neuron_to_muscle_syn        (L178)  — 创建神经元到肌肉的模拟突触（``GradedSynapse``）和缝隙连接
-#     get_elec_syn                       (L209)  — 根据连接类型获取缝隙连接（``GapJunction``）对象
-#     get_exc_syn                        (L242)  — 根据连接类型获取兴奋性模拟突触（``GradedSynapse``）对象
-#     get_inh_syn                        (L317)  — 根据连接类型获取抑制性模拟突触（``GradedSynapse``）对象
-#     create_n_connection_synapse        (L393)  — D1 层级重载此方法以支持 ``GradedSynapse2`` 的注册
-#     is_analog_conn                     (L414)  — D1 层级扩展模拟突触判断，将 ``GradedSynapse2`` 也视为模拟连接
-#   GradedSynapse2                       (L425)  — GradedSynapse2 类
-#     __init__                           (L426)  — 初始化 D1 层级自定义双分量模拟突触，存储 ID
-#     export                             (L442)  — 将 D1 的 GradedSynapse2 以 NeuroML XML 格式写入输出流
+#   ParameterisedModel                   (L46)   — ParameterisedModel 类
+#     __init__                           (L47)   — 初始化 Level D1 参数模型，多室导电模型 + 模拟突触（GradedSynapse）
+#     set_default_bioparameters          (L61)   — 设置 Level D1 的默认生物参数，使用较低内阻（3 kohm_cm vs D 的 12 kohm_cm），
+#     create_neuron_to_neuron_syn        (L176)  — 创建神经元间模拟突触（``GradedSynapse``）和缝隙连接（``GapJunction``）
+#     create_neuron_to_muscle_syn        (L207)  — 创建神经元到肌肉的模拟突触（``GradedSynapse``）和缝隙连接
+#     get_elec_syn                       (L238)  — 根据连接类型获取缝隙连接（``GapJunction``）对象
+#     get_exc_syn                        (L271)  — 根据连接类型获取兴奋性模拟突触（``GradedSynapse``）对象
+#     get_inh_syn                        (L346)  — 根据连接类型获取抑制性模拟突触（``GradedSynapse``）对象
+#     create_n_connection_synapse        (L422)  — D1 层级重载此方法以支持 ``GradedSynapse2`` 的注册
+#     is_analog_conn                     (L443)  — D1 层级扩展模拟突触判断，将 ``GradedSynapse2`` 也视为模拟连接
+#   GradedSynapse2                       (L454)  — GradedSynapse2 类
+#     __init__                           (L455)  — 初始化 D1 层级自定义双分量模拟突触，存储 ID
+#     export                             (L471)  — 将 D1 的 GradedSynapse2 以 NeuroML XML 格式写入输出流
+#
+# 更新日志：
+#   2026-04-16  Copilot  添加中文 docstring 和行内注释（计划1阶段三）
+#
+# 当前维护者：Copilot
+# =============================================================================
 """
 
 Parameters D:

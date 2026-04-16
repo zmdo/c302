@@ -1,14 +1,24 @@
+# =============================================================================
+# 功能描述：
+#   Level BC1 混合参数层级定义。细胞使用 B 级的 IafActivityCell，突触使用
+#   C1 级的 GradedSynapse，兼顾计算效率和模拟型突触传递。
 #
 # 类与方法索引：
-#   ParameterisedModel                   (L22)   — ParameterisedModel 类
-#     __init__                           (L23)   — 初始化 Level BC1 参数模型，混合层级：B 级细胞 + C1 级模拟突触
-#     set_default_bioparameters          (L39)   — 设置 Level BC1 的默认生物参数，同时包含 IaF 细胞参数和 GradedSynapse 参数
-#     create_generic_muscle_cell         (L104)  — 创建带 activity 变量的肌肉细胞（``IafActivityCell``）
-#     create_generic_neuron_cell         (L116)  — 创建带 activity 变量的神经元细胞（``IafActivityCell``）
-#     create_offset                      (L128)  — 创建偏置电流生成器（``PulseGenerator``）
-#     create_neuron_to_neuron_syn        (L137)  — 创建神经元间模拟突触（``GradedSynapse``）和缝隙连接（``GapJunction``）
-#     create_neuron_to_muscle_syn        (L166)  — 创建神经元到肌肉的模拟突触（``GradedSynapse``）和缝隙连接（``GapJunction``）
-#     create_models                      (L195)  — 按顺序创建所有网络组件：肌肉细胞、神经元细胞、偏置电流、神经元间突触、
+#   ParameterisedModel                   (L43)   — ParameterisedModel 类
+#     __init__                           (L44)   — 初始化 Level BC1 参数模型，混合层级：B 级细胞 + C1 级模拟突触
+#     set_default_bioparameters          (L60)   — 设置 Level BC1 的默认生物参数，同时包含 IaF 细胞参数和 GradedSynapse 参数
+#     create_generic_muscle_cell         (L130)  — 创建带 activity 变量的肌肉细胞（``IafActivityCell``）
+#     create_generic_neuron_cell         (L142)  — 创建带 activity 变量的神经元细胞（``IafActivityCell``）
+#     create_offset                      (L154)  — 创建偏置电流生成器（``PulseGenerator``）
+#     create_neuron_to_neuron_syn        (L163)  — 创建神经元间模拟突触（``GradedSynapse``）和缝隙连接（``GapJunction``）
+#     create_neuron_to_muscle_syn        (L192)  — 创建神经元到肌肉的模拟突触（``GradedSynapse``）和缝隙连接（``GapJunction``）
+#     create_models                      (L221)  — 按顺序创建所有网络组件：肌肉细胞、神经元细胞、偏置电流、神经元间突触、
+#
+# 更新日志：
+#   2026-04-16  Copilot  添加中文 docstring 和行内注释（计划1阶段三）
+#
+# 当前维护者：Copilot
+# =============================================================================
 """
 
 Parameters BC1:
