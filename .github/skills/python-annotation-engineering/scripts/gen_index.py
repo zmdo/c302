@@ -5,13 +5,14 @@
 #   生成符合 SP-CODE-2026-001 规范的索引块，并可就地更新文件。
 #
 # 类与方法索引：
-#   generate_index_block                 (L38)   — 根据 AST 解析结果生成索引文本块
-#   update_file_header                   (L93)   — 就地更新文件头部的索引段落
-#   preview_file                         (L170)  — 预览文件的索引生成结果（不修改文件）
-#   process_target                       (L195)  — 处理单个文件或目录
-#   main                                 (L233)  — 脚本入口，解析命令行参数并执行索引生成
-#   _get_first_line_doc                  (L272)  — 提取节点的 docstring 首行作为描述
-#   _find_insert_position                (L295)  — 查找索引段落应插入的位置
+#   generate_index_block                 (L39)   — 根据 AST 解析结果生成索引文本块
+#   update_file_header                   (L94)   — 就地更新文件头部的索引段落
+#   preview_file                         (L182)  — 预览文件的索引生成结果（不修改文件）
+#   process_target                       (L207)  — 处理单个文件或目录
+#   main                                 (L245)  — 脚本入口，解析命令行参数并执行索引生成
+#   _get_first_line_doc                  (L284)  — 提取节点的 docstring 首行作为描述
+#   _find_header_block                   (L307)  — 查找 ``# ===`` 分隔线包围的 SP-CODE-2026-001 文件头块范围
+#   _find_insert_position                (L324)  — 查找索引段落应插入的位置
 #
 # 更新日志：
 #   2026-04-16  Copilot  初始创建
@@ -95,6 +96,7 @@ def update_file_header(filepath: str, verbose: bool = False) -> bool:
 
     如果文件已有「类与方法索引：」段落，替换其内容；
     如果没有，在「功能描述：」段落后插入索引段落。
+    仅在 ``# ===`` 头部块内搜索和替换，防止误插到文件开头。
 
     :param filepath: 文件路径
     :param verbose: 是否输出详细信息
@@ -117,13 +119,19 @@ def update_file_header(filepath: str, verbose: bool = False) -> bool:
     lines = content.splitlines()
     new_index_section = f"# 类与方法索引：\n{index_block}"
 
-    # 查找现有的索引段落位置
+    # ── 定位 # === 头部块的范围 ──
+    header_start, header_end = _find_header_block(lines)
+
+    # 在头部块内查找现有的索引段落位置
     index_start = None
     index_end = None
     in_index = False
 
-    for i, line in enumerate(lines):
-        stripped = line.rstrip()
+    search_start = header_start if header_start is not None else 0
+    search_end = header_end if header_end is not None else len(lines)
+
+    for i in range(search_start, search_end):
+        stripped = lines[i].rstrip()
         if re.match(r"^#\s+类与方法索引[：:]", stripped):
             index_start = i
             in_index = True
@@ -149,7 +157,11 @@ def update_file_header(filepath: str, verbose: bool = False) -> bool:
         new_lines = lines[:index_start] + new_index_section.splitlines() + lines[index_end:]
     else:
         # 没有索引段落——在功能描述段落后插入
-        insert_pos = _find_insert_position(lines)
+        insert_pos = _find_insert_position(lines, header_start, header_end)
+        if insert_pos < 0:
+            print(f"[警告] {filepath}: 未找到 SP-CODE-2026-001 文件头，跳过索引生成。"
+                  "请先手动添加文件头（功能描述/更新日志/维护者）。")
+            return False
         new_lines = (
             lines[:insert_pos]
             + ["#"]
@@ -292,17 +304,43 @@ def _get_first_line_doc(node: ast.AST) -> str:
     return "（无描述）"
 
 
-def _find_insert_position(lines: list[str]) -> int:
+def _find_header_block(lines: list[str]) -> tuple[int | None, int | None]:
+    """查找 ``# ===`` 分隔线包围的 SP-CODE-2026-001 文件头块范围。
+
+    :param lines: 文件行列表
+    :return: ``(header_start, header_end)`` 行索引元组；未找到时返回 ``(None, None)``
+    """
+    sep_pattern = re.compile(r"^#\s*={10,}")
+    first_sep = None
+    for i, line in enumerate(lines):
+        if sep_pattern.match(line.rstrip()):
+            if first_sep is None:
+                first_sep = i
+            else:
+                return (first_sep, i + 1)  # header_end 为闭合分隔线的下一行
+    return (None, None)
+
+
+def _find_insert_position(lines: list[str],
+                          header_start: int | None = None,
+                          header_end: int | None = None) -> int:
     """查找索引段落应插入的位置。
 
     在功能描述段落结束后、更新日志之前插入。
+    仅在 ``header_start..header_end`` 范围内搜索。
+    如果找不到合适的位置，返回 ``-1`` 表示拒绝插入。
 
     :param lines: 文件行列表
-    :return: 插入位置的行索引
+    :param header_start: 头部块起始行索引
+    :param header_end: 头部块结束行索引
+    :return: 插入位置的行索引，找不到时返回 ``-1``
     """
+    if header_start is None or header_end is None:
+        return -1  # 无头部块，拒绝插入
+
     in_desc = False
-    for i, line in enumerate(lines):
-        stripped = line.rstrip()
+    for i in range(header_start, header_end):
+        stripped = lines[i].rstrip()
         if "功能描述" in stripped:
             in_desc = True
             continue
@@ -314,8 +352,7 @@ def _find_insert_position(lines: list[str]) -> int:
             if re.match(r"^#\s*(更新日志|当前维护者|=)", stripped):
                 return i
 
-    # 回退：在文件开头
-    return 0
+    return -1  # 未找到合适位置，拒绝插入
 
 
 if __name__ == "__main__":
