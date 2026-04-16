@@ -44,6 +44,7 @@
 /project/examples/*MusclesSine.*ml
 /project/examples/console.txt
 .DS_Store
+.venv/
 /project/examples/parametersweep/*.gv*
 /project/examples/parametersweep/report.*.txt
 /project/getpyow.sh
