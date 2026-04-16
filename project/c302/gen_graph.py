@@ -9,12 +9,12 @@
 #   usage                                (L39)   — 打印命令行用法说明并退出程序
 #   is_muscle                            (L48)   — 判断细胞名称是否为肌肉（以 ``MV`` 或 ``MD`` 开头）
 #   get_cells                            (L57)   — 从 NeuroML XML 根节点提取所有种群（Population）的细胞名称
-#   get_elec_conns                       (L74)   — 从 NeuroML XML 中提取所有电突触（缝隙连接）并生成 Graphviz 边描述
-#   get_chem_conns                       (L105)  — 从 NeuroML XML 中提取所有化学突触连接并生成 Graphviz 边描述
-#   write_graph_file                     (L136)  — 将细胞和连接数据写入 Graphviz DOT 格式文件
-#   find_nml_files                       (L189)  — 在指定目录中查找所有 ``.nml`` 文件
-#   execute_graph_generator              (L209)  — 调用 Graphviz 命令行工具将 DOT 文件转换为 PNG 图片
-#   main                                 (L233)  — gen_graph 主入口：解析命令行参数，批量生成网络拓扑图
+#   get_elec_conns                       (L76)   — 从 NeuroML XML 中提取所有电突触（缝隙连接）并生成 Graphviz 边描述
+#   get_chem_conns                       (L108)  — 从 NeuroML XML 中提取所有化学突触连接并生成 Graphviz 边描述
+#   write_graph_file                     (L140)  — 将细胞和连接数据写入 Graphviz DOT 格式文件
+#   find_nml_files                       (L194)  — 在指定目录中查找所有 ``.nml`` 文件
+#   execute_graph_generator              (L214)  — 调用 Graphviz 命令行工具将 DOT 文件转换为 PNG 图片
+#   main                                 (L238)  — gen_graph 主入口：解析命令行参数，批量生成网络拓扑图
 #
 # 更新日志：
 #   2026-04-16  Copilot  添加中文 docstring 和行内注释
@@ -61,10 +61,12 @@ def get_cells(root):
     :return: 细胞名称列表
     """
     cells = []
+    # [废弃] 以下为早期直接定位 network 节点的写法，现改为全树遍历 population 标签
     # network = root.find('network')
     for cell in root.getiterator():
         if "population" not in cell.tag:
             continue
+        # [备选] 以下过滤逻辑可在仅绘制神经元时启用，当前保留肌肉节点
         # if is_muscle(cell.attrib['id']):
         #    continue
         cells.append(cell.attrib["id"])
@@ -92,6 +94,7 @@ def get_elec_conns(root):
             if "%s -> %s" % (post, pre) in conn:
                 append = False  # 去重：反向连接已存在，不重复添加
 
+        # [备选] 可取消以下过滤，仅保留纯神经元之间的电突触
         # if is_muscle(pre) or is_muscle(post):
         #    continue
 
@@ -118,6 +121,7 @@ def get_chem_conns(root):
         pre = chem_conn.attrib["presynapticPopulation"]
         post = chem_conn.attrib["postsynapticPopulation"]
 
+        # [备选] 可取消以下过滤，仅保留纯神经元之间的化学突触
         # if is_muscle(pre) or is_muscle(post):
         #    continue
 
@@ -149,6 +153,7 @@ def write_graph_file(filename, cells, elec_conns, chem_conns, layout="neato"):
         graph.write("graph [layout = %s];\n" % layout)
 
         graph.write("splines=true; ")
+        # [备选] Graphviz 的 concentrate 选项可合并平行边，当前为保留细节而关闭
         # graph.write('concentrate=false; ')
         graph.write('sep="+25,25"; ')
         graph.write("overlap=false; ")

@@ -77,6 +77,7 @@ def run_c302(
     :return: ``(cells, cells_to_stimulate, params, muscles)`` 四元组
     """
     if save_fig_to:
+        # 允许调用方覆盖默认的图像输出目录
         global save_fig_dir
         save_fig_dir = save_fig_to
 
@@ -86,12 +87,14 @@ def run_c302(
     )
 
     if not config_package:
+        # 默认从 c302 包导入配置；notebooks 等扩展配置可指定其他包路径
         config_package = "c302"
 
     # ── 步骤 1：导入配置模块并生成 NeuroML 网络 ──────────────
     setup = IM.import_module("%s.c302_%s" % (config_package, config)).setup
 
     try:
+        # 网络文件、LEMS 文件和仿真结果都写入独立输出目录
         os.makedirs(target_directory)
     except OSError as e:
         if e.errno != errno.EEXIST:
@@ -111,6 +114,7 @@ def run_c302(
 
     orig_dir = os.getcwd()
 
+    # jNeuroML 相关工具默认在当前工作目录读写文件，因此临时切换目录
     os.chdir(target_directory)
 
     try:
@@ -146,6 +150,7 @@ def run_c302(
     )
 
     if plot_connectivity:
+        # 直接复用 setup() 返回的 NeuroML 文档生成连接矩阵，避免重复加载网络文件
         c302_utils.generate_conn_matrix(nml_doc, save_fig_dir=save_image_full_dir)
 
     os.chdir(orig_dir)
@@ -192,6 +197,7 @@ if __name__ == "__main__":
         )
 
     elif "-fw1" in sys.argv:
+        # [备选] 以下为较短时长的 FW 测试运行参数
         # run_c302('FW','C2','',1000,0.05,'jNeuroML_NEURON', data_reader='UpdatedSpreadsheetDataReader2', save=True)
         run_c302(
             "FW",
@@ -441,6 +447,7 @@ if __name__ == "__main__":
         html = "<table>\n"
 
         levels = ["A", "B", "C0", "C", "C1", "C2", "D", "D1", "W2D"]
+        # [备选] 以下为聚焦少量参数层级的快速批量生成配置
         # levels = ['D','D1']
         # levels = ['C2']
         # levels = ['C0']

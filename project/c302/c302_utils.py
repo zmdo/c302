@@ -7,10 +7,10 @@
 # 类与方法索引：
 #   natsort                              (L31)   — 对字符串进行自然排序的辅助键函数
 #   plots                                (L48)   — 将仿真数据矩阵绘制为热图（pcolormesh）
-#   generate_traces_plot                 (L130)  — 使用 pyNeuroML 绘制各细胞的膜电位或活性轨迹叠加图
-#   plot_c302_results                    (L177)  — c302 仿真结果的主绘图函数
-#   _show_conn_matrix                    (L453)  — 内部辅助函数：显示单个连接矩阵热图
-#   generate_conn_matrix                 (L539)  — 从 NeuroML 文档生成完整的连接矩阵可视化
+#   generate_traces_plot                 (L137)  — 使用 pyNeuroML 绘制各细胞的膜电位或活性轨迹叠加图
+#   plot_c302_results                    (L184)  — c302 仿真结果的主绘图函数
+#   _show_conn_matrix                    (L473)  — 内部辅助函数：显示单个连接矩阵热图
+#   generate_conn_matrix                 (L563)  — 从 NeuroML 文档生成完整的连接矩阵可视化
 #
 # 更新日志：
 #   2026-04-16  Copilot  添加中文 docstring 和行内注释
@@ -67,15 +67,16 @@ def plots(a_n, info, cells, dt):
     if len(cells) > 100:
         matrix_height_in = 20
     if heightened:
+        # [备选] 以下为按刻度字体精确估算矩阵高度的旧方案（当前改用固定高度）
         # fontsize_pt = plt.rcParams['ytick.labelsize']
         # dpi = 72.27
 
-        # comput the matrix height in points and inches
+        # 计算矩阵高度（点 / 英寸）
         ##matrix_height_pt = fontsize_pt * a_n.shape[0]
         ##matrix_height_in = float(matrix_height_pt) / dpi
         # matrix_height_in = 10
 
-        # compute the required figure height
+        # 根据上下边距反推最终图形高度
         top_margin = 0.04  # in percentage of the figure height
         bottom_margin = 0.04  # in percentage of the figure height
         figure_height = matrix_height_in / (1 - top_margin - bottom_margin)
@@ -87,6 +88,7 @@ def plots(a_n, info, cells, dt):
     else:
         fig, ax = plt.subplots()
 
+    # [备选] 旧版使用 figure()+gca() 初始化坐标轴
     # fig = plt.figure()
     # ax = fig.gca()
     downscale = 10  # 降采样倍率，减少渲染点数
@@ -98,6 +100,7 @@ def plots(a_n, info, cells, dt):
     ax.set_yticks(np.arange(a_n_.shape[0]) + 0.5, minor=False)
     ax.set_yticklabels(cells)
     ax.tick_params(axis="y", labelsize=6)
+    # [备选] 可旋转 Y 轴标签以提升极密集热图的可读性
     # plt.setp(ax.get_yticklabels(), rotation=45)
 
     fig.colorbar(plot0)
@@ -112,17 +115,21 @@ def plots(a_n, info, cells, dt):
     for label in ax.get_xticklabels():
         if len(label.get_text()) > 0:
             labels.append(float(str((label.get_text()))) * dt * downscale * 1000)
+        # [调试] 以下输出用于定位刻度文本解析失败的异常值
         # except:
         #     print "Error value on forming axis values, value: ", label.get_text(), ", length: ",len(label.get_text())
 
+    # [备选] 旧版使用列表推导式一次性重建 X 轴标签
     # labels = [float(label.get_text())*dt*downscale*1000 for item in ax.get_xticklabels()]
     ax.set_xticklabels(labels)
+    # [调试] 可取消注释以检查标签重建后的 X 轴范围
     # print labels
     # print plt.xlim()
     plt.xlim(0, a_n_.shape[1])
     # print plt.xlim()
 
 
+# [调试] 旧版 cProfile 性能分析入口（当前未启用）
 # def plots_prof(a_n, info, cells, dt):
 #    cProfile.run("real_plots(a_n, info, cells, dt)")
 
@@ -208,10 +215,13 @@ def plot_c302_results(
         directory += "/"
     save_fig_path = directory + "%s"
 
+    # [调试] 可取消注释以检查 LEMS 结果中实际加载的变量键
     # c302.print_("Reloaded data: %s"%lems_results.keys())
     cells = []
     muscles = []
     times = [t * 1000 for t in lems_results["t"]]
+
+    # 扫描结果键名，拆分出神经元和肌肉两类绘图目标
     for cm in lems_results.keys():
         if not cm == "t" and cm.endswith("/v"):
             cell_name_part = cm.split("/")[0]
@@ -220,6 +230,7 @@ def plot_c302_results(
             else:
                 cells.append(cell_name_part)
 
+    # 热图按自然排序后逆序显示，以维持既有图像的上下顺序
     cells.sort(key=natsort)
     cells.reverse()
 
@@ -242,6 +253,7 @@ def plot_c302_results(
         yvals = []
         labels = []
 
+        # 逐个提取神经元膜电位，并同时构造热图矩阵与轨迹图输入
         for cell in cells:
             v = lems_results[template.format(cell, "v")]
 
@@ -260,6 +272,7 @@ def plot_c302_results(
             parameter_set,
         )
 
+        # [备选] 旧版曾将绘图任务压入队列后统一执行
         # tasks.append((volts_n, info, cells, dt))
         plots(volts_n, info, cells, dt)
 
@@ -297,6 +310,7 @@ def plot_c302_results(
         if parameter_set.startswith("A") or parameter_set.startswith("B"):
             template_m = "{0}/0/generic_muscle_iaf_cell/{1}"
 
+        # 逐个提取肌肉膜电位，并构造热图矩阵与轨迹图输入
         for muscle in muscles:
             mv = lems_results[template_m.format(muscle, "v")]
 
@@ -342,6 +356,7 @@ def plot_c302_results(
         variable = "activity"
         description = "Activity"
 
+        # Level C/D 使用 ``caConc``，其余参数集使用 ``activity`` 字段
         if parameter_set.startswith("C") or parameter_set.startswith("D"):
             variable = "caConc"
             description = "[Ca2+]"
@@ -356,6 +371,8 @@ def plot_c302_results(
             config,
             parameter_set,
         )
+
+        # 逐个提取神经元活性或钙浓度，构造热图矩阵与轨迹图输入
         for cell in cells:
             a = lems_results[template.format(cell, variable)]
 
@@ -395,6 +412,7 @@ def plot_c302_results(
         variable = "activity"
         description = "Activity"
 
+        # Level C/D 使用 ``caConc``，其余参数集使用 ``activity`` 字段
         if parameter_set.startswith("C") or parameter_set.startswith("D"):
             variable = "caConc"
             description = "[Ca2+]"
@@ -409,6 +427,8 @@ def plot_c302_results(
             config,
             parameter_set,
         )
+
+        # 逐个提取肌肉活性或钙浓度，构造热图矩阵与轨迹图输入
         for m in muscles:
             a = lems_results[template_m.format(m, variable)]
 
@@ -477,6 +497,7 @@ def _show_conn_matrix(
     :param colormap: matplotlib 色彩映射名称
     """
     if data.shape[0] > 0 and data.shape[1] > 0 and np.amax(data) > 0:
+        # [备选] 旧版尝试使用对数色标增强稀疏矩阵的对比度
         ##norm = matplotlib.colors.LogNorm(vmin=1, vmax=np.amax(data))
         maxn = int(np.amax(data))
     else:
@@ -496,6 +517,7 @@ def _show_conn_matrix(
     plt.title(title)
     fig.canvas.manager.set_window_title(title)
 
+    # [备选] 可切换为其他 matplotlib 预置色图
     # cm = matplotlib.cm.get_cmap('gist_stern_r')
     if colormap is None:
         cmap = plt.colormaps["gist_stern_r"]
@@ -517,6 +539,7 @@ def _show_conn_matrix(
     ax.set_yticks(np.arange(data.shape[0]) + 0)
     ax.set_yticks(np.arange(data.shape[0]) + 0.5, minor=True)
 
+    # Y 轴显示突触前细胞，X 轴显示突触后细胞
     ax.set_yticklabels([all_info_pre[k][4] for k in all_info_pre])
     ax.set_xticklabels([all_info_post[k][4] for k in all_info_post])
     ax.set_ylabel("presynaptic")
@@ -526,6 +549,7 @@ def _show_conn_matrix(
     ax.tick_params(axis="x", labelsize=tick_size)
     fig.autofmt_xdate()
 
+    # [备选] 旧版使用 pcolor 绘制热图
     # heatmap = ax.pcolor(data, cmap='gist_stern')
     cbar = plt.colorbar(im, ticks=range(maxn + 1))
     cbar.set_ticklabels(range(maxn + 1))
@@ -614,6 +638,7 @@ def generate_conn_matrix(
         with Bundle("openworm/owmeta-data", version=6) as bnd:
             all_neuron_info, all_muscle_info = c302._get_cell_info(bnd, all_cells)
     except Exception as e:
+        # [调试] 可取消注释以输出完整 traceback，定位 owmeta 连接失败原因
         # traceback.print_exc()
         c302.print_(
             "Unable to connect to the owmeta bundle: %s\n Proceeding anyway..." % e
@@ -815,6 +840,7 @@ def generate_conn_matrix(
             colormap=colormap,
         )
 
+    # [备选] 旧版曾单独绘制“电突触到肌肉”子图，现已由组合矩阵覆盖
     # _show_conn_matrix(data_m, 'Electrical (gap junction) conns to muscles',all_neuron_info,all_muscle_info, net.id)
 
 
