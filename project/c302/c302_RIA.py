@@ -4,9 +4,10 @@
 #   选取 RIAL/RIAR 及连接神经元，验证 RIA 中间层信号处理。
 #
 # 类与方法索引：
-#   setup                                (L20)   — RIA 单细胞测试配置的 setup 函数
+#   setup                                (L21)   — RIA 单细胞测试配置的 setup 函数
 #
 # 更新日志：
+#   2026-04-16  Copilot  计划2 阶段八收尾：补记汇总校验与最终勘误完成
 #   2026-04-16  Copilot  添加中文 docstring 和行内注释
 #
 # 当前维护者：Copilot

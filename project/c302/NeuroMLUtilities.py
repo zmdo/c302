@@ -5,11 +5,12 @@
 #   用于将 Population/Instance 放置于正确的空间位置。
 #
 # 类与方法索引：
-#   getSegmentIds                        (L21)   — 提取细胞形态学中所有片段的 ID 列表
-#   get3DPosition                        (L34)   — 计算细胞指定片段上某点的三维坐标
-#   fract                                (L66)   — 在两点之间进行线性插值
+#   getSegmentIds                        (L22)   — 提取细胞形态学中所有片段的 ID 列表
+#   get3DPosition                        (L35)   — 计算细胞指定片段上某点的三维坐标
+#   fract                                (L67)   — 在两点之间进行线性插值
 #
 # 更新日志：
+#   2026-04-16  Copilot  计划2 阶段八收尾：补记汇总校验与最终勘误完成
 #   2026-04-16  Copilot  添加中文 docstring 和行内注释
 #
 # 当前维护者：Copilot

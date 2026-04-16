@@ -5,9 +5,10 @@
 #   包含细胞在 c302 网络文件中的位置链接和 3D 可视化链接。
 #
 # 类与方法索引：
-#   get_adopted_cell_names               (L26)   — 读取 OpenWorm 赞助者认领的细胞名称映射
+#   get_adopted_cell_names               (L27)   — 读取 OpenWorm 赞助者认领的细胞名称映射
 #
 # 更新日志：
+#   2026-04-16  Copilot  计划2 阶段八收尾：补记汇总校验与最终勘误完成
 #   2026-04-16  Copilot  添加中文 docstring 和行内注释
 #
 # 当前维护者：Copilot

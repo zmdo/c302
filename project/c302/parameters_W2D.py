@@ -4,25 +4,26 @@
 #   （仅偏置和增益参数），突触为连续型 OutputSynapse，参数数量极少。
 #
 # 类与方法索引：
-#   ParameterisedModel                   (L49)   — ParameterisedModel 类
-#     __init__                           (L50)   — 初始化 Level W2D 参数模型，使用 Worm2D 偏置-增益型细胞模型
-#     set_default_bioparameters          (L69)   — 设置 Level W2D 的默认生物参数（参数数量极少）
-#     create_models                      (L101)  — 按顺序创建所有网络组件：肌肉细胞、神经元细胞、偏置电流、神经元间突触、
-#     create_generic_muscle_cell         (L111)  — 创建 W2D 通用肌肉细胞（``CellW2D``）
-#     create_generic_neuron_cell         (L115)  — 创建 W2D 通用神经元细胞（``CellW2D``）
-#     create_offsetcurrent               (L119)  — 创建偏置电流生成器（``PulseGenerator``）
-#     create_neuron_to_neuron_syn        (L128)  — 创建神经元间兴奋性/抑制性输出突触（``OutputSynapse``）和缝隙连接（``GapJunction``）
-#     create_neuron_to_muscle_syn        (L142)  — 创建神经元到肌肉的兴奋性/抑制性输出突触（``OutputSynapse``）和缝隙连接
-#     create_muscle_to_muscle_syn        (L151)  — 创建肌肉间缝隙连接（``GapJunction``）
-#     get_elec_syn                       (L160)  — 根据连接类型获取缝隙连接（``GapJunction``）对象
-#     get_exc_syn                        (L183)  — 返回神经元间兴奋性输出突触（``OutputSynapse``）
-#     get_inh_syn                        (L195)  — 返回神经元间抑制性输出突触（``OutputSynapse``）
-#   CellW2D                              (L208)  — CellW2D 类
-#     __init__                           (L209)  — 初始化 W2D 神经元/肌肉细胞，存储 ID
-#   OutputSynapse                        (L220)  — OutputSynapse 类
-#     __init__                           (L221)  — 初始化 W2D 输出突触，存储 ID
+#   ParameterisedModel                   (L50)   — ParameterisedModel 类
+#     __init__                           (L51)   — 初始化 Level W2D 参数模型，使用 Worm2D 偏置-增益型细胞模型
+#     set_default_bioparameters          (L70)   — 设置 Level W2D 的默认生物参数（参数数量极少）
+#     create_models                      (L102)  — 按顺序创建所有网络组件：肌肉细胞、神经元细胞、偏置电流、神经元间突触、
+#     create_generic_muscle_cell         (L112)  — 创建 W2D 通用肌肉细胞（``CellW2D``）
+#     create_generic_neuron_cell         (L116)  — 创建 W2D 通用神经元细胞（``CellW2D``）
+#     create_offsetcurrent               (L120)  — 创建偏置电流生成器（``PulseGenerator``）
+#     create_neuron_to_neuron_syn        (L129)  — 创建神经元间兴奋性/抑制性输出突触（``OutputSynapse``）和缝隙连接（``GapJunction``）
+#     create_neuron_to_muscle_syn        (L143)  — 创建神经元到肌肉的兴奋性/抑制性输出突触（``OutputSynapse``）和缝隙连接
+#     create_muscle_to_muscle_syn        (L152)  — 创建肌肉间缝隙连接（``GapJunction``）
+#     get_elec_syn                       (L161)  — 根据连接类型获取缝隙连接（``GapJunction``）对象
+#     get_exc_syn                        (L184)  — 返回神经元间兴奋性输出突触（``OutputSynapse``）
+#     get_inh_syn                        (L196)  — 返回神经元间抑制性输出突触（``OutputSynapse``）
+#   CellW2D                              (L209)  — CellW2D 类
+#     __init__                           (L210)  — 初始化 W2D 神经元/肌肉细胞，存储 ID
+#   OutputSynapse                        (L221)  — OutputSynapse 类
+#     __init__                           (L222)  — 初始化 W2D 输出突触，存储 ID
 #
 # 更新日志：
+#   2026-04-16  Copilot  计划2 阶段八收尾：补记汇总校验与最终勘误完成
 #   2026-04-16  Copilot  添加中文 docstring 和行内注释（计划1阶段三）
 #
 # 当前维护者：Copilot

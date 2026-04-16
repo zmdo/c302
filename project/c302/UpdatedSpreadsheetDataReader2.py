@@ -5,21 +5,22 @@
 #   （仅保留 pre=神经元 且 post=体壁肌肉 的连接，过滤更严格）。
 #
 # 类与方法索引：
-#   get_all_muscle_prefixes              (L52)   — 返回所有已知肌肉前缀列表（含体壁肌肉和咽部肌肉）
-#   get_body_wall_muscle_prefixes        (L60)   — 返回体壁肌肉专属前缀列表
-#   is_muscle                            (L68)   — 判断给定细胞名称是否为肌肉细胞
-#   is_body_wall_muscle                  (L79)   — 判断给定细胞名称是否为体壁肌肉
-#   is_neuron                            (L90)   — 判断给定细胞名称是否为神经元
-#   remove_leading_index_zero            (L100)  — Returns neuron name with an index without leading zero. E.g. VB01 -> VB1.
-#   get_old_muscle_name                  (L110)  — 将 herm_full_edgelist_MODIFIED 格式的肌肉名称转换为标准命名格式
-#   get_syntype                          (L131)  — 将 CSV 中的突触类型字符串映射为 ConnectionInfo 标准形式
-#   get_synclass                         (L147)  — 根据突触前细胞名称和突触类型推断神经递质分类
-#   parse_row                            (L165)  — 解析 CSV 中的单行数据，返回连接信息元组
-#   read_data                            (L179)  — Args:
-#   read_muscle_data                     (L223)  — Returns:
-#   main                                 (L267)  — main 函数
+#   get_all_muscle_prefixes              (L53)   — 返回所有已知肌肉前缀列表（含体壁肌肉和咽部肌肉）
+#   get_body_wall_muscle_prefixes        (L61)   — 返回体壁肌肉专属前缀列表
+#   is_muscle                            (L69)   — 判断给定细胞名称是否为肌肉细胞
+#   is_body_wall_muscle                  (L80)   — 判断给定细胞名称是否为体壁肌肉
+#   is_neuron                            (L91)   — 判断给定细胞名称是否为神经元
+#   remove_leading_index_zero            (L101)  — Returns neuron name with an index without leading zero. E.g. VB01 -> VB1.
+#   get_old_muscle_name                  (L111)  — 将 herm_full_edgelist_MODIFIED 格式的肌肉名称转换为标准命名格式
+#   get_syntype                          (L132)  — 将 CSV 中的突触类型字符串映射为 ConnectionInfo 标准形式
+#   get_synclass                         (L148)  — 根据突触前细胞名称和突触类型推断神经递质分类
+#   parse_row                            (L166)  — 解析 CSV 中的单行数据，返回连接信息元组
+#   read_data                            (L180)  — Args:
+#   read_muscle_data                     (L224)  — Returns:
+#   main                                 (L268)  — main 函数
 #
 # 更新日志：
+#   2026-04-16  Copilot  计划2 阶段八收尾：补记汇总校验与最终勘误完成
 #   2026-04-16  zmdo  添加中文注释（计划1 阶段二）
 #
 # 当前维护者：zmdo

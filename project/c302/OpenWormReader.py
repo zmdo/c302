@@ -5,15 +5,16 @@
 #   缓存结果，提供与其他数据读取器一致的 read_data() 和 read_muscle_data() 接口。
 #
 # 类与方法索引：
-#   OpenWormReader                       (L48)   — 封装 owmeta Bundle 查询接口的连接组数据读取器
-#     __init__                           (L56)   — __init__ 函数
-#     get_cells_in_model                 (L60)   — 提取 owmeta 神经网络对象中所有神经元的名称集合
-#     read_data                          (L73)   — 读取神经元间连接数据
-#     read_muscle_data                   (L98)   — 读取神经肌肉连接数据
-#     _read_connections                  (L109)  — 内部方法：执行 owmeta Bundle 查询并返回连接列表
-#   format_muscle_name                   (L192)  — 将 owmeta 返回的肌肉名称转换为 c302 标准命名格式
+#   OpenWormReader                       (L49)   — 封装 owmeta Bundle 查询接口的连接组数据读取器
+#     __init__                           (L57)   — __init__ 函数
+#     get_cells_in_model                 (L61)   — 提取 owmeta 神经网络对象中所有神经元的名称集合
+#     read_data                          (L74)   — 读取神经元间连接数据
+#     read_muscle_data                   (L99)   — 读取神经肌肉连接数据
+#     _read_connections                  (L110)  — 内部方法：执行 owmeta Bundle 查询并返回连接列表
+#   format_muscle_name                   (L193)  — 将 owmeta 返回的肌肉名称转换为 c302 标准命名格式
 #
 # 更新日志：
+#   2026-04-16  Copilot  计划2 阶段八收尾：补记汇总校验与最终勘误完成
 #   2026-04-16  zmdo  添加中文注释（计划1 阶段二）
 #
 # 当前维护者：zmdo

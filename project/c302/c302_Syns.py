@@ -4,9 +4,10 @@
 #   选取 URYDL、SMDDR、IL2VL 等少量神经元，测试突触生成。
 #
 # 类与方法索引：
-#   setup                                (L20)   — 突触连接测试配置的 setup 函数
+#   setup                                (L21)   — 突触连接测试配置的 setup 函数
 #
 # 更新日志：
+#   2026-04-16  Copilot  计划2 阶段八收尾：补记汇总校验与最终勘误完成
 #   2026-04-16  Copilot  添加中文 docstring 和行内注释
 #
 # 当前维护者：Copilot

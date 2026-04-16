@@ -5,41 +5,42 @@
 #   查询、更新机制以及多层级细胞和突触模型的抽象接口。
 #
 # 类与方法索引：
-#   split_neuroml_quantity               (L56)   — 将 NeuroML 数量字符串分解为数值与单位两部分
-#   BioParameter                         (L78)   — BioParameter 类
-#     __init__                           (L79)   — 初始化生物参数对象，存储名称、数值字符串、来源及确定性信息
-#     __str__                            (L92)   — 返回参数的人类可读字符串表示，包含名称、值、来源和确定性
-#     __repr__                           (L104)  — 返回与 ``__str__`` 相同的调试表示，便于在容器中查看
-#     change_magnitude                   (L111)  — 更新参数的数值部分，保留原有单位不变
-#     x                                  (L123)  — 以 float 形式返回参数的数值（去除单位）
-#   ParameterisedModelPrototype          (L131)  — ParameterisedModelPrototype 类
-#     __init__                           (L134)  — 初始化参数化模型原型，创建空的生物参数列表
-#     print_                             (L138)  — 带 ``c302`` 前缀的调试输出，用于区分 c302 框架自身的日志信息
-#     add_bioparameter                   (L146)  — 注册或更新一个生物参数
-#     add_bioparameter_obj               (L170)  — 直接注册 ``BioParameter`` 对象，若同名已存在则先移除旧对象
-#     get_bioparameter                   (L183)  — 按名称查找生物参数，返回第一个匹配项
-#     set_bioparameter                   (L204)  — 更新已有生物参数的值、来源和确定性，若参数不存在则静默忽略
-#     bioparameter_info                  (L218)  — 返回所有已注册生物参数的格式化摘要字符串，按名称字典序排列
-#   NonNeuroMLCustomType                 (L230)  — NonNeuroMLCustomType 类
-#     __init__                           (L231)  — 初始化非 NeuroML 自定义突触类型，仅存储 ID
-#   c302ModelPrototype                   (L242)  — c302ModelPrototype 类
-#     __init__                           (L243)  — 初始化 c302 网络构建原型，设置各网络组件属性的默认空值
-#     is_level_A                         (L264)  — 判断当前参数层级是否为 A（积分放电神经元 + 事件突触）
-#     is_level_B                         (L273)  — 判断当前参数层级是否为 B（带 activity 变量的积分放电 + 真实缝隙连接）
-#     is_level_C                         (L282)  — 判断当前参数层级是否属于 C 系列（单室导电模型 + HH 型离子通道）
-#     is_level_C0                        (L291)  — 判断是否为 C0（简化导电模型，无快钾通道，模拟突触，适合非放电神经元）
-#     is_level_C2                        (L298)  — 判断是否为 C2（含专有缝隙连接类型和本体感觉反馈的高级导电模型）
-#     is_level_D1                        (L305)  — 判断是否为 D1（多室导电模型 + 模拟突触变体）
-#     is_level_D                         (L312)  — 判断是否属于 D 系列（多室导电模型，含细胞形态数据）
-#     is_level_X                         (L321)  — 判断是否为 X 系列（扩展或实验性层级）
-#     get_conn_param                     (L328)  — 获取特定细胞对连接的参数值，优先返回精确匹配，否则返回默认模板值
-#     get_syn                            (L360)  — 根据突触极性类型（``pol``）分发到对应的突触获取方法
-#     create_n_connection_synapse        (L379)  — 获取或注册突触原型对象，确保同一 ID 的突触只添加到文档一次（幂等）
-#     is_nonneuroml_conn                 (L413)  — 判断突触是否为非 NeuroML 自定义类型（如 W2D 的 OutputSynapse）
-#     is_analog_conn                     (L423)  — 判断突触是否为模拟（连续传递）型突触（GradedSynapse）
-#     is_elec_conn                       (L434)  — 判断突触是否为电突触（缝隙连接，GapJunction）
+#   split_neuroml_quantity               (L57)   — 将 NeuroML 数量字符串分解为数值与单位两部分
+#   BioParameter                         (L79)   — BioParameter 类
+#     __init__                           (L80)   — 初始化生物参数对象，存储名称、数值字符串、来源及确定性信息
+#     __str__                            (L93)   — 返回参数的人类可读字符串表示，包含名称、值、来源和确定性
+#     __repr__                           (L105)  — 返回与 ``__str__`` 相同的调试表示，便于在容器中查看
+#     change_magnitude                   (L112)  — 更新参数的数值部分，保留原有单位不变
+#     x                                  (L124)  — 以 float 形式返回参数的数值（去除单位）
+#   ParameterisedModelPrototype          (L132)  — ParameterisedModelPrototype 类
+#     __init__                           (L135)  — 初始化参数化模型原型，创建空的生物参数列表
+#     print_                             (L139)  — 带 ``c302`` 前缀的调试输出，用于区分 c302 框架自身的日志信息
+#     add_bioparameter                   (L147)  — 注册或更新一个生物参数
+#     add_bioparameter_obj               (L171)  — 直接注册 ``BioParameter`` 对象，若同名已存在则先移除旧对象
+#     get_bioparameter                   (L184)  — 按名称查找生物参数，返回第一个匹配项
+#     set_bioparameter                   (L205)  — 更新已有生物参数的值、来源和确定性，若参数不存在则静默忽略
+#     bioparameter_info                  (L219)  — 返回所有已注册生物参数的格式化摘要字符串，按名称字典序排列
+#   NonNeuroMLCustomType                 (L231)  — NonNeuroMLCustomType 类
+#     __init__                           (L232)  — 初始化非 NeuroML 自定义突触类型，仅存储 ID
+#   c302ModelPrototype                   (L243)  — c302ModelPrototype 类
+#     __init__                           (L244)  — 初始化 c302 网络构建原型，设置各网络组件属性的默认空值
+#     is_level_A                         (L265)  — 判断当前参数层级是否为 A（积分放电神经元 + 事件突触）
+#     is_level_B                         (L274)  — 判断当前参数层级是否为 B（带 activity 变量的积分放电 + 真实缝隙连接）
+#     is_level_C                         (L283)  — 判断当前参数层级是否属于 C 系列（单室导电模型 + HH 型离子通道）
+#     is_level_C0                        (L292)  — 判断是否为 C0（简化导电模型，无快钾通道，模拟突触，适合非放电神经元）
+#     is_level_C2                        (L299)  — 判断是否为 C2（含专有缝隙连接类型和本体感觉反馈的高级导电模型）
+#     is_level_D1                        (L306)  — 判断是否为 D1（多室导电模型 + 模拟突触变体）
+#     is_level_D                         (L313)  — 判断是否属于 D 系列（多室导电模型，含细胞形态数据）
+#     is_level_X                         (L322)  — 判断是否为 X 系列（扩展或实验性层级）
+#     get_conn_param                     (L329)  — 获取特定细胞对连接的参数值，优先返回精确匹配，否则返回默认模板值
+#     get_syn                            (L361)  — 根据突触极性类型（``pol``）分发到对应的突触获取方法
+#     create_n_connection_synapse        (L380)  — 获取或注册突触原型对象，确保同一 ID 的突触只添加到文档一次（幂等）
+#     is_nonneuroml_conn                 (L414)  — 判断突触是否为非 NeuroML 自定义类型（如 W2D 的 OutputSynapse）
+#     is_analog_conn                     (L424)  — 判断突触是否为模拟（连续传递）型突触（GradedSynapse）
+#     is_elec_conn                       (L435)  — 判断突触是否为电突触（缝隙连接，GapJunction）
 #
 # 更新日志：
+#   2026-04-16  Copilot  计划2 阶段八收尾：补记汇总校验与最终勘误完成
 #   2026-04-16  Copilot  添加中文 docstring 和行内注释（计划1阶段三）
 #
 # 当前维护者：Copilot

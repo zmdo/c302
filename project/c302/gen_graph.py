@@ -6,17 +6,18 @@
 #   边样式编码：电突触（虚线无箭头）、兴奋性化学突触（黑色箭头）、抑制性（红色T形）。
 #
 # 类与方法索引：
-#   usage                                (L39)   — 打印命令行用法说明并退出程序
-#   is_muscle                            (L48)   — 判断细胞名称是否为肌肉（以 ``MV`` 或 ``MD`` 开头）
-#   get_cells                            (L57)   — 从 NeuroML XML 根节点提取所有种群（Population）的细胞名称
-#   get_elec_conns                       (L76)   — 从 NeuroML XML 中提取所有电突触（缝隙连接）并生成 Graphviz 边描述
-#   get_chem_conns                       (L108)  — 从 NeuroML XML 中提取所有化学突触连接并生成 Graphviz 边描述
-#   write_graph_file                     (L140)  — 将细胞和连接数据写入 Graphviz DOT 格式文件
-#   find_nml_files                       (L194)  — 在指定目录中查找所有 ``.nml`` 文件
-#   execute_graph_generator              (L214)  — 调用 Graphviz 命令行工具将 DOT 文件转换为 PNG 图片
-#   main                                 (L238)  — gen_graph 主入口：解析命令行参数，批量生成网络拓扑图
+#   usage                                (L40)   — 打印命令行用法说明并退出程序
+#   is_muscle                            (L49)   — 判断细胞名称是否为肌肉（以 ``MV`` 或 ``MD`` 开头）
+#   get_cells                            (L58)   — 从 NeuroML XML 根节点提取所有种群（Population）的细胞名称
+#   get_elec_conns                       (L77)   — 从 NeuroML XML 中提取所有电突触（缝隙连接）并生成 Graphviz 边描述
+#   get_chem_conns                       (L109)  — 从 NeuroML XML 中提取所有化学突触连接并生成 Graphviz 边描述
+#   write_graph_file                     (L141)  — 将细胞和连接数据写入 Graphviz DOT 格式文件
+#   find_nml_files                       (L195)  — 在指定目录中查找所有 ``.nml`` 文件
+#   execute_graph_generator              (L215)  — 调用 Graphviz 命令行工具将 DOT 文件转换为 PNG 图片
+#   main                                 (L239)  — gen_graph 主入口：解析命令行参数，批量生成网络拓扑图
 #
 # 更新日志：
+#   2026-04-16  Copilot  计划2 阶段八收尾：补记汇总校验与最终勘误完成
 #   2026-04-16  Copilot  添加中文 docstring 和行内注释
 #
 # 当前维护者：Copilot

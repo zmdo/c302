@@ -5,20 +5,21 @@
 #   （非真实 GapJunction）。
 #
 # 类与方法索引：
-#   ParameterisedModel                   (L55)   — ParameterisedModel 类
-#     __init__                           (L56)   — 初始化 Level A 参数模型，设置层级标识并调用默认参数初始化
-#     set_default_bioparameters          (L68)   — 设置 Level A 的全套默认生物参数
-#     create_generic_muscle_cell         (L166)  — 创建通用肌肉细胞模型（``IafCell``），从生物参数表读取各项膜特性
-#     create_generic_neuron_cell         (L177)  — 创建通用神经元细胞模型（``IafCell``），从生物参数表读取各项膜特性
-#     create_offset                      (L188)  — 创建偏置电流生成器（``PulseGenerator``），用于向特定细胞注入固定幅度的偏置电流
-#     create_neuron_to_neuron_syn        (L201)  — 创建神经元间兴奋性、抑制性和电突触（事件驱动 ``ExpTwoSynapse``）
-#     create_neuron_to_muscle_syn        (L231)  — 创建神经元到肌肉的兴奋性、抑制性和电突触（事件驱动 ``ExpTwoSynapse``）
-#     create_models                      (L257)  — 按顺序创建所有细胞和突触模型，供网络生成主循环调用
-#     get_elec_syn                       (L268)  — 根据连接类型获取电突触对象（Level A 中为 ``ExpTwoSynapse`` 模拟）
-#     get_exc_syn                        (L342)  — 根据连接类型获取兴奋性化学突触对象（``ExpTwoSynapse``）
-#     get_inh_syn                        (L399)  — 根据连接类型获取抑制性化学突触对象（``ExpTwoSynapse``）
+#   ParameterisedModel                   (L56)   — ParameterisedModel 类
+#     __init__                           (L57)   — 初始化 Level A 参数模型，设置层级标识并调用默认参数初始化
+#     set_default_bioparameters          (L69)   — 设置 Level A 的全套默认生物参数
+#     create_generic_muscle_cell         (L167)  — 创建通用肌肉细胞模型（``IafCell``），从生物参数表读取各项膜特性
+#     create_generic_neuron_cell         (L178)  — 创建通用神经元细胞模型（``IafCell``），从生物参数表读取各项膜特性
+#     create_offset                      (L189)  — 创建偏置电流生成器（``PulseGenerator``），用于向特定细胞注入固定幅度的偏置电流
+#     create_neuron_to_neuron_syn        (L202)  — 创建神经元间兴奋性、抑制性和电突触（事件驱动 ``ExpTwoSynapse``）
+#     create_neuron_to_muscle_syn        (L232)  — 创建神经元到肌肉的兴奋性、抑制性和电突触（事件驱动 ``ExpTwoSynapse``）
+#     create_models                      (L258)  — 按顺序创建所有细胞和突触模型，供网络生成主循环调用
+#     get_elec_syn                       (L269)  — 根据连接类型获取电突触对象（Level A 中为 ``ExpTwoSynapse`` 模拟）
+#     get_exc_syn                        (L343)  — 根据连接类型获取兴奋性化学突触对象（``ExpTwoSynapse``）
+#     get_inh_syn                        (L400)  — 根据连接类型获取抑制性化学突触对象（``ExpTwoSynapse``）
 #
 # 更新日志：
+#   2026-04-16  Copilot  计划2 阶段八收尾：补记汇总校验与最终勘误完成
 #   2026-04-16  Copilot  添加中文 docstring 和行内注释（计划1阶段三）
 #
 # 当前维护者：Copilot

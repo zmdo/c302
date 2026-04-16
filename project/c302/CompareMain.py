@@ -5,15 +5,16 @@
 #   仅存在于某一文件的独有连接，以及方向相反的连接对。
 #
 # 类与方法索引：
-#   comparitor                           (L28)   — 比较两个 XLS 连接组数据文件的差异
-#   getColumns                           (L106)  — 从制表符分隔的文本文件中读取列数据
-#   getColumnsXls                        (L140)  — 从 XLS 电子表格文件中读取列数据
-#   sortTwoColumns                       (L182)  — 按前两列（From/To 神经元）对字典进行排序
-#   formatNames                          (L191)  — 格式化神经元名称，移除中间的填充零
-#   matchLists                           (L204)  — 比较两个连接列表，提取匹配对并从原列表中移除
-#   typeMapping                          (L332)  — 连接类型映射（未完成）
+#   comparitor                           (L29)   — 比较两个 XLS 连接组数据文件的差异
+#   getColumns                           (L107)  — 从制表符分隔的文本文件中读取列数据
+#   getColumnsXls                        (L141)  — 从 XLS 电子表格文件中读取列数据
+#   sortTwoColumns                       (L183)  — 按前两列（From/To 神经元）对字典进行排序
+#   formatNames                          (L192)  — 格式化神经元名称，移除中间的填充零
+#   matchLists                           (L205)  — 比较两个连接列表，提取匹配对并从原列表中移除
+#   typeMapping                          (L333)  — 连接类型映射（未完成）
 #
 # 更新日志：
+#   2026-04-16  Copilot  计划2 阶段八收尾：补记汇总校验与最终勘误完成
 #   2026-04-16  Copilot  添加中文 docstring 和行内注释
 #
 # 当前维护者：Copilot

@@ -5,14 +5,15 @@
 #   支持神经元与肌肉分组显示、自动保存 PNG、自然排序等。
 #
 # 类与方法索引：
-#   natsort                              (L31)   — 对字符串进行自然排序的辅助键函数
-#   plots                                (L48)   — 将仿真数据矩阵绘制为热图（pcolormesh）
-#   generate_traces_plot                 (L137)  — 使用 pyNeuroML 绘制各细胞的膜电位或活性轨迹叠加图
-#   plot_c302_results                    (L184)  — c302 仿真结果的主绘图函数
-#   _show_conn_matrix                    (L473)  — 内部辅助函数：显示单个连接矩阵热图
-#   generate_conn_matrix                 (L563)  — 从 NeuroML 文档生成完整的连接矩阵可视化
+#   natsort                              (L32)   — 对字符串进行自然排序的辅助键函数
+#   plots                                (L49)   — 将仿真数据矩阵绘制为热图（pcolormesh）
+#   generate_traces_plot                 (L138)  — 使用 pyNeuroML 绘制各细胞的膜电位或活性轨迹叠加图
+#   plot_c302_results                    (L185)  — c302 仿真结果的主绘图函数
+#   _show_conn_matrix                    (L474)  — 内部辅助函数：显示单个连接矩阵热图
+#   generate_conn_matrix                 (L564)  — 从 NeuroML 文档生成完整的连接矩阵可视化
 #
 # 更新日志：
+#   2026-04-16  Copilot  计划2 阶段八收尾：补记汇总校验与最终勘误完成
 #   2026-04-16  Copilot  添加中文 docstring 和行内注释
 #
 # 当前维护者：Copilot

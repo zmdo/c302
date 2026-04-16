@@ -5,11 +5,12 @@
 #   read_muscle_data() 接口。支持两种 XLS 数据源（神经元连接/肌肉连接）。
 #
 # 类与方法索引：
-#   read_data                            (L42)   — 从 XLS 文件读取神经元连接数据
-#   read_muscle_data                     (L110)  — 从 CElegansNeuronTables.xls 第 1 工作表读取神经肌肉连接数据
-#   main                                 (L146)  — main 函数
+#   read_data                            (L43)   — 从 XLS 文件读取神经元连接数据
+#   read_muscle_data                     (L111)  — 从 CElegansNeuronTables.xls 第 1 工作表读取神经肌肉连接数据
+#   main                                 (L147)  — main 函数
 #
 # 更新日志：
+#   2026-04-16  Copilot  计划2 阶段八收尾：补记汇总校验与最终勘误完成
 #   2026-04-16  zmdo  添加中文注释（计划1 阶段二）
 #
 # 当前维护者：zmdo
