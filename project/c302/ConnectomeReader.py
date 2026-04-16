@@ -614,6 +614,7 @@ def analyse_connections(cells, neuron_conns, neurons2muscles, muscles, muscle_co
     """
     # 打印连接组统计摘要，用于调试和验证数据读取器输出的完整性
     print_("Found %s cells: %s\n" % (len(cells), sorted(cells)))
+    # [调试] 以下为保留的断言和调试输出，可取消注释以校验细胞数量
     # assert(len(cells) == 302)
     # print_("Expected number of cells correct if include_nonconnected_cells=True")
 
@@ -682,6 +683,7 @@ def analyse_connections(cells, neuron_conns, neurons2muscles, muscles, muscle_co
 
     nts = {}
     nts_tot = {}
+    # 按神经递质类别统计神经肌肉连接条数和序列突触总数
     for c in muscle_conns:
         nt = c.synclass
         if nt not in nts:
@@ -697,6 +699,7 @@ def analyse_connections(cells, neuron_conns, neurons2muscles, muscles, muscle_co
         )
 
     core_set = ["AVBL", "PVCL", "VA6", "VB6", "VD6", "DB4", "DD4"]
+    # [备选] 可替换为更小核心集合，聚焦特定神经元 pair
     # core_set = ['VA6', 'VD6']
     # 对小型核心神经元子集进行连接详细列印，便于调试网络拓扑
     print_("\n\nConnections between cells in the subset %s:\n" % (core_set))
@@ -706,6 +709,7 @@ def analyse_connections(cells, neuron_conns, neurons2muscles, muscles, muscle_co
             print_(str(c))
 
     print_details_on = ["AVBR", "NSMR"]
+    # 对特定神经元详细打印其全部传出和传入连接，用于定向调试
     for cd in print_details_on:
         print_("\n\nAll outgoing connections of %s:\n" % (cd))
         for c in neuron_conns:

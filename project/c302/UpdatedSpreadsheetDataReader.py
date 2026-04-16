@@ -151,7 +151,7 @@ def get_synclass(cell, syntype):
     """
     # 简化处理：通过神经元名称前缀推断神经递质类型
     # DD/VD 类运动神经元发出 GABA，其他使用乙酰胆碱
-    # dirty hack
+    # 临时方案：缺少完整的神经递质数据，通过名称前缀规则粗略推断
     if syntype == "GapJunction":
         return "Generic_GJ"
     else:
@@ -202,6 +202,7 @@ def read_data(include_nonconnected_cells=False):
             post = remove_leading_index_zero(post)
 
             conns.append(ConnectionInfo(pre, post, num, syntype, synclass))
+            # [调试] 可取消注释以逐条打印连接信息
             # print ConnectionInfo(pre, post, num, syntype, synclass)
             # 将神经元加入并去重，保证神经元列表不重复
             if pre not in cells:

@@ -4,11 +4,17 @@
 
 ## 模块概要
 
-<!-- TODO: 填写模块功能描述 -->
+`WhiteDataReader.White_whole` 读取器的临时适配器模块。
+将 `White_whole` 类的 `read_data` / `read_muscle_data` 方法暴露为模块级别名，
+供比较 notebook 使用。数据源：White et al. 1986 完整成虫连接组（whole）。
 
 ## 分析记录
 
-<!-- 按时间倒序记录每次分析/勘误的发现 -->
+### 2026-04-16 注释勘误
+
+**范围**：全文件
+**发现**：无 A/B/C 类问题
+**结论**：无需修改
 
 ## 修改记忆
 

@@ -162,8 +162,8 @@ class OpenWormReader(object):
                     post_name = format_muscle_name(post_name)
 
                 if not synclass:
-                    # 缺少 synclass时依其他字段猜测，保证生成模型时有有效的 synclass
-                    # Hack/guess
+                    # 缺少 synclass 时依其他字段猜测，保证生成模型时有有效的 synclass
+                    # 临时方案：synclass 未知时按电突触和 DD/VD 前缀规则粗略猜测
                     if syntype and syntype.lower() == "gapjunction":
                         synclass = "Generic_GJ"
                     else:
@@ -227,6 +227,7 @@ if __name__ == "__main__":
 
     from c302.UpdatedSpreadsheetDataReader import read_data as read_data_usr
 
+    # [备选] 可替换为旧版 SpreadsheetDataReader 进行对比验证
     # from c302.SpreadsheetDataReader import read_data as read_data_usr
 
     cells2, conns2 = read_data_usr(include_nonconnected_cells=True)
@@ -271,6 +272,7 @@ if __name__ == "__main__":
     refs_USR = list(conn_map_USR.keys())
 
     for i in range(min(maxn, len(refs_USR))):
+        # [调试] 可取消注释以打印 USR 连接详情
         # print("\n-----  Connection in USR: %s"%refs[i])
         # print cm2[refs[i]]
         ref = refs_USR[i]
