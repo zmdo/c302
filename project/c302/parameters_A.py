@@ -155,7 +155,7 @@ class ParameterisedModel(c302ModelPrototype):
         # 非生理偏置电流：KnownError 表示已知此参数不代表真实生物行为，仅供调试
         self.add_bioparameter(
             "unphysiological_offset_current", "0pA", "KnownError", "0"
-        )  # Can be activated later
+        )  # 可在后续激活（当前值为 0，即禁用此非生理性偏置电流）
         self.add_bioparameter(
             "unphysiological_offset_current_del", "0ms", "KnownError", "0"
         )

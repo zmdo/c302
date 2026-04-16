@@ -8,51 +8,51 @@
 #   ParameterisedModel                   (L101)  — ParameterisedModel 类
 #     __init__                           (L102)  — 初始化 Level C2 参数模型，还在开发中（under development）
 #     set_default_bioparameters          (L122)  — 设置 Level C2 的默认生物参数（仍在调整中）
-#     create_models                      (L676)  — 按顺序创建所有网络组件：偏置电流和浓度模型、肌肉细胞、神经元细胞、
-#     create_generic_muscle_cell         (L687)  — 创建 C2 层级的肌肉细胞（``Cell``），含独立的膜参数（容抗、阈值、漏/慢钾/快钾/钙通道）
-#     create_neuron_to_neuron_syn        (L797)  — 创建神经元间突触：兴奋性模拟突触、抑制性模拟突触、标准缝隙连接和延迟缝隙连接
-#     create_offsetcurrent_concentrationmodel (L842)  — 创建偏置电流和神经元/肌肉独立的钙浓度模型
-#     create_neuron_to_muscle_syn        (L899)  — 创建神经元到肌肉的模拟突触（兴奋性/抑制性）和缝隙连接
-#     create_muscle_to_muscle_syn        (L928)  — 创建肌肉到肌肉的缝隙连接（``GapJunction``）
-#     get_elec_syn                       (L935)  — 根据连接类型和参数覆盖获取电突触对象，支持多种特殊缝隙连接变体
-#     get_exc_syn                        (L1073) — 根据连接类型和参数覆盖获取兴奋性突触对象，支持多种模拟突触变体
-#     get_inh_syn                        (L1268) — 根据连接类型获取抑制性模拟突触（``GradedSynapse``）对象
-#     create_n_connection_synapse        (L1363) — C2 层级重载此方法以支持 ``DelayedGapJunction``、``ProprioGapJunction``、
-#     is_elec_conn                       (L1391) — C2 层级扩展电突触判断，将 ``DelayedGapJunction``、``ProprioGapJunction``、
-#     is_analog_conn                     (L1402) — C2 层级扩展模拟突触判断，将 ``NeuronMuscle``、``GradedSynapse2`` 也视为模拟连接
-#   SwitchedGapJunction                  (L1413) — SwitchedGapJunction 类
-#     __init__                           (L1414) — 初始化开关型缝隙连接（C2 自定义，由开关参数控制导通），存储 ID
-#     export                             (L1423) — 将 SwitchedGapJunction 以 NeuroML XML 格式写入输出流
-#   DelayedGapJunction                   (L1439) — DelayedGapJunction 类
-#     __init__                           (L1440) — 初始化延迟调制缝隙连接，其传递量由 sigmoid 函数在时间轴上调制
-#     export                             (L1458) — 将 DelayedGapJunction 以 NeuroML XML 格式写入输出流
-#     __repr__                           (L1473) — 返回 DelayedGapJunction 的字符串表示
-#   ProprioGapJunction                   (L1484) — ProprioGapJunction 类
-#     __init__                           (L1485) — 初始化本体感觉调制缝隙连接，传递量由本体感觉电导（p_conductance）叠加基础电导
-#     export                             (L1503) — 将 ProprioGapJunction 以 NeuroML XML 格式写入输出流
-#     __repr__                           (L1525) — 返回 ProprioGapJunction 的字符串表示
-#   ProprioGapJunction2                  (L1543) — ProprioGapJunction2 类
-#     __init__                           (L1544) — 初始化增强型本体感觉缝隙连接，支持时间门控（ar/ad/beta）和电压门控（vth）参数
-#     export                             (L1583) — 将 ProprioGapJunction2 以 NeuroML XML 格式写入输出流
-#     __repr__                           (L1610) — 返回 ProprioGapJunction2 的字符串表示
-#   DelayedGradedSynapse                 (L1633) — DelayedGradedSynapse 类
-#     __init__                           (L1634) — 初始化延迟型模拟突触，在标准 GradedSynapse 参数基础上增加时间调制参数
-#     export                             (L1666) — 将 DelayedGradedSynapse 以 NeuroML XML 格式写入输出流
-#     __repr__                           (L1691) — 返回 DelayedGradedSynapse 的字符串表示
-#   NeuronMuscle                         (L1712) — NeuronMuscle 类
-#     __init__                           (L1713) — 初始化肌肉本体感觉反馈类突触，包含激活/失活速率和阈值等参数
-#     export                             (L1734) — 将 NeuronMuscle 以 NeuroML XML 格式写入输出流
-#   MuscleConcentrationModel             (L1758) — MuscleConcentrationModel 类
-#     __init__                           (L1759) — 初始化肌肉钙浓度模型（简化版），包含衰减时间、转换系数等参数
-#     export                             (L1774) — 将 MuscleConcentrationModel 以 NeuroML XML 格式写入输出流
-#     __repr__                           (L1789) — 返回 MuscleConcentrationModel 的字符串表示
-#   MuscleConcentrationModel2            (L1800) — MuscleConcentrationModel2 类
-#     __init__                           (L1801) — 初始化扩展肌肉钙浓度模型，增加 sigmoid 浓度阈值调制参数
-#     export                             (L1847) — 将 MuscleConcentrationModel2 以 NeuroML XML 格式写入输出流
-#     __repr__                           (L1875) — 返回 MuscleConcentrationModel2 的字符串表示
-#   GradedSynapse2                       (L1899) — GradedSynapse2 类
-#     __init__                           (L1900) — 初始化双分量模拟突触（C2 特有），支持激活/失活速率门控
-#     export                             (L1919) — 将 GradedSynapse2 以 NeuroML XML 格式写入输出流
+#     create_models                      (L691)  — 按顺序创建所有网络组件：偏置电流和浓度模型、肌肉细胞、神经元细胞、
+#     create_generic_muscle_cell         (L702)  — 创建 C2 层级的肌肉细胞（``Cell``），含独立的膜参数（容抗、阈值、漏/慢钾/快钾/钙通道）
+#     create_neuron_to_neuron_syn        (L812)  — 创建神经元间突触：兴奋性模拟突触、抑制性模拟突触、标准缝隙连接和延迟缝隙连接
+#     create_offsetcurrent_concentrationmodel (L857)  — 创建偏置电流和神经元/肌肉独立的钙浓度模型
+#     create_neuron_to_muscle_syn        (L914)  — 创建神经元到肌肉的模拟突触（兴奋性/抑制性）和缝隙连接
+#     create_muscle_to_muscle_syn        (L943)  — 创建肌肉到肌肉的缝隙连接（``GapJunction``）
+#     get_elec_syn                       (L950)  — 根据连接类型和参数覆盖获取电突触对象，支持多种特殊缝隙连接变体
+#     get_exc_syn                        (L1088) — 根据连接类型和参数覆盖获取兴奋性突触对象，支持多种模拟突触变体
+#     get_inh_syn                        (L1283) — 根据连接类型获取抑制性模拟突触（``GradedSynapse``）对象
+#     create_n_connection_synapse        (L1378) — C2 层级重载此方法以支持 ``DelayedGapJunction``、``ProprioGapJunction``、
+#     is_elec_conn                       (L1406) — C2 层级扩展电突触判断，将 ``DelayedGapJunction``、``ProprioGapJunction``、
+#     is_analog_conn                     (L1417) — C2 层级扩展模拟突触判断，将 ``NeuronMuscle``、``GradedSynapse2`` 也视为模拟连接
+#   SwitchedGapJunction                  (L1428) — SwitchedGapJunction 类
+#     __init__                           (L1429) — 初始化开关型缝隙连接（C2 自定义，由开关参数控制导通），存储 ID
+#     export                             (L1438) — 将 SwitchedGapJunction 以 NeuroML XML 格式写入输出流
+#   DelayedGapJunction                   (L1454) — DelayedGapJunction 类
+#     __init__                           (L1455) — 初始化延迟调制缝隙连接，其传递量由 sigmoid 函数在时间轴上调制
+#     export                             (L1473) — 将 DelayedGapJunction 以 NeuroML XML 格式写入输出流
+#     __repr__                           (L1488) — 返回 DelayedGapJunction 的字符串表示
+#   ProprioGapJunction                   (L1499) — ProprioGapJunction 类
+#     __init__                           (L1500) — 初始化本体感觉调制缝隙连接，传递量由本体感觉电导（p_conductance）叠加基础电导
+#     export                             (L1518) — 将 ProprioGapJunction 以 NeuroML XML 格式写入输出流
+#     __repr__                           (L1540) — 返回 ProprioGapJunction 的字符串表示
+#   ProprioGapJunction2                  (L1558) — ProprioGapJunction2 类
+#     __init__                           (L1559) — 初始化增强型本体感觉缝隙连接，支持时间门控（ar/ad/beta）和电压门控（vth）参数
+#     export                             (L1598) — 将 ProprioGapJunction2 以 NeuroML XML 格式写入输出流
+#     __repr__                           (L1625) — 返回 ProprioGapJunction2 的字符串表示
+#   DelayedGradedSynapse                 (L1648) — DelayedGradedSynapse 类
+#     __init__                           (L1649) — 初始化延迟型模拟突触，在标准 GradedSynapse 参数基础上增加时间调制参数
+#     export                             (L1681) — 将 DelayedGradedSynapse 以 NeuroML XML 格式写入输出流
+#     __repr__                           (L1706) — 返回 DelayedGradedSynapse 的字符串表示
+#   NeuronMuscle                         (L1727) — NeuronMuscle 类
+#     __init__                           (L1728) — 初始化肌肉本体感觉反馈类突触，包含激活/失活速率和阈值等参数
+#     export                             (L1749) — 将 NeuronMuscle 以 NeuroML XML 格式写入输出流
+#   MuscleConcentrationModel             (L1773) — MuscleConcentrationModel 类
+#     __init__                           (L1774) — 初始化肌肉钙浓度模型（简化版），包含衰减时间、转换系数等参数
+#     export                             (L1789) — 将 MuscleConcentrationModel 以 NeuroML XML 格式写入输出流
+#     __repr__                           (L1804) — 返回 MuscleConcentrationModel 的字符串表示
+#   MuscleConcentrationModel2            (L1815) — MuscleConcentrationModel2 类
+#     __init__                           (L1816) — 初始化扩展肌肉钙浓度模型，增加 sigmoid 浓度阈值调制参数
+#     export                             (L1862) — 将 MuscleConcentrationModel2 以 NeuroML XML 格式写入输出流
+#     __repr__                           (L1890) — 返回 MuscleConcentrationModel2 的字符串表示
+#   GradedSynapse2                       (L1914) — GradedSynapse2 类
+#     __init__                           (L1915) — 初始化双分量模拟突触（C2 特有），支持激活/失活速率门控
+#     export                             (L1934) — 将 GradedSynapse2 以 NeuroML XML 格式写入输出流
 #
 # 更新日志：
 #   2026-04-16  Copilot  添加中文 docstring 和行内注释（计划1阶段三）
@@ -150,6 +150,7 @@ class ParameterisedModel(ParameterisedModel_C):
         self.add_bioparameter("neuron_spike_thresh", "-55 mV", "BlindGuess", "0.1")
         self.add_bioparameter("muscle_spike_thresh", "-10 mV", "BlindGuess", "0.1")
 
+        # [备选] 以下为该参数（组）的备选值，可取消注释以替换当前设定
         # self.add_bioparameter("muscle_leak_cond_density", "0.0172 mS_per_cm2", "BlindGuess", "0.1")
         self.add_bioparameter(
             "muscle_leak_cond_density", "0.002 mS_per_cm2", "BlindGuess", "0.1"
@@ -159,9 +160,11 @@ class ParameterisedModel(ParameterisedModel_C):
         )
 
         self.add_bioparameter("leak_erev", "-60 mV", "BlindGuess", "0.1")
+        # [备选] 以下为该参数（组）的备选值，可取消注释以替换当前设定
         # self.add_bioparameter("muscle_leak_erev", "-13 mV", "BlindGuess", "0.1")
         self.add_bioparameter("muscle_leak_erev", "-20 mV", "BlindGuess", "0.1")
 
+        # [备选] 以下为该参数（组）的备选值，可取消注释以替换当前设定
         # self.add_bioparameter("muscle_k_slow_cond_density", "0.564 mS_per_cm2", "BlindGuess", "0.1")
         self.add_bioparameter(
             "muscle_k_slow_cond_density",
@@ -176,9 +179,11 @@ class ParameterisedModel(ParameterisedModel_C):
             "0.1",
         )
         self.add_bioparameter("k_slow_erev", "-60 mV", "BlindGuess", "0.1")
+        # [备选] 以下为该参数（组）的备选值，可取消注释以替换当前设定
         # self.add_bioparameter("muscle_k_slow_erev", "-70 mV", "BlindGuess", "0.1")
         self.add_bioparameter("muscle_k_slow_erev", "-30 mV", "BlindGuess", "0.1")
 
+        # [备选] 以下为该参数（组）的备选值，可取消注释以替换当前设定
         # self.add_bioparameter("muscle_k_fast_cond_density", "1.015 mS_per_cm2", "BlindGuess", "0.1")
         self.add_bioparameter(
             "neuron_k_fast_cond_density",
@@ -187,6 +192,7 @@ class ParameterisedModel(ParameterisedModel_C):
             "0.1",
         )
         self.add_bioparameter("k_fast_erev", "-70 mV", "BlindGuess", "0.1")
+        # [备选] 以下为该参数（组）的备选值，可取消注释以替换当前设定
         # self.add_bioparameter("muscle_k_fast_erev", "-50 mV", "BlindGuess", "0.1")
 
         self.add_bioparameter(
@@ -197,6 +203,7 @@ class ParameterisedModel(ParameterisedModel_C):
         )
         self.add_bioparameter("muscle_k_fast_erev", "-30 mV", "BlindGuess", "0.1")
 
+        # [备选] 以下为该参数（组）的备选值，可取消注释以替换当前设定
         # self.add_bioparameter("muscle_ca_boyle_cond_density", "0.284 mS_per_cm2", "BlindGuess", "0.1")
         self.add_bioparameter(
             "muscle_ca_boyle_cond_density",
@@ -212,6 +219,7 @@ class ParameterisedModel(ParameterisedModel_C):
         )
 
         self.add_bioparameter("ca_boyle_erev", "10 mV", "BlindGuess", "0.1")
+        # [备选] 以下为该参数（组）的备选值，可取消注释以替换当前设定
         # self.add_bioparameter("muscle_ca_boyle_erev", "46 mV", "BlindGuess", "0.1")
         self.add_bioparameter("muscle_ca_boyle_erev", "0 mV", "BlindGuess", "0.1")
 
@@ -232,6 +240,7 @@ class ParameterisedModel(ParameterisedModel_C):
             "BlindGuess",
             "0.1",
         )
+        # [备选] 以下为该参数（组）的备选值，可取消注释以替换当前设定
         # self.add_bioparameter("ca_conc_xRho_muscle", "0.0238919 mol_per_m_per_A_per_s", "BlindGuess", "0.1")
         # self.add_bioparameter("ca_conc_iCaSigmoidMid_muscle", "3 pA", "BlindGuess", "0.1")
         # self.add_bioparameter("ca_conc_iCaSigmoidSlope_muscle", "0.01 pA", "BlindGuess", "0.1")
@@ -326,6 +335,7 @@ class ParameterisedModel(ParameterisedModel_C):
             "neuron_to_muscle_elec_syn_gbase", "0.00152 nS", "BlindGuess", "0.1"
         )
 
+        # [备选] 以下为该参数（组）的备选值，可取消注释以替换当前设定
         # self.add_bioparameter("muscle_to_muscle_elec_syn_gbase", "0.0002 nS", "BlindGuess", "0.1")
         self.add_bioparameter(
             "muscle_to_muscle_elec_syn_gbase", "0 nS", "BlindGuess", "0.1"
@@ -345,6 +355,7 @@ class ParameterisedModel(ParameterisedModel_C):
             "neuron_to_motor_delayed_elec_syn_mu", "-30", "BlindGuess", "0.1"
         )
 
+        # [备选] 以下为该参数（组）的备选值，可取消注释以替换当前设定
         # self.add_bioparameter("muscle_to_muscle_elec_syn_gbase", "0.0002 nS", "BlindGuess", "0.1")
         self.add_bioparameter(
             "muscle_to_muscle_elec_syn_gbase", "0 nS", "BlindGuess", "0.1"
@@ -365,7 +376,7 @@ class ParameterisedModel(ParameterisedModel_C):
 
         self.add_bioparameter(
             "unphysiological_offset_current", "0 pA", "KnownError", "0"
-        )  # Can be activated later
+        )  # 可在后续激活（当前值为 0，即禁用此非生理性偏置电流）
         self.add_bioparameter(
             "unphysiological_offset_current_del", "0 ms", "KnownError", "0"
         )
@@ -392,6 +403,7 @@ class ParameterisedModel(ParameterisedModel_C):
         self.add_bioparameter("AVAR_to_DA9_elec_syn_gbase", "0.00052 nS", "BlindGuess", "0.1")
         self.add_bioparameter("AVAL_to_DA9_elec_syn_gbase", "0.00052 nS", "BlindGuess", "0.1")"""
 
+        # [备选] 以下为该参数（组）的备选值，可取消注释以替换当前设定
         # self.add_bioparameter("neuron_to_neuron_elec_syn_gbase", "0 nS", "BlindGuess", "0.1")
 
         """self.add_bioparameter("AVBL_to_DB2_elec_syn_delay", "250ms", "BlindGuess", "0.1")
@@ -441,6 +453,7 @@ class ParameterisedModel(ParameterisedModel_C):
         self.add_bioparameter("DB6_to_AVBR_elec_syn_gbase", "0 nS", "BlindGuess", "0.1")
         self.add_bioparameter("DB7_to_AVBR_elec_syn_gbase", "0 nS", "BlindGuess", "0.1")"""
 
+        # [备选] 以下为该参数（组）的备选值，可取消注释以替换当前设定
         # self.add_bioparameter("AVBR_to_DB4_exc_syn_conductance", "0 nS", "BlindGuess", "0.1")
 
         """self.add_bioparameter("neuron_to_neuron_elec_syn_gbase", "0.01252 nS", "BlindGuess", "0.1")
@@ -520,6 +533,7 @@ class ParameterisedModel(ParameterisedModel_C):
             self.add_bioparameter(syn, self.get_bioparameter('neuron_to_muscle_exc_syn_k').value, "BlindGuess", "0.1")
         """
 
+        # [备选] 以下为该参数（组）的备选值，可取消注释以替换当前设定
         # self.add_bioparameter("DB1_to_MDL06_exc_syn_delta", "5 mV", "BlindGuess", "0.1")
         # self.add_bioparameter("DB1_to_MDL06_exc_syn_vth", "0 mV", "BlindGuess", "0.1")
         # self.add_bioparameter("DB1_to_MDL06_exc_syn_erev", "-50 mV", "BlindGuess", "0.1")
@@ -626,6 +640,7 @@ class ParameterisedModel(ParameterisedModel_C):
         self.add_bioparameter("AVBR_to_VB11_elec_syn_sigma", "0.3per_ms", "BlindGuess", "0.1")
         self.add_bioparameter("AVBR_to_VB11_elec_syn_mu", "100ms", "BlindGuess", "0.1")"""
 
+        # [备选] 以下为该参数（组）的备选值，可取消注释以替换当前设定
         # self.add_bioparameter("AVBL_to_DB4_elec_syn_gbase", "0.00652 nS", "BlindGuess", "0.1")
         # self.add_bioparameter("AVBR_to_DB4_elec_syn_gbase", "0.00652 nS", "BlindGuess", "0.1")
         # self.add_bioparameter("AVBR_to_DB4_exc_syn_conductance", "0.49 nS", "BlindGuess", "0.1")
@@ -780,10 +795,10 @@ class ParameterisedModel(ParameterisedModel_C):
         ip = IntracellularProperties()
         self.generic_muscle_cell.biophysical_properties.intracellular_properties = ip
 
-        # NOTE: resistivity/axial resistance not used for single compartment cell models, so value irrelevant!
+        # 注意：单室细胞模型不使用轴向电阻率/轴向电阻，此参数取值无影响
         ip.resistivities.append(Resistivity(value="0.1 kohm_cm"))
 
-        # NOTE: Ca reversal potential not calculated by Nernst, so initial_ext_concentration value irrelevant!
+        # 注意：钙反转电位未通过 Nernst 方程计算，initial_ext_concentration 取值无影响
         species = Species(
             id="ca",
             ion="ca",

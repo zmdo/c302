@@ -169,7 +169,7 @@ class ParameterisedModel(c302ModelPrototype):
 
         self.add_bioparameter(
             "unphysiological_offset_current", "0 pA", "KnownError", "0"
-        )  # Can be activated later
+        )  # 可在后续激活（当前值为 0，即禁用此非生理性偏置电流）
         self.add_bioparameter(
             "unphysiological_offset_current_del", "0 ms", "KnownError", "0"
         )
@@ -277,12 +277,12 @@ class ParameterisedModel(c302ModelPrototype):
         ip = IntracellularProperties()
         self.generic_muscle_cell.biophysical_properties.intracellular_properties = ip
 
-        # NOTE: resistivity/axial resistance not used for single compartment cell models, so value irrelevant!
+        # 注意：单室细胞模型不使用轴向电阻率/轴向电阻，此参数取值无影响
         ip.resistivities.append(
             Resistivity(value=self.get_bioparameter("resistivity").value)
         )
 
-        # NOTE: Ca reversal potential not calculated by Nernst, so initial_ext_concentration value irrelevant!
+        # 注意：钙反转电位未通过 Nernst 方程计算，initial_ext_concentration 取值无影响
         species = Species(
             id="ca",
             ion="ca",
@@ -372,12 +372,12 @@ class ParameterisedModel(c302ModelPrototype):
         ip = IntracellularProperties()
         cell.biophysical_properties.intracellular_properties = ip
 
-        # NOTE: resistivity/axial resistance not used for single compartment cell models, so value irrelevant!
+        # 注意：单室细胞模型不使用轴向电阻率/轴向电阻，此参数取值无影响
         ip.resistivities.append(
             Resistivity(value=self.get_bioparameter("resistivity").value)
         )
 
-        # NOTE: Ca reversal potential not calculated by Nernst, so initial_ext_concentration value irrelevant!
+        # 注意：钙反转电位未通过 Nernst 方程计算，initial_ext_concentration 取值无影响
         species = Species(
             id="ca",
             ion="ca",
