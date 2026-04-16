@@ -632,9 +632,9 @@ def analyse_connections(cells, neuron_conns, neurons2muscles, muscles, muscle_co
         print_("   %s" % c)
 
     print_("   ...\n")
-    # 按神经递质类别统计神经元间连接条数和序列突触总数
+    # 按神经递质类别统计神经元间连接条数和突触总数
     nts = {}  # 每种神经递质类型的连接条数
-    nts_tot = {}  # 每种神经递质类型的穑触总数
+    nts_tot = {}  # 每种神经递质类型的突触总数
     for c in neuron_conns:
         nt = c.synclass
         if nt not in nts:
@@ -683,7 +683,7 @@ def analyse_connections(cells, neuron_conns, neurons2muscles, muscles, muscle_co
 
     nts = {}
     nts_tot = {}
-    # 按神经递质类别统计神经肌肉连接条数和序列突触总数
+    # 按神经递质类别统计神经肌肉连接条数和突触总数
     for c in muscle_conns:
         nt = c.synclass
         if nt not in nts:

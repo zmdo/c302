@@ -132,7 +132,7 @@ class OpenWormReader(object):
                 syn.syntype()
                 syn.synclass()
                 syn.number()
-                # 将所有穑触对象转换为 Python对象列表并缓存
+                # 将所有突触对象转换为 Python对象列表并缓存
                 self.connlist = syn.to_objects()
 
                 self.cell_names = self.get_cells_in_model(net)

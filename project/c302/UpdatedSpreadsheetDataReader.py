@@ -12,12 +12,12 @@
 #   is_neuron                            (L88)   — 判断给定细胞名称是否为神经元
 #   remove_leading_index_zero            (L98)   — Returns neuron name with an index without leading zero. E.g. VB01 -> VB1.
 #   get_old_muscle_name                  (L108)  — 将 herm_full_edgelist 格式的肌肉名称转换为标准命名格式
-#   get_syntype                          (L129)  — 将 CSV 中的穑触类型字符串映射为 ConnectionInfo 标准形式
-#   get_synclass                         (L145)  — 根据穑触前细胞名称和穑触类型推断神经递质分类
+#   get_syntype                          (L129)  — 将 CSV 中的突触类型字符串映射为 ConnectionInfo 标准形式
+#   get_synclass                         (L145)  — 根据突触前细胞名称和突触类型推断神经递质分类
 #   parse_row                            (L163)  — 解析 CSV 中的单行数据，返回连接信息元组
 #   read_data                            (L177)  — Args:
-#   read_muscle_data                     (L220)  — Returns:
-#   main                                 (L261)  — main 函数
+#   read_muscle_data                     (L221)  — Returns:
+#   main                                 (L262)  — main 函数
 #
 # 更新日志：
 #   2026-04-16  zmdo  添加中文注释（计划1 阶段二）
@@ -43,7 +43,7 @@ from c302 import print_
 
 # CSV 数据文件目录：和模块文件处于同一 data/ 子目录
 spreadsheet_location = os.path.dirname(os.path.abspath(__file__)) + "/data/"
-# herm_full_edgelist.csv 来源于 OpenWorm 内力小鸟文件连接组数据（雌性成虫全连接组）
+# herm_full_edgelist.csv 来源于 OpenWorm 项目连接组数据（雌雄同体成体全连接边列表）
 filename = "%sherm_full_edgelist.csv" % spreadsheet_location
 
 
@@ -127,13 +127,13 @@ def get_old_muscle_name(muscle):
 
 
 def get_syntype(syntype):
-    """将 CSV 中的穑触类型字符串映射为 ConnectionInfo 标准形式。
+    """将 CSV 中的突触类型字符串映射为 ConnectionInfo 标准形式。
 
-    :param syntype: CSV 中的穑触类型，如 'electrical' 或 'chemical'
-    :return: 标准化穑触类型字符串
-    :raises NotImplementedError: 无法解析的穑触类型时抛出
+    :param syntype: CSV 中的突触类型，如 'electrical' 或 'chemical'
+    :return: 标准化突触类型字符串
+    :raises NotImplementedError: 无法解析的突触类型时抛出
     """
-    # 将 CSV 中的穑触类型字符串转换为 ConnectionInfo 中使用的标准形式
+    # 将 CSV 中的突触类型字符串转换为 ConnectionInfo 中使用的标准形式
     if syntype == "electrical":
         return "GapJunction"
     elif syntype == "chemical":
@@ -143,10 +143,10 @@ def get_syntype(syntype):
 
 
 def get_synclass(cell, syntype):
-    """根据穑触前细胞名称和穑触类型推断神经递质分类。
+    """根据突触前细胞名称和突触类型推断神经递质分类。
 
-    :param cell: 穑触前细胞名称
-    :param syntype: 穑触类型（由 get_syntype 处理后的标准形式）
+    :param cell: 突触前细胞名称
+    :param syntype: 突触类型（由 get_syntype 处理后的标准形式）
     :return: 神经递质分类字符串，如 'Generic_GJ'、'GABA'、'Acetylcholine'
     """
     # 简化处理：通过神经元名称前缀推断神经递质类型

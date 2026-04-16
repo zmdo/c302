@@ -63,7 +63,7 @@ def read_data(include_nonconnected_cells=False, neuron_connect=False):
             post = str(rb.sheet_by_index(0).cell(row, 1).value)
             syntype = rb.sheet_by_index(0).cell(row, 2).value
             num = int(rb.sheet_by_index(0).cell(row, 3).value)
-            # 判断突触类型：包含 'EJ'则为缝隙连接（电穑触），否则为化学穑触
+            # 判断突触类型：包含 'EJ'则为缝隙连接（电突触），否则为化学突触
             synclass = "Generic_GJ" if "EJ" in syntype else "Chemical_Synapse"
 
             conns.append(ConnectionInfo(pre, post, num, syntype, synclass))
@@ -130,7 +130,7 @@ def read_muscle_data():
     for row in range(1, sheet.nrows):
         pre = str(sheet.cell(row, 0).value)
         post = str(sheet.cell(row, 1).value)
-        syntype = "Send"  # 肌肉连接均为化学穑触（Send）
+        syntype = "Send"  # 肌肉连接均为化学突触（Send）
         num = int(sheet.cell(row, 2).value)
         synclass = sheet.cell(row, 3).value.replace(",", "plus").replace(" ", "_")
 

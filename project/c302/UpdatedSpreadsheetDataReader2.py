@@ -12,12 +12,12 @@
 #   is_neuron                            (L90)   — 判断给定细胞名称是否为神经元
 #   remove_leading_index_zero            (L100)  — Returns neuron name with an index without leading zero. E.g. VB01 -> VB1.
 #   get_old_muscle_name                  (L110)  — 将 herm_full_edgelist_MODIFIED 格式的肌肉名称转换为标准命名格式
-#   get_syntype                          (L131)  — 将 CSV 中的穑触类型字符串映射为 ConnectionInfo 标准形式
-#   get_synclass                         (L147)  — 根据穑触前细胞名称和穑触类型推断神经递质分类
+#   get_syntype                          (L131)  — 将 CSV 中的突触类型字符串映射为 ConnectionInfo 标准形式
+#   get_synclass                         (L147)  — 根据突触前细胞名称和突触类型推断神经递质分类
 #   parse_row                            (L165)  — 解析 CSV 中的单行数据，返回连接信息元组
 #   read_data                            (L179)  — Args:
-#   read_muscle_data                     (L222)  — Returns:
-#   main                                 (L266)  — main 函数
+#   read_muscle_data                     (L223)  — Returns:
+#   main                                 (L267)  — main 函数
 #
 # 更新日志：
 #   2026-04-16  zmdo  添加中文注释（计划1 阶段二）
@@ -129,13 +129,13 @@ def get_old_muscle_name(muscle):
 
 
 def get_syntype(syntype):
-    """将 CSV 中的穑触类型字符串映射为 ConnectionInfo 标准形式。
+    """将 CSV 中的突触类型字符串映射为 ConnectionInfo 标准形式。
 
-    :param syntype: CSV 中的穑触类型，如 'electrical' 或 'chemical'
-    :return: 标准化穑触类型字符串
-    :raises NotImplementedError: 无法解析的穑触类型时抛出
+    :param syntype: CSV 中的突触类型，如 'electrical' 或 'chemical'
+    :return: 标准化突触类型字符串
+    :raises NotImplementedError: 无法解析的突触类型时抛出
     """
-    # 将 CSV 中的穑触类型字符串转换为 ConnectionInfo 中使用的标准形式
+    # 将 CSV 中的突触类型字符串转换为 ConnectionInfo 中使用的标准形式
     if syntype == "electrical":
         return "GapJunction"
     elif syntype == "chemical":
@@ -145,10 +145,10 @@ def get_syntype(syntype):
 
 
 def get_synclass(cell, syntype):
-    """根据穑触前细胞名称和穑触类型推断神经递质分类。
+    """根据突触前细胞名称和突触类型推断神经递质分类。
 
-    :param cell: 穑触前细胞名称
-    :param syntype: 穑触类型（由 get_syntype 处理后的标准形式）
+    :param cell: 突触前细胞名称
+    :param syntype: 突触类型（由 get_syntype 处理后的标准形式）
     :return: 神经递质分类字符串，如 'Generic_GJ'、'GABA'、'Acetylcholine'
     """
     # 简化处理：通过神经元名称前缀推断神经递质类型
@@ -242,7 +242,7 @@ def read_muscle_data():
             if (
                 not is_neuron(pre) and not is_body_wall_muscle(pre)
             ) or not is_body_wall_muscle(post):
-                # 跳过：仅保留“前突触为神经元、后穑触为体壁肌肉”的连接，过滤其他类型
+                # 跳过：仅保留“前突触为神经元、后突触为体壁肌肉”的连接，过滤其他类型
                 continue
 
             if is_neuron(pre):
