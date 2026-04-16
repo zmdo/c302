@@ -251,6 +251,8 @@ git commit -m "style: 为 <模块名> 添加中文注释" \
 |------|------|---------|
 | YAML 格式错误 | `规范文件顶层须为列表` | 用 Python `yaml.dump()` 生成 YAML |
 | gen_index.py 批量调用 | 多文件参数只更新 1 个 | 必须逐文件循环调用 |
-| gen_index.py 未收敛 | check_index.py 报行号不匹配 | 多跑几遍 `--write` || gen_index.py 头部块外插入 | 文件开头出现裸的 `# 类与方法索引：` 块，与 `# ===` 头部块内的索引重复 | **已修复**：现仅在 `# ===` 分隔线内搜索；无头部块时拒绝插入并打印警告。若已产生重复块，手动删除 `# ===` 外的索引行后重新运行 || PowerShell BOM | verify 报首行差异 `\ufeff` | 用 Python subprocess 提取 git 文件 |
+| gen_index.py 未收敛 | check_index.py 报行号不匹配 | 多跑几遍 `--write` |
+| gen_index.py 头部块外插入 | 文件开头出现裸的 `# 类与方法索引：` 块，与 `# ===` 头部块内的索引重复 | **已修复**：现仅在 `# ===` 分隔线内搜索；无头部块时拒绝插入并打印警告。若已产生重复块，手动删除 `# ===` 外的索引行后重新运行 |
+| PowerShell BOM | verify 报首行差异 `\ufeff` | 用 Python subprocess 提取 git 文件 |
 | 注释掉的代码被翻译 | verify 报 FAIL | 仅翻译活跃注释，`# code` 保持原样 |
 | 多处重复上下文 | replace_string_in_file 报多处匹配 | 增加上下文行数，或用行号定位脚本 |
