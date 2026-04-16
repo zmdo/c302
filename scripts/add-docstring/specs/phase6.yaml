@@ -1,0 +1,183 @@
+- file: project/c302/CompareMain.py
+  functions:
+  - name: comparitor
+    docstring: '比较两个 XLS 连接组数据文件的差异。
+
+
+      读取两个 XLS 文件，格式化名称后进行配对匹配，
+
+      输出匹配对、仅存在于文件1的连接、仅存在于文件2的连接。
+
+
+      :param fName1: 第一个 XLS 文件路径
+
+      :param fName2: 第二个 XLS 文件路径
+
+      '
+  - name: getColumns
+    docstring: '从制表符分隔的文本文件中读取列数据。
+
+
+      :param fileIn: 已打开的文件对象
+
+      :param delim: 列分隔符（默认制表符）
+
+      :param header: 首行是否为表头
+
+      :return: ``(cols, indexName)`` 二元组，cols 为列数据字典，indexName 为列索引映射
+
+      '
+  - name: getColumnsXls
+    docstring: '从 XLS 电子表格文件中读取列数据。
+
+
+      使用 xlrd 打开工作簿，读取第一个工作表的前 4 列。
+
+
+      :param fileIn: XLS 文件路径
+
+      :return: ``(cols, indexName)`` 二元组，cols 为列数据字典，indexName 为列索引映射
+
+      '
+  - name: sortTwoColumns
+    docstring: '按前两列（From/To 神经元）对字典进行排序。
+
+
+      :param cols: 列数据字典
+
+      '
+  - name: formatNames
+    docstring: '格式化神经元名称，移除中间的填充零。
+
+
+      :param cols: 列数据字典
+
+      :param indexName: 列索引映射
+
+      '
+  - name: matchLists
+    docstring: '比较两个连接列表，提取匹配对并从原列表中移除。
+
+
+      执行三轮匹配：
+
+      1. 在长列表与短列表之间查找完全匹配的连接对
+
+      2. 在长列表与已匹配列表之间查找重复连接
+
+      3. 在长列表中查找与已匹配对方向相反的连接（A→B vs B→A）
+
+
+      :param cols1: 第一个连接列表
+
+      :param cols2: 第二个连接列表
+
+      :param indexName1: 第一个列表的列索引映射
+
+      :param indexName2: 第二个列表的列索引映射
+
+      :return: ``(matches, col1, col2)`` 三元组
+
+      '
+  - name: typeMapping
+    docstring: '连接类型映射（未完成）。
+
+
+      预期将 ``EJ`` 映射为 ``GapJunction``，
+
+      ``R``/``Rp``/``S``/``Sp`` 映射为 ``Send``。
+
+
+      :param cols1: 第一个连接列表
+
+      :param cols2: 第二个连接列表
+
+      :param indexName1: 第一个列表的列索引映射
+
+      :param indexName2: 第二个列表的列索引映射
+
+      '
+- file: project/c302/backers.py
+  functions:
+  - name: get_adopted_cell_names
+    docstring: '读取 OpenWorm 赞助者认领的细胞名称映射。
+
+
+      从 ``data/adopters.txt`` 文件中解析 ``细胞名:认领名`` 格式的映射关系。
+
+
+      :param root: 数据目录路径（默认为模块所在目录下的 ``data/``）
+
+      :return: ``{细胞名: 认领名}`` 字典
+
+      '
+- file: project/c302/c302_info.py
+  functions:
+  - name: generate_c302_info
+    docstring: '从 NeuroML 文档生成神经元和肌肉的汇总信息表。
+
+
+      解析网络中所有连续投射和电投射，通过 owmeta 查询细胞类型、
+
+      神经递质和受体信息，生成 Markdown 格式汇总文件。
+
+
+      :param nml_doc: NeuroML 文档对象
+
+      :param verbose: 是否输出详细日志
+
+      '
+  - name: _info_set
+    docstring: '将集合排序后用逗号连接为字符串。
+
+
+      :param s: 可迭代对象
+
+      :return: 逗号分隔的排序字符串
+
+      '
+- file: project/c302/NeuroMLUtilities.py
+  functions:
+  - name: getSegmentIds
+    docstring: '提取细胞形态学中所有片段的 ID 列表。
+
+
+      :param cell: NeuroML Cell 对象
+
+      :return: 片段 ID 列表
+
+      '
+  - name: get3DPosition
+    docstring: '计算细胞指定片段上某点的三维坐标。
+
+
+      根据 ``fraction_along`` 在片段的近端（proximal）和远端（distal）之间
+
+      进行线性插值。若近端缺失，则使用父片段的远端作为起点。
+
+
+      :param cell: NeuroML Cell 对象
+
+      :param segment_index: 片段索引
+
+      :param fraction_along: 沿片段的分数位置（0.0=近端，1.0=远端）
+
+      :return: ``(x, y, z)`` 三维坐标元组
+
+      '
+  - name: fract
+    docstring: '在两点之间进行线性插值。
+
+
+      公式：``a + (b - a) * f``
+
+
+      :param a: 起始值
+
+      :param b: 终止值
+
+      :param f: 插值分数（0.0=a，1.0=b）
+
+      :return: 插值结果
+
+      '

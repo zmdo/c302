@@ -1,12 +1,35 @@
+# =============================================================================
+# 功能描述：
+#   c302 网络文档生成工具。
+#   从 NeuroML 文档中解析连接信息，通过 owmeta 查询细胞类型、
+#   神经递质和受体数据，生成 Markdown 格式的神经元/肌肉汇总表。
+#
+# 类与方法索引：
+#   generate_c302_info                   (L19)   — 从 NeuroML 文档生成神经元和肌肉的汇总信息表
+#   _info_set                            (L136)  — 将集合排序后用逗号连接为字符串
+#
+# 更新日志：
+#   2026-04-16  Copilot  添加中文 docstring 和行内注释
+#
+# 当前维护者：Copilot
+# =============================================================================
 import c302
 
 
 def generate_c302_info(nml_doc, verbose=False):
+    """从 NeuroML 文档生成神经元和肌肉的汇总信息表。
+
+    解析网络中所有连续投射和电投射，通过 owmeta 查询细胞类型、
+    神经递质和受体信息，生成 Markdown 格式汇总文件。
+
+    :param nml_doc: NeuroML 文档对象
+    :param verbose: 是否输出详细日志
+    """
     net = nml_doc.networks[0]
 
-    cc_exc_conns = {}
-    cc_inh_conns = {}
-    all_cells = []
+    cc_exc_conns = {}   # 兴奋性化学突触连接 {pre: {post: weight}}
+    cc_inh_conns = {}   # 抑制性化学突触连接
+    all_cells = []      # 所有参与连接的细胞名称
 
     for cp in net.continuous_projections:
         if cp.presynaptic_population not in cc_exc_conns.keys():
@@ -29,7 +52,7 @@ def generate_c302_info(nml_doc, verbose=False):
                     float(c.weight)
                 )
 
-    gj_conns = {}
+    gj_conns = {}  # 电突触（缝隙连接） {pre: {post: weight}}
     for ep in net.electrical_projections:
         if ep.presynaptic_population not in gj_conns.keys():
             gj_conns[ep.presynaptic_population] = {}
@@ -47,6 +70,7 @@ def generate_c302_info(nml_doc, verbose=False):
     all_cells = sorted(all_cells)
 
     try:
+        # 尝试使用 PyOpenWorm 查询细胞信息
         from PyOpenWorm import (
             connect as pyow_connect,
             __version__ as pyow_version,
@@ -57,6 +81,7 @@ def generate_c302_info(nml_doc, verbose=False):
         ver_info = "PyOpenWorm v%s" % pyow_version
     except Exception as e:
         c302.print_("Unable to connect to PyOpenWorm database: %s" % e)
+        # 回退到 owmeta 查询
         from owmeta_core.bundle import Bundle
 
         from owmeta_core import __version__ as owc_version
@@ -109,6 +134,11 @@ def generate_c302_info(nml_doc, verbose=False):
 
 
 def _info_set(s):
+    """将集合排序后用逗号连接为字符串。
+
+    :param s: 可迭代对象
+    :return: 逗号分隔的排序字符串
+    """
     s = sorted(s)
     return ", ".join(["%s" % i for i in s])
 

@@ -1,3 +1,23 @@
+# =============================================================================
+# 功能描述：
+#   连接组数据比较工具。
+#   比较两个 XLS 格式的线虫连接组数据文件，找出匹配的连接对、
+#   仅存在于某一文件的独有连接，以及方向相反的连接对。
+#
+# 类与方法索引：
+#   comparitor                           (L28)   — 比较两个 XLS 连接组数据文件的差异
+#   getColumns                           (L106)  — 从制表符分隔的文本文件中读取列数据
+#   getColumnsXls                        (L140)  — 从 XLS 电子表格文件中读取列数据
+#   sortTwoColumns                       (L177)  — 按前两列（From/To 神经元）对字典进行排序
+#   formatNames                          (L186)  — 格式化神经元名称，移除中间的填充零
+#   matchLists                           (L199)  — 比较两个连接列表，提取匹配对并从原列表中移除
+#   typeMapping                          (L322)  — 连接类型映射（未完成）
+#
+# 更新日志：
+#   2026-04-16  Copilot  添加中文 docstring 和行内注释
+#
+# 当前维护者：Copilot
+# =============================================================================
 __author__ = "Ari"
 
 from operator import itemgetter
@@ -6,26 +26,34 @@ import os
 
 
 def comparitor(fName1, fName2):
+    """比较两个 XLS 连接组数据文件的差异。
+
+    读取两个 XLS 文件，格式化名称后进行配对匹配，
+    输出匹配对、仅存在于文件1的连接、仅存在于文件2的连接。
+
+    :param fName1: 第一个 XLS 文件路径
+    :param fName2: 第二个 XLS 文件路径
+    """
     path1 = fName1
     path2 = fName2
     dir = os.path.dirname(__file__)
     file1 = os.path.join(dir, path1)
     file2 = os.path.join(dir, path2)
 
-    # read .xls files, place data in dictionary.
+    # 读取 XLS 文件，将数据存入字典
     cols1, indexName1 = getColumnsXls(file1)
     cols2, indexName2 = getColumnsXls(file2)
 
-    # Format dictionaries to match, and arrange alphabetically.
+    # 格式化神经元名称并按字母顺序排列
     formatNames(cols1, indexName1)
     formatNames(cols2, indexName2)
     sortTwoColumns(cols1)
     sortTwoColumns(cols2)
 
-    # Create column with matching values, while removing those values from original lists.
+    # 提取匹配的连接对，并从原列表中移除已匹配项
     matches, col1, col2 = matchLists(cols1, cols2, indexName1, indexName2)
 
-    # Print results. Give number of pairs that are matched, remained from unmatched files, and associated pairs.
+    # 输出结果：匹配对数、文件1独有对、文件2独有对
     print("Number of matching pairs: " + str(len(matches[indexName2[0]])))
     for p in range(len(matches[indexName2[0]])):
         print(
@@ -74,8 +102,15 @@ def comparitor(fName1, fName2):
         )
 
 
-# Get columns from .txt files
+# 从制表符分隔的文本文件中读取列数据
 def getColumns(fileIn, delim="\t", header=True):
+    """从制表符分隔的文本文件中读取列数据。
+
+    :param fileIn: 已打开的文件对象
+    :param delim: 列分隔符（默认制表符）
+    :param header: 首行是否为表头
+    :return: ``(cols, indexName)`` 二元组，cols 为列数据字典，indexName 为列索引映射
+    """
     cols = {}
     indexName = {}
     for lineNum, line in enumerate(fileIn):
@@ -101,8 +136,15 @@ def getColumns(fileIn, delim="\t", header=True):
     return cols, indexName
 
 
-# Get columns from .xls files
+# 从 XLS 电子表格中读取列数据
 def getColumnsXls(fileIn):
+    """从 XLS 电子表格文件中读取列数据。
+
+    使用 xlrd 打开工作簿，读取第一个工作表的前 4 列。
+
+    :param fileIn: XLS 文件路径
+    :return: ``(cols, indexName)`` 二元组，cols 为列数据字典，indexName 为列索引映射
+    """
     cols = {}
     indexName = {}
     workbook = xlrd.open_workbook(fileIn)
@@ -131,22 +173,44 @@ def getColumnsXls(fileIn):
     return cols, indexName
 
 
-# Sort dictionaries by first two column (From/To Neurons), first by one, then the other.
+# 按前两列（From/To 神经元）对字典排序
 def sortTwoColumns(cols):
+    """按前两列（From/To 神经元）对字典进行排序。
+
+    :param cols: 列数据字典
+    """
     cols = sorted(cols, key=itemgetter(0, 1))
 
 
-# Formatting involved removing any filler zeros from the middle of strings.
+# 格式化神经元名称，移除字符串中间的填充零
 def formatNames(cols, indexName):
+    """格式化神经元名称，移除中间的填充零。
+
+    :param cols: 列数据字典
+    :param indexName: 列索引映射
+    """
     for i in range(2):
         for char in cols[indexName[i]]:
             if char[-1] != "0":
                 char = "".join(char.split("0", 1))
 
 
-# Compare two lists, create new list of matching pairs, remove pairs from respective original lists.
+# 比较两个列表，提取匹配对并从原列表中移除
 def matchLists(cols1, cols2, indexName1, indexName2):
-    # Ensure that largest list is always "col1"
+    # 确保 col1 始终是较长的列表
+    """比较两个连接列表，提取匹配对并从原列表中移除。
+
+    执行三轮匹配：
+    1. 在长列表与短列表之间查找完全匹配的连接对
+    2. 在长列表与已匹配列表之间查找重复连接
+    3. 在长列表中查找与已匹配对方向相反的连接（A→B vs B→A）
+
+    :param cols1: 第一个连接列表
+    :param cols2: 第二个连接列表
+    :param indexName1: 第一个列表的列索引映射
+    :param indexName2: 第二个列表的列索引映射
+    :return: ``(matches, col1, col2)`` 三元组
+    """
     if len(cols1[indexName1[0]]) > len(cols2[indexName2[0]]):
         col1 = cols1.copy()
         col2 = cols2.copy()
@@ -158,23 +222,23 @@ def matchLists(cols1, cols2, indexName1, indexName2):
         indexNames1 = indexName2.copy()
         indexNames2 = indexName1.copy()
 
-    # Initialize matches dictionary
+    # 初始化匹配结果字典
     matches = {}
     for i in range(len(indexNames1)):
         matches[indexNames1[i]] = []
 
-    # 1 - check if pair matches from long list and short list
+    # ── 第 1 轮：在长列表与短列表之间查找完全匹配的连接对 ──
     for pair in zip(col1[indexNames1[0]], col1[indexNames1[1]]):
         for p1, x1 in enumerate(zip(col1[indexNames1[0]], col1[indexNames1[1]])):
             if x1 == pair:
                 index1 = p1
         # ind = [p for p,x in enumerate(zip(cols1[indexName1[0], cols1[indexName1[1]]])) if x == pair]
-        # If first two columns of small array contain current pair from long array...
+        # 若短列表中包含当前连接对...
         if zip(col2[indexNames2[0]], col2[indexNames2[1]]).__contains__(pair):
             for p2, x2 in enumerate(zip(col2[indexNames2[0]], col2[indexNames2[1]])):
                 if x2 == pair:
                     index2 = p2
-            # If matches array does not contain current pair from long array, add it
+            # 若匹配结果中尚不包含当前对，则添加
             if not zip(matches[indexNames1[0]], matches[indexNames1[1]]).__contains__(
                 ([pair[0]], [pair[1]])
             ):
@@ -192,7 +256,7 @@ def matchLists(cols1, cols2, indexName1, indexName2):
                         ]
                         del col2[indexNames2[i]][index2]
                         del col1[indexNames1[i]][index1]
-            # If pair is already in array, add value from last two columns to array
+            # 若当前对已在匹配结果中，则将后两列（连接类型/数量）追加到已有记录
             else:
                 for p3, x3 in enumerate(
                     zip(matches[indexNames1[0]], matches[indexNames1[1]])
@@ -207,12 +271,12 @@ def matchLists(cols1, cols2, indexName1, indexName2):
                     del col1[indexNames1[i]][index1]
                     del col2[indexNames2[i]][index2]
 
-    # 2* - check if pair matches again from long list and matching list
+    # ── 第 2 轮：在长列表与已匹配列表之间查找重复连接 ──
     for pair in zip(col1[indexNames1[0]], col1[indexNames1[1]]):
         for p1, x1 in enumerate(zip(col1[indexNames1[0]], col1[indexNames1[1]])):
             if x1 == pair:
                 index1 = p1
-        # If matches array does contain current pair from long array, add its conn. type and number
+        # 若当前对在已匹配结果中存在，则追加连接类型和数量
         if zip(matches[indexNames1[0]], matches[indexNames1[1]]).__contains__(
             ([pair[0]], [pair[1]])
         ):
@@ -226,7 +290,7 @@ def matchLists(cols1, cols2, indexName1, indexName2):
                     matches[indexNames1[i]][index3] += [col1[indexNames1[i]][index1]]
                 del col1[indexNames1[i]][index1]
 
-    # 3 - check if pair from match list has a reversable pair from the long list
+    # ── 第 3 轮：在长列表中查找与已匹配对方向相反的连接（A→B vs B→A） ──
     for pair in zip(col1[indexNames1[0]], col1[indexNames1[1]]):
         # reversepair = [pair[1],pair[0]]
         for p1, x1 in enumerate(zip(col1[indexNames1[0]], col1[indexNames1[1]])):
@@ -251,15 +315,25 @@ def matchLists(cols1, cols2, indexName1, indexName2):
     return matches, col1, col2
 
 
-# Option of additional formatting to shorten lists. Not used. Not complete.
-# 'EJ' maps to 'GapJunction'.
-# 'R', 'Rp', 'S', 'Sp' map to 'Send'.
-# 'NMJ' does not map.
+# 连接类型映射（未完成）。
+# 'EJ' 映射为 'GapJunction'（缝隙连接）。
+# 'R', 'Rp', 'S', 'Sp' 映射为 'Send'（化学突触）。
+# 'NMJ' 无对应映射。
 def typeMapping(cols1, cols2, indexName1, indexName2):
     # list1 = ["GapJunction", "Send"]
     # list2 = ["EJ", "NMJ", "R", "Rp", "S", "Sp"]
     # type1 = cols1[indexName1[2]]
     # type2 = cols2[indexName2[2]]
+    """连接类型映射（未完成）。
+
+    预期将 ``EJ`` 映射为 ``GapJunction``，
+    ``R``/``Rp``/``S``/``Sp`` 映射为 ``Send``。
+
+    :param cols1: 第一个连接列表
+    :param cols2: 第二个连接列表
+    :param indexName1: 第一个列表的列索引映射
+    :param indexName2: 第二个列表的列索引映射
+    """
     pass
 
 

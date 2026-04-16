@@ -1,3 +1,17 @@
+# =============================================================================
+# 功能描述：
+#   OpenWorm 赞助者细胞认领信息工具。
+#   读取赞助者认领的细胞名称映射，生成 Markdown 格式的细胞信息页面，
+#   包含细胞在 c302 网络文件中的位置链接和 3D 可视化链接。
+#
+# 类与方法索引：
+#   get_adopted_cell_names               (L26)   — 读取 OpenWorm 赞助者认领的细胞名称映射
+#
+# 更新日志：
+#   2026-04-16  Copilot  添加中文 docstring 和行内注释
+#
+# 当前维护者：Copilot
+# =============================================================================
 """
 This method reads a generated list of cells vs. names as assigned by OpenWorm backers
 
@@ -10,11 +24,18 @@ currentfile_dir = os.path.dirname(os.path.abspath(__file__))
 
 
 def get_adopted_cell_names(root=os.path.join(currentfile_dir, "data")):
+    """读取 OpenWorm 赞助者认领的细胞名称映射。
+
+    从 ``data/adopters.txt`` 文件中解析 ``细胞名:认领名`` 格式的映射关系。
+
+    :param root: 数据目录路径（默认为模块所在目录下的 ``data/``）
+    :return: ``{细胞名: 认领名}`` 字典
+    """
     with open(os.path.join(root, "adopters.txt")) as file:
-        ads = {}
+        ads = {}  # {细胞名: 认领者名} 映射字典
         for line in file:
-            cell = line.split(":")[0].strip()
-            name = line.split(":")[1].strip()
+            cell = line.split(":")[0].strip()   # 冒号左侧为细胞名
+            name = line.split(":")[1].strip()   # 冒号右侧为认领者名
             ads[cell] = name
 
     return ads
