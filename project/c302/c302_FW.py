@@ -198,6 +198,7 @@ def setup(
         i += d_v_delay * 2
         j += d_v_delay * 2
 
+    # [备选] 以下为短时 AVB 背景电流配置，已由上方长时输入列表替代
     # input_list = []
     # input_list.append(('AVBL', '0ms', '1900ms', '15pA'))
     # input_list.append(('AVBR', '0ms', '1900ms', '15pA'))
@@ -211,6 +212,7 @@ def setup(
             r"^AVB._to_DB\d+\_GJ$_elec_syn_gbase": "0.001 nS",
             r"^AVB._to_VB\d+\_GJ$_elec_syn_gbase": "0.001 nS",
             r"^DB\d+_to_DB\d+\_GJ$_elec_syn_gbase": "0.001 nS",
+            # [备选] 以下为曾尝试的缝隙连接门控参数
             #'^DB\d+_to_DB\d+\_GJ$_elec_syn_p_gbase': '0.08 nS',
             #'^DB\d+_to_DB\d+\_GJ$_elec_syn_sigma': '0.2 per_mV',
             #'^DB\d+_to_DB\d+\_GJ$_elec_syn_mu': '-20 mV',
@@ -245,6 +247,7 @@ def setup(
         #'VB4_to_VB5_exc_syn_conductance': '0 nS',
         "AVBL_to_VB2_exc_syn_conductance": "0 nS",
         "AVBR_to_VD3_exc_syn_conductance": "0 nS",
+        # [备选] 以下为整体关闭部分化学突触的旧参数组合
         #'^DB\d+_to_DD\d+$_exc_syn_conductance': '0 nS',
         #'^DD\d+_to_DB\d+$_inh_syn_conductance': '0 nS',
         #'^VB\d+_to_VD\d+$_exc_syn_conductance': '0 nS',
@@ -259,6 +262,7 @@ def setup(
         "neuron_to_muscle_exc_syn_vth": "37 mV",
         "neuron_to_muscle_inh_syn_conductance": "0.6 nS",
         "neuron_to_neuron_inh_syn_conductance": "0.2 nS",
+        # [备选] 以下为单条连接的手动覆盖方案
         #'DB2_to_MDL11_exc_syn_conductance': '1 nS',
         "AVBR_to_MVL16_exc_syn_conductance": "0 nS",
         "ca_conc_decay_time_muscle": "60.8 ms",
@@ -286,6 +290,7 @@ def setup(
             verbose=verbose,
         )
 
+        # [废弃] 以下为旧版从配置覆盖字典回读 input 列表的兼容逻辑
         # if config_param_overrides.has_key('input'):
         #    input_list = config_param_overrides['input']
 
@@ -296,7 +301,7 @@ def setup(
         nml_file = target_directory + "/" + reference + ".net.nml"
         writers.NeuroMLWriter.write(
             nml_doc, nml_file
-        )  # Write over network file written above...
+        )  # 覆盖前面生成的网络文件...
 
         c302.print_("(Re)written network file to: " + nml_file)
 

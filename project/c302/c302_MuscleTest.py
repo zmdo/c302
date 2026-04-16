@@ -112,6 +112,7 @@ def setup(
     # --- 手动定义的肌肉刺激列表: (cell, start, dur, amp) ---
     input_list = []
 
+    # [备选] 以下为早期试验使用的肌肉刺激组合
     # input_list.append(('MDL02', '0ms', '250ms', '3pA'))
     # input_list.append(('MDL03', '0ms', '250ms', '3pA'))
     # input_list.append(('MDR02', '0ms', '250ms', '3pA'))
@@ -201,7 +202,7 @@ def setup(
         nml_file = target_directory + "/" + reference + ".net.nml"
         writers.NeuroMLWriter.write(
             nml_doc, nml_file
-        )  # Write over network file written above...
+        )  # 覆盖前面生成的网络文件...
 
         c302.print_("(Re)written network file to: " + nml_file)
 

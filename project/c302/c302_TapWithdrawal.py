@@ -122,17 +122,21 @@ def setup(
     )
     # all_motors = []
 
+    # [备选] 以下为旧的触觉回路神经元全集参考列表
     # neurons = ['AVAL', 'AVAR', 'AVBL', 'AVBR', 'PVCL', 'PVCR', 'AVDL', 'AVDR', 'DVA', 'PVDL', 'PVDR', 'PLML', 'PLMR', 'AVM', 'ALML', 'ALMR']
 
     muscles_to_include = False
+    # [备选] 以下为包含全部或部分肌肉的旧配置
     # muscles_to_include = True # ALL muscles
     # muscles_to_include = ['MVL01', 'MVL10']
 
     cells = list(TW_cells + all_motors)
 
     cells_to_plot = list(cells)
+    # [备选] 以下为精简绘图目标配置
     # cells_to_plot = ["VB5", "VA4"]
 
+    # [备选] 以下列表项为曾考虑追加但最终未启用的其他神经元
     cells += [  # 'AS1', 'AS10', 'AS11', 'AS2', 'AS3', 'AS4', 'AS5', 'AS6', 'AS7', 'AS8', 'AS9',
         # 'AVFL', 'AVFR', 'AVKR', 'AVL',
         # 'CEPVL', 'CEPVR',
@@ -151,10 +155,12 @@ def setup(
         # 'VC1', 'VC2', 'VC3', 'VC4', 'VC5', 'VC6',
     ]
 
+    # [备选] 以下为更宽松的网络规模与刺激目标配置
     # cells = None
     # cells_to_stimulate = ['PLML', 'PLMR', 'AVM']
     cells_to_stimulate = []
 
+    # [备选] 以下为多组绘图目标选择方案
     # cells_to_plot = ['AVAL', 'AVAR', 'AVBL', 'AVBR', 'PLML', 'PLMR', 'AVM', 'ALML', 'ALMR', 'PVDL', 'PVDR', 'AVDL', 'AVDR']
     # cells_to_plot = ['PLML', 'AVM', 'AVBL', 'AVAL']
     # cells_to_plot = cells
@@ -523,6 +529,7 @@ def setup(
                 params=params,
             )
 
+        # [备选] 以下为改用单次阶跃电流刺激触觉神经元的旧方案
         # c302.add_new_input(nml_doc, "AVM", "10ms", "700ms", stim_amplitude, params)
         # c302.add_new_input(nml_doc, "ALML", "10ms", "700ms", stim_amplitude, params)
         # c302.add_new_input(nml_doc, "ALMR", "10ms", "700ms", stim_amplitude, params)
@@ -532,7 +539,7 @@ def setup(
         nml_file = target_directory + "/" + reference + ".net.nml"
         writers.NeuroMLWriter.write(
             nml_doc, nml_file
-        )  # Write over network file written above...
+        )  # 覆盖前面生成的网络文件...
 
         c302.print_("(Re)written network file to: " + nml_file)
 

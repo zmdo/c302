@@ -55,6 +55,7 @@ def setup(
     )
 
     # --- 突触衰减参数调整 ---
+    # [备选] 以下为手动试验时使用的替代突触参数
     # params.set_bioparameter("exc_syn_conductance", ".20 nS", "BlindGuess", "0.1")
     params.set_bioparameter("chem_exc_syn_decay", "5 ms", "BlindGuess", "0.1")
 
@@ -194,9 +195,10 @@ def setup(
     ]
 
     cells += ["AVAL", "AVAR", "AVBL", "AVBR", "AVDL", "AVDR", "PVCL", "PVCR"]  # 命令中间神经元
+    # [备选] 以下为直接包含全部细胞的旧配置
     # cells=None  # implies all cells...
 
-    ## Some random set of neurons
+    # [调试] 以下为按概率随机挑选刺激神经元的旧实验代码
     # probability = 0.1
     cells_to_stimulate = []
     """
@@ -205,6 +207,7 @@ def setup(
         #    cells_to_stimulate.append(cell)
         if cell.startswith("xxVB") or cell.startswith("DB"):
             cells_to_stimulate.append(cell)"""
+    # [备选] 以下为早期使用过的刺激目标组合
     # cells_to_stimulate = ['DB1', 'VB1']
 
     # cells_to_stimulate = ['PVCL', 'AVBL']
@@ -213,8 +216,9 @@ def setup(
     # cells_to_stimulate = ['PLML','PLMR']
     cells_to_stimulate = ["AVBL", "AVBR"]
 
-    # Plot some directly stimulated & some not stimulated
+    # [备选] 以下为更完整的绘图目标列表
     # cells_to_plot      = ['AS1', 'AS10', 'AVFL', 'DA1','DB1','DB4','DB7','IL1DL','RID', 'RIML','SMBDL', 'SMBDR', 'VB1', 'VB5', 'VB10','VC1', 'VC2']
+    # 绘制部分直接受刺激与未受刺激神经元，便于对比响应
     cells_to_plot = [
         "AVBL",
         "AVBR",
@@ -252,7 +256,7 @@ def setup(
         )
 
     # --- 正弦波电流发生器：用于代替阶跃电流刺激 ---
-    # Import from libNeuroML
+    # 从 libNeuroML 导入正弦波输入相关类型
     from neuroml import SineGenerator, InputList, Input
     import neuroml.writers as writers
 
@@ -282,7 +286,7 @@ def setup(
     )
     nml_doc.networks[0].input_lists.append(input_list)
 
-    # Write over network file created already...
+    # 覆盖前面已经生成的网络文件...
     nml_file = target_directory + "/" + reference + ".net.nml"
     writers.NeuroMLWriter.write(nml_doc, nml_file)
 

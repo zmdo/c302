@@ -58,6 +58,7 @@ def setup(
     )
 
     # --- 突触参数调整：拉长抑制衰减 / 降低抑制反转电位 ---
+    # [备选] 以下为手动试验时使用的替代突触参数
     # params.set_bioparameter("chem_exc_syn_gbase", ".02 nS", "BlindGuess", "0.1")
     params.set_bioparameter("chem_exc_syn_decay", "5 ms", "BlindGuess", "0.1")
 
@@ -111,8 +112,10 @@ def setup(
     # 覆盖为精简子集：DB2-3/VB2-3/DD2-3/VD2-3 + DA2-3/VA2-3
     cells = ["DB2", "VB2", "DD2", "VD2", "DB3", "VB3", "DD3", "VD3"]
     cells += ["DA2", "VA2", "DA3", "VA3"]
+    # [备选] 以下为更小范围的振荡器子集配置
     # cells = ['DB3', 'VB3', 'DB4', 'VB4']
 
+    # [备选] 以下为其他命令中间神经元组合与全量细胞配置
     # cells+=['AVBL','PVCL','AVBR','PVCR']
     # cells+=[]
     # cells+=['PVCL', 'PVCR','AVBL','AVBR']
@@ -120,13 +123,15 @@ def setup(
     cells += ["AVBL", "AVBR"]  # 添加命令中间神经元作为振荡驱动源
     # cells=None  # implies all cells...
 
+    # [备选] 以下为旧的刺激目标选择方案
     # cells_to_stimulate = ['PVCL','PVCR']
     # cells_to_stimulate = ['PLML','PLMR']
     cells_to_stimulate = ["AVBL", "AVBR"]
     # cells_to_stimulate = ['AVBL']
 
-    # Plot some directly stimulated & some not stimulated
+    # [备选] 以下为手工指定的绘图目标列表
     # cells_to_plot      = ['AVBL','PVCL', 'PVCR', 'DB1','DB2','DB3', 'DB4','DD1','DD2','DD3', 'DD4','DB4','VB1','VB2', 'VB3', 'VB4','VD1','VD2', 'VD3', 'VD4']
+    # 绘制直接受刺激与未受刺激神经元，便于对比响应
     cells_to_plot = cells
 
     reference = "c302_%s_Oscillator" % parameter_set

@@ -23,7 +23,7 @@ def setup(
     duration=1000,
     dt=0.05,
     target_directory="examples",
-    muscles_to_include=None,  # None => All!
+    muscles_to_include=None,  # None 表示包含全部肌肉
     data_reader=c302.DEFAULT_DATA_READER,
     param_overrides={},
     config_param_overrides={},
@@ -77,6 +77,7 @@ def setup(
     ]
     cells_to_stimulate = ["PVCL", "PVCR"]
     cells_to_stimulate = ["PLML", "PLMR"]  # 最终选用：PLM 触觉感觉神经元
+    # [备选] 以下为旧的刺激目标配置
     # cells_to_stimulate = ['AVBL','AVBR']
 
     # 绘图目标：混合刺激/非刺激神经元以对比响应

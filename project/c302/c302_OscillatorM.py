@@ -60,8 +60,10 @@ def setup(
         "unphysiological_offset_current_dur", "1200 ms", "Testing Osc", "0"
     )
 
+    # [备选] 以下为较高初始膜电位的旧试验配置
     # params.set_bioparameter("initial_memb_pot", "-62 mV", "Testing Osc", "0")
 
+    # [备选] 以下为手动试验时使用的替代突触参数
     # params.set_bioparameter("chem_exc_syn_gbase", ".2 nS", "BlindGuess", "0.1")
     # params.set_bioparameter("chem_exc_syn_decay", "5 ms", "BlindGuess", "0.1")
 
@@ -132,11 +134,13 @@ def setup(
         "VA12",
     ]
 
+    # [备选] 以下为更小范围的振荡器子集配置
     # cells = ['DB2', 'VB2', 'DD2', 'VD2', 'DB3', 'VB3', 'DD3', 'VD3', 'DB4', 'VB4', 'DD4', 'VD4']
     # cells = ['DB3', 'VB3', 'DD3', 'VD3']
     # cells += ['DA2', 'VA2','DA3','VA3']
     # cells = ['DB3', 'VB3', 'DB4', 'VB4']
 
+    # [备选] 以下为其他命令中间神经元组合与全量细胞配置
     # cells+=['AVBL','PVCL','AVBR','PVCR']
     # cells+=[]
     cells += ["PVCL", "PVCR", "AVBL", "AVBR"]  # 命令中间神经元
@@ -144,6 +148,7 @@ def setup(
     # cells+=['AVBL','AVBR']
     # cells=None  # implies all cells...
 
+    # [备选] 以下为旧的刺激目标选择方案
     # cells = ['AVBR', 'VB2', 'VD3', 'DB3', 'DD2']
     # cells = ['VB2', 'VD3']
 
@@ -153,8 +158,9 @@ def setup(
     cells_to_stimulate = ["VB1", "VB2"]  # 最终选用：VB1/VB2 腹侧运动神经元
     # cells_to_stimulate = ['AVAL']
 
-    # Plot some directly stimulated & some not stimulated
+    # [备选] 以下为手工指定的绘图目标列表
     # cells_to_plot      = ['AVBL','PVCL', 'PVCR', 'DB1','DB2','DB3', 'DB4','DD1','DD2','DD3', 'DD4','DB4','VB1','VB2', 'VB3', 'VB4','VD1','VD2', 'VD3', 'VD4']
+    # 绘制直接受刺激与未受刺激神经元，便于对比响应
     cells_to_plot = cells
 
     reference = "c302_%s_OscillatorM" % parameter_set

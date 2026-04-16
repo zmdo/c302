@@ -63,6 +63,7 @@ def setup(
     )
 
     # --- 突触衰减参数调整 ---
+    # [备选] 以下为手动试验时使用的替代突触参数
     # params.set_bioparameter("exc_syn_conductance", ".20 nS", "BlindGuess", "0.1")
     params.set_bioparameter("chem_exc_syn_decay", "5 ms", "BlindGuess", "0.1")
 
@@ -202,9 +203,10 @@ def setup(
     ]
 
     cells += ["AVAL", "AVAR", "AVBL", "AVBR", "AVDL", "AVDR", "PVCL", "PVCR"]  # 命令中间神经元
+    # [备选] 以下为直接包含全部细胞的旧配置
     # cells=None  # implies all cells...
 
-    ## Some random set of neurons
+    # [调试] 以下为按概率随机挑选刺激神经元的旧实验代码
     # probability = 0.1
     cells_to_stimulate = []
     """
@@ -213,6 +215,7 @@ def setup(
         #    cells_to_stimulate.append(cell)
         if cell.startswith("xxVB") or cell.startswith("DB"):
             cells_to_stimulate.append(cell)"""
+    # [备选] 以下为更早的固定刺激目标设置
     # cells_to_stimulate = ['DB1', 'VB1']
 
     # 多次覆盖刺激目标（保留实验记录），最终选用 AVB 命令神经元
@@ -222,7 +225,7 @@ def setup(
     cells_to_stimulate = ["PLML", "PLMR"]
     cells_to_stimulate = ["AVBL", "AVBR"]
 
-    # Plot some directly stimulated & some not stimulated
+    # 绘制部分直接受刺激与未受刺激神经元，便于对比响应
     cells_to_plot = [
         "AS1",
         "AS10",

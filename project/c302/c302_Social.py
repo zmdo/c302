@@ -89,7 +89,7 @@ def setup(
     nml_file = target_directory + "/" + reference + ".net.nml"
     writers.NeuroMLWriter.write(
         nml_doc, nml_file
-    )  # Write over network file written above...
+    )  # 覆盖前面生成的网络文件...
 
     c302.print_("(Re)written network file to: " + nml_file)
 
