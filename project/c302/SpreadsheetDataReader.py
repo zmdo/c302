@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # =============================================================================
 # 功能描述：
 #   从 CElegansNeuronTables.xls 电子表格读取线虫神经元连接数据的数据读取器。
@@ -6,9 +5,9 @@
 #   read_muscle_data() 接口。支持两种 XLS 数据源（神经元连接/肌肉连接）。
 #
 # 类与方法索引：
-#   read_data                            (L43)   — 从 XLS 文件读取神经元连接数据
-#   read_muscle_data                     (L111)  — 从 CElegansNeuronTables.xls 第 1 工作表读取神经肌肉连接数据
-#   main                                 (L147)  — main 函数
+#   read_data                            (L42)   — 从 XLS 文件读取神经元连接数据
+#   read_muscle_data                     (L110)  — 从 CElegansNeuronTables.xls 第 1 工作表读取神经肌肉连接数据
+#   main                                 (L146)  — main 函数
 #
 # 更新日志：
 #   2026-04-16  zmdo  添加中文注释（计划1 阶段二）

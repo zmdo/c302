@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # =============================================================================
 # 功能描述：
 #   线虫（C. elegans）连接组数据的读取与解析工具集。
@@ -7,22 +6,22 @@
 #   ConnectionInfo 数据类用于统一表示突触连接记录。
 #
 # 类与方法索引：
-#   convert_to_preferred_muscle_name     (L450)  — 将非标准体壁肌肉名称转换为标准命名格式
-#   get_all_muscle_prefixes              (L470)  — 返回所有已知肌肉名称前缀列表（含体壁肌肉和咽部肌肉）
-#   get_body_wall_muscle_prefixes        (L478)  — 返回体壁肌肉专属前缀列表，不含咽部肌肉前缀（pm/vm/um）
-#   is_muscle                            (L486)  — 判断给定细胞名称是否为肌肉细胞（含体壁肌肉和咽部肌肉）
-#   is_body_wall_muscle                  (L497)  — 判断给定细胞名称是否为体壁肌肉（排除咽部肌肉）
-#   is_neuron                            (L508)  — 判断给定细胞是否为神经元（非体壁肌肉即视为神经元）
-#   remove_leading_index_zero            (L518)  — Returns neuron name with an index without leading zero. E.g. VB01 -> VB1.
-#   ConnectionInfo                       (L529)  — 表示两个细胞之间的一条突触连接记录
-#     __init__                           (L536)  — __init__ 函数
-#     __str__                            (L543)  — __str__ 函数
-#     short                              (L552)  — 返回连接的简短文字描述（不含突触计数）
-#     __eq__                             (L563)  — __eq__ 函数
-#     __lt__                             (L572)  — __lt__ 函数
-#     __repr__                           (L578)  — __repr__ 函数
-#   check_neurons                        (L582)  — 将细胞列表与标准神经元名称集合做三路比对，返回比对结果
-#   analyse_connections                  (L607)  — 打印连接组完整统计摘要，用于调试和验证数据读取器输出的完整性
+#   convert_to_preferred_muscle_name     (L449)  — 将非标准体壁肌肉名称转换为标准命名格式
+#   get_all_muscle_prefixes              (L469)  — 返回所有已知肌肉名称前缀列表（含体壁肌肉和咽部肌肉）
+#   get_body_wall_muscle_prefixes        (L477)  — 返回体壁肌肉专属前缀列表，不含咽部肌肉前缀（pm/vm/um）
+#   is_muscle                            (L485)  — 判断给定细胞名称是否为肌肉细胞（含体壁肌肉和咽部肌肉）
+#   is_body_wall_muscle                  (L496)  — 判断给定细胞名称是否为体壁肌肉（排除咽部肌肉）
+#   is_neuron                            (L507)  — 判断给定细胞是否为神经元（非体壁肌肉即视为神经元）
+#   remove_leading_index_zero            (L517)  — Returns neuron name with an index without leading zero. E.g. VB01 -> VB1.
+#   ConnectionInfo                       (L528)  — 表示两个细胞之间的一条突触连接记录
+#     __init__                           (L535)  — __init__ 函数
+#     __str__                            (L542)  — __str__ 函数
+#     short                              (L551)  — 返回连接的简短文字描述（不含突触计数）
+#     __eq__                             (L562)  — __eq__ 函数
+#     __lt__                             (L571)  — __lt__ 函数
+#     __repr__                           (L577)  — __repr__ 函数
+#   check_neurons                        (L581)  — 将细胞列表与标准神经元名称集合做三路比对，返回比对结果
+#   analyse_connections                  (L606)  — 打印连接组完整统计摘要，用于调试和验证数据读取器输出的完整性
 #
 # 更新日志：
 #   2026-04-16  zmdo  添加中文注释（计划1 阶段二）

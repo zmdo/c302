@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # =============================================================================
 # 功能描述：
 #   从 herm_full_edgelist.csv（OpenWorm 项目线虫雌雄同体全连接组数据）读取
@@ -6,19 +5,19 @@
 #   （get_syntype/get_synclass）和肌肉名称格式转换功能。
 #
 # 类与方法索引：
-#   get_all_muscle_prefixes              (L51)   — 返回所有已知肌肉前缀列表（含体壁肌肉和咽部肌肉）
-#   get_body_wall_muscle_prefixes        (L59)   — 返回体壁肌肉专属前缀列表
-#   is_muscle                            (L67)   — 判断给定细胞名称是否为肌肉细胞
-#   is_body_wall_muscle                  (L78)   — 判断给定细胞名称是否为体壁肌肉
-#   is_neuron                            (L89)   — 判断给定细胞名称是否为神经元
-#   remove_leading_index_zero            (L99)   — Returns neuron name with an index without leading zero. E.g. VB01 -> VB1.
-#   get_old_muscle_name                  (L109)  — 将 herm_full_edgelist 格式的肌肉名称转换为标准命名格式
-#   get_syntype                          (L130)  — 将 CSV 中的穑触类型字符串映射为 ConnectionInfo 标准形式
-#   get_synclass                         (L146)  — 根据穑触前细胞名称和穑触类型推断神经递质分类
-#   parse_row                            (L164)  — 解析 CSV 中的单行数据，返回连接信息元组
-#   read_data                            (L178)  — Args:
-#   read_muscle_data                     (L221)  — Returns:
-#   main                                 (L262)  — main 函数
+#   get_all_muscle_prefixes              (L50)   — 返回所有已知肌肉前缀列表（含体壁肌肉和咽部肌肉）
+#   get_body_wall_muscle_prefixes        (L58)   — 返回体壁肌肉专属前缀列表
+#   is_muscle                            (L66)   — 判断给定细胞名称是否为肌肉细胞
+#   is_body_wall_muscle                  (L77)   — 判断给定细胞名称是否为体壁肌肉
+#   is_neuron                            (L88)   — 判断给定细胞名称是否为神经元
+#   remove_leading_index_zero            (L98)   — Returns neuron name with an index without leading zero. E.g. VB01 -> VB1.
+#   get_old_muscle_name                  (L108)  — 将 herm_full_edgelist 格式的肌肉名称转换为标准命名格式
+#   get_syntype                          (L129)  — 将 CSV 中的穑触类型字符串映射为 ConnectionInfo 标准形式
+#   get_synclass                         (L145)  — 根据穑触前细胞名称和穑触类型推断神经递质分类
+#   parse_row                            (L163)  — 解析 CSV 中的单行数据，返回连接信息元组
+#   read_data                            (L177)  — Args:
+#   read_muscle_data                     (L220)  — Returns:
+#   main                                 (L261)  — main 函数
 #
 # 更新日志：
 #   2026-04-16  zmdo  添加中文注释（计划1 阶段二）
