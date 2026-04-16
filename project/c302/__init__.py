@@ -1,3 +1,47 @@
+# =============================================================================
+# 功能描述：
+#   c302 框架的核心网络生成模块。将连接组数据（connectome）与参数化细胞/突触
+#   模型组装为完整的 NeuroML2 网络，并输出 .net.nml 和 LEMS 仿真文件。
+#   包含 CLI 入口、数据读取器加载、种群创建、连接遍历、刺激注入等功能。
+#
+# 类与方法索引：
+#   print_                               (L135)  — 带 ``c302`` 前缀的调试输出，用于区分框架自身的日志信息
+#   load_data_reader                     (L146)  — Imports and returns data reader module
+#   get_str_from_exponential             (L161)  — Returns a formatted string representing a floating point number, e.g. 1*0.00001 would result into 1e-05. Returning 0.00001.
+#   get_muscle_position                  (L172)  — 根据肌肉名称计算其在虫体中的三维坐标
+#   is_muscle                            (L208)  — 判断细胞名称是否为肌肉（匹配 ``M[VD][LR]<digits>`` 模式）
+#   process_args                         (L217)  — Parse command-line arguments.
+#   get_next_stim_id                     (L379)  — 为指定细胞生成下一个不重复的刺激 ID
+#   get_cell_position                    (L397)  — 从 NeuroML 多室形态文件中读取细胞 soma 位置
+#   append_input_to_nml_input_list       (L415)  — 将刺激输入追加到 NeuroML 网络的 ``InputList`` 中
+#   add_new_sinusoidal_input             (L437)  — 为指定细胞创建正弦波刺激输入
+#   add_new_input                        (L480)  — 为指定细胞创建脉冲刺激输入（``PulseGenerator``）
+#   get_muscle_names                     (L497)  — 生成全部 96 条体壁肌肉的名称列表
+#   merge_with_template                  (L518)  — 使用 Airspeed 模板引擎将变量字典与 LEMS 模板文件合并
+#   write_to_file                        (L530)  — 将生成的 NeuroML 网络和 LEMS 仿真文件写入磁盘
+#   get_projection_id                    (L585)  — 根据突触前/后细胞和突触类型生成标准 Projection ID
+#   get_random_colour_hex                (L604)  — 生成随机十六进制颜色字符串（``#RRGGBB``），用于绘图颜色分配
+#   get_file_name_relative_to_c302       (L620)  — 返回相对于 ``C302_HOME`` 环境变量的文件路径
+#   get_cell_names_and_connection        (L630)  — 读取连接组数据，返回所有细胞名称和突触连接列表
+#   get_cell_muscle_names_and_connection (L653)  — 读取神经元-肌肉连接数据，返回运动神经元、已知肌肉列表和肌肉连接
+#   is_cond_based_cell                   (L686)  — 判断参数层级是否为导电模型（Level C 或 D 系列）
+#   get_cell_id_string                   (L695)  — 构建 NeuroML 中引用细胞实例的路径字符串
+#   regex_match                          (L721)  — 当 pattern 为正则表达式时执行匹配
+#   is_regex_string                      (L731)  — 判断字符串是否为正则表达式格式（同时含 ``^`` 和 ``$``）
+#   elem_in_coll_matches_conn            (L740)  — 检查集合中是否有正则元素匹配给定的连接字符串
+#   _get_cell_info                       (L756)  — 从 owmeta Bundle 或本地缓存获取细胞的详细注释信息
+#   set_param                            (L851)  — 设置或新增生物参数值
+#   mirror_param                         (L871)  — 为双向缝隙连接参数设置镜像值（A-B 和 B-A 使用相同参数）
+#   generate                             (L896)  — c302 网络生成主入口，将连接组数据转化为完整的 NeuroML2 网络
+#   parse_list_arg                       (L2042) — 解析 CLI 列表参数字符串为 Python 列表
+#   parse_dict_arg                       (L2064) — 解析 CLI 字典参数字符串为 Python 字典
+#   main                                 (L2085) — c302 CLI 主入口，解析命令行参数并调用 ``generate()``
+#
+# 更新日志：
+#   2026-04-16  Copilot  添加中文 docstring 和行内注释（计划1阶段四）
+#
+# 当前维护者：Copilot
+# =============================================================================
 #! /usr/bin/env python
 
 from neuroml import NeuroMLDocument
@@ -49,10 +93,10 @@ try:
     from owmeta.neuron import Neuron
     from owmeta.muscle import Muscle
 
-    owmeta_installed = True
+    owmeta_installed = True  # owmeta 安装成功标记
 
 except Exception:
-    print("owmeta not installed! Proceeding anyway...")
+    print("owmeta not installed! Proceeding anyway...")  # owmeta 未安装，仅使用缓存数据
     owmeta_installed = False
 
 try:
@@ -67,7 +111,9 @@ from cect.Cells import BODY_WALL_MUSCLE_NAMES
 #
 # DEFAULT_DATA_READER = "cect.White_whole"
 # DEFAULT_DATA_READER = "cect.Cook2019HermReader"
+# 默认数据读取器：使用 cect 包的 SpreadsheetDataReader
 DEFAULT_DATA_READER = "cect.readers.SpreadsheetDataReader"
+# 前向运动专用数据读取器
 FW_DATA_READER = "cect.readers.UpdatedSpreadsheetDataReader2"
 
 
@@ -87,6 +133,11 @@ OWMETA_CACHED_DATA_FILE = (
 
 
 def print_(msg, print_it=True):  # print_it=False when not verbose
+    """带 ``c302`` 前缀的调试输出，用于区分框架自身的日志信息。
+
+    :param msg: 要输出的消息字符串
+    :param print_it: 为 False 时静默（非 verbose 模式）
+    """
     if print_it:
         pre = "c302      >>> "
         print("%s %s" % (pre, msg.replace("\n", "\n" + pre)))
@@ -119,6 +170,20 @@ def get_str_from_exponential(num):
 
 
 def get_muscle_position(muscle, data_reader):
+    """根据肌肉名称计算其在虫体中的三维坐标。
+
+    按照命名模式 ``M[VD][LR]<index>`` 解析：
+    - D/V 决定 z 轴方向（+80/-80）
+    - L/R 决定 x 轴方向（+80/-80）
+    - index 决定 y 轴位置（-300 + 30*index）
+
+    特殊肌肉（MANAL/MVULVA）返回原点 (0,0,0)。
+
+    :param muscle: 肌肉名称字符串
+    :param data_reader: 数据读取器实例（当前未使用，保留接口）
+    :return: ``(x, y, z)`` 坐标元组
+    :raises Exception: 无法识别的肌肉名称格式
+    """
     if muscle == "MANAL" or muscle == "MVULVA":
         return 0, 0, 0
 
@@ -141,6 +206,11 @@ def get_muscle_position(muscle, data_reader):
 
 
 def is_muscle(cell_name):
+    """判断细胞名称是否为肌肉（匹配 ``M[VD][LR]<digits>`` 模式）。
+
+    :param cell_name: 细胞名称字符串
+    :return: 匹配对象（truthy）或 None
+    """
     return MUSCLE_RE.fullmatch(cell_name)
 
 
@@ -280,7 +350,7 @@ quadrant1 = "MVR"
 quadrant2 = "MVL"
 quadrant3 = "MDL"
 
-# soma positions from http://www.wormatlas.org/neuronalwiring.html - 2.2 Neuron Description (Neuron Types)
+# 运动神经元 soma 位置（来源：wormatlas.org - 2.2 神经元描述）
 VB_soma_pos = {
     "VB1": 0.21,
     "VB2": 0.19,
@@ -307,6 +377,15 @@ DB_soma_pos = {
 
 
 def get_next_stim_id(nml_doc, cell):
+    """为指定细胞生成下一个不重复的刺激 ID。
+
+    遍历已有 ``pulse_generators``，计数以 ``stim_{cell}`` 开头的数量，
+    返回 ``stim_{cell}_{n+1}`` 格式的新 ID。
+
+    :param nml_doc: NeuroML 文档对象
+    :param cell: 细胞名称
+    :return: 新的刺激 ID 字符串
+    """
     i = 1
     for stim in nml_doc.pulse_generators:
         if stim.id.startswith("%s_%s" % ("stim", cell)):
@@ -316,6 +395,13 @@ def get_next_stim_id(nml_doc, cell):
 
 
 def get_cell_position(cell):
+    """从 NeuroML 多室形态文件中读取细胞 soma 位置。
+
+    加载 ``NeuroML2/{cell}.cell.nml`` 文件，返回第一个 segment 的 proximal 坐标。
+
+    :param cell: 细胞名称
+    :return: ``Point3DWithDiam`` 对象（含 x, y, z 属性）
+    """
     root_dir = os.path.dirname(os.path.abspath(__file__))
     # cell_file_path = root_dir + "/../../../" if test else root_dir + "/../../"  # if running test
     cell_file_path = root_dir + "/"
@@ -327,6 +413,16 @@ def get_cell_position(cell):
 
 
 def append_input_to_nml_input_list(stim, nml_doc, cell, params):
+    """将刺激输入追加到 NeuroML 网络的 ``InputList`` 中。
+
+    创建 ``InputList`` 并添加一个 ``Input`` 条目，将其绑定到指定细胞的
+    突触目标端点上。
+
+    :param stim: 刺激生成器对象（``PulseGenerator`` 或 ``SineGenerator``）
+    :param nml_doc: NeuroML 文档对象
+    :param cell: 目标细胞名称
+    :param params: 参数模型对象
+    """
     target = get_cell_id_string(cell, params, muscle=is_muscle(cell))
 
     input_list = InputList(
@@ -339,6 +435,19 @@ def append_input_to_nml_input_list(stim, nml_doc, cell, params):
 
 
 def add_new_sinusoidal_input(nml_doc, cell, delay, duration, amplitude, period, params):
+    """为指定细胞创建正弦波刺激输入。
+
+    根据运动神经元（VB/DB）的 soma 位置自动计算相位偏移，
+    VB 系列的幅度取反以产生反相振荡。
+
+    :param nml_doc: NeuroML 文档对象
+    :param cell: 目标细胞名称
+    :param delay: 延迟时间
+    :param duration: 持续时间
+    :param amplitude: 幅度
+    :param period: 周期
+    :param params: 参数模型对象
+    """
     id = get_next_stim_id(nml_doc, cell)
 
     if cell.startswith("VB"):
@@ -369,6 +478,15 @@ def add_new_sinusoidal_input(nml_doc, cell, delay, duration, amplitude, period, 
 
 
 def add_new_input(nml_doc, cell, delay, duration, amplitude, params):
+    """为指定细胞创建脉冲刺激输入（``PulseGenerator``）。
+
+    :param nml_doc: NeuroML 文档对象
+    :param cell: 目标细胞名称
+    :param delay: 延迟时间
+    :param duration: 持续时间
+    :param amplitude: 幅度
+    :param params: 参数模型对象
+    """
     id = get_next_stim_id(nml_doc, cell)
     input = PulseGenerator(id=id, delay=delay, duration=duration, amplitude=amplitude)
     nml_doc.pulse_generators.append(input)
@@ -377,6 +495,13 @@ def add_new_input(nml_doc, cell, delay, duration, amplitude, params):
 
 
 def get_muscle_names():
+    """生成全部 96 条体壁肌肉的名称列表。
+
+    按象限顺序（MDR/MVR/MVL/MDL）x 24 条/象限生成，
+    编号 01~24，低位数字补零（如 ``MDR01``）。
+
+    :return: 96 个肌肉名称的列表
+    """
     names = []
     for i in range(24):
         names.append("%s%s" % (quadrant0, i + 1 if i > 8 else ("0%i" % (i + 1))))
@@ -391,6 +516,12 @@ def get_muscle_names():
 
 
 def merge_with_template(model, templfile):
+    """使用 Airspeed 模板引擎将变量字典与 LEMS 模板文件合并。
+
+    :param model: 变量字典（传入模板的上下文数据）
+    :param templfile: 模板文件路径
+    :return: 合并后的 XML 字符串
+    """
     with open(templfile) as f:
         templ = airspeed.Template(f.read())
     return templ.merge(model)
@@ -405,8 +536,24 @@ def write_to_file(
     verbose=True,
     target_directory=".",
 ):
-    #######   Write to file  ######
+    # ── 写入 NeuroML 网络文件和 LEMS 仿真文件 ──
 
+    """将生成的 NeuroML 网络和 LEMS 仿真文件写入磁盘。
+
+    输出两个文件：
+    1. ``{reference}.net.nml`` -- NeuroML 网络描述文件
+    2. ``LEMS_{reference}.xml`` -- LEMS 仿真配置文件（由模板渲染）
+
+    可选进行 NeuroML2 schema 验证。
+
+    :param nml_doc: NeuroML 文档对象
+    :param lems_info: LEMS 模板变量字典
+    :param reference: 网络标识字符串
+    :param template_path: LEMS 模板文件所在目录
+    :param validate: 是否进行 NeuroML2 验证
+    :param verbose: 是否输出详细日志
+    :param target_directory: 输出目录
+    """
     nml_file = target_directory + "/" + reference + ".net.nml"
     print_("Writing generated network to: %s" % os.path.realpath(nml_file))
     writers.NeuroMLWriter.write(nml_doc, nml_file)
@@ -416,7 +563,7 @@ def write_to_file(
 
     lems_file_name = target_directory + "/" + "LEMS_%s.xml" % reference
     with open(lems_file_name, "w") as lems:
-        # if running unittest concat template_path
+        # 单元测试时拼接模板路径前缀
         merged = merge_with_template(lems_info, template_path + LEMS_TEMPLATE_FILE)
         lems.write(merged)
 
@@ -434,8 +581,18 @@ def write_to_file(
             print_("Problem validating against remote Schema!")
 
 
-# Get the standard name for a network connection
+# 获取网络连接的标准命名
 def get_projection_id(pre, post, synclass, syntype):
+    """根据突触前/后细胞和突触类型生成标准 Projection ID。
+
+    格式：``NC_{pre}_{post}_{synclass}``。
+
+    :param pre: 突触前细胞名称
+    :param post: 突触后细胞名称
+    :param synclass: 突触分类名
+    :param syntype: 突触类型名（当前未使用，保留接口）
+    :return: Projection ID 字符串
+    """
     proj_id = "NC_%s_%s_%s" % (pre, post, synclass)
     """
     if "GapJunction" in syntype:
@@ -445,6 +602,10 @@ def get_projection_id(pre, post, synclass, syntype):
 
 
 def get_random_colour_hex():
+    """生成随机十六进制颜色字符串（``#RRGGBB``），用于绘图颜色分配。
+
+    :return: 颜色字符串
+    """
     rgb = [
         hex(random.randint(0, 256)),
         hex(random.randint(0, 256)),
@@ -457,15 +618,29 @@ def get_random_colour_hex():
 
 
 def get_file_name_relative_to_c302(file_name):
+    """返回相对于 ``C302_HOME`` 环境变量的文件路径。
+
+    :param file_name: 文件名
+    :return: 相对路径字符串，或 None（若环境变量未设置）
+    """
     if "C302_HOME" in os.environ:
         return os.path.relpath(os.environ["C302_HOME"], file_name)
 
 
 def get_cell_names_and_connection(data_reader, test=False):
-    # Use the data reader to give a list of all cells and a list of all connections
-    # This could be replaced with a call to "DatabaseReader" or "OpenWormNeuroLexReader" in future...
-    # If called from unittest folder ammend path to "../../../../"
+    # 使用数据读取器获取所有细胞列表和连接列表
+    # 将来可替换为 DatabaseReader 或 OpenWormNeuroLexReader
+    # 若从单元测试目录调用，需修正路径
 
+    """读取连接组数据，返回所有细胞名称和突触连接列表。
+
+    调用数据读取器的 ``read_data()`` 方法获取完整连接组
+    （包含非连接细胞），并按字母序排列细胞名称。
+
+    :param data_reader: 数据读取器模块路径
+    :param test: 是否为测试模式（当前未使用）
+    :return: ``(cell_names, conns)`` 元组
+    """
     cell_names, conns = load_data_reader(data_reader).read_data(
         include_nonconnected_cells=True
     )
@@ -476,6 +651,15 @@ def get_cell_names_and_connection(data_reader, test=False):
 
 
 def get_cell_muscle_names_and_connection(data_reader, test=False):
+    """读取神经元-肌肉连接数据，返回运动神经元、已知肌肉列表和肌肉连接。
+
+    过滤掉非体壁肌肉（``MANAL``/``MVULVA``），仅保留
+    在 ``BODY_WALL_MUSCLE_NAMES`` 中的已知肌肉。
+
+    :param data_reader: 数据读取器模块路径
+    :param test: 是否为测试模式（当前未使用）
+    :return: ``(mneurons, all_known_muscles, muscle_conns)`` 元组
+    """
     mneurons, all_muscles, muscle_conns = load_data_reader(
         data_reader
     ).read_muscle_data()
@@ -500,10 +684,25 @@ def get_cell_muscle_names_and_connection(data_reader, test=False):
 
 
 def is_cond_based_cell(params):
+    """判断参数层级是否为导电模型（Level C 或 D 系列）。
+
+    :param params: 参数模型对象
+    :return: bool
+    """
     return params.is_level_C() or params.is_level_D()
 
 
 def get_cell_id_string(cell, params, muscle=False):
+    """构建 NeuroML 中引用细胞实例的路径字符串。
+
+    格式为 ``../{cell_name}/0/{cell_component_id}``，
+    Level D 的神经元使用细胞名本身作为 component ID。
+
+    :param cell: 细胞名称
+    :param params: 参数模型对象
+    :param muscle: 是否为肌肉细胞
+    :return: 路径字符串
+    """
     if cell in get_muscle_names():
         muscle = True
     if not params.is_level_D():
@@ -520,14 +719,31 @@ def get_cell_id_string(cell, params, muscle=False):
 
 
 def regex_match(pattern, str):
+    """当 pattern 为正则表达式时执行匹配。
+
+    :param pattern: 模式字符串（需含 ``^`` 和 ``$`` 才视为正则）
+    :param str: 待匹配字符串
+    :return: 匹配对象或 False
+    """
     return is_regex_string(pattern) and re.match(pattern, str)
 
 
 def is_regex_string(str):
+    """判断字符串是否为正则表达式格式（同时含 ``^`` 和 ``$``）。
+
+    :param str: 待检查字符串
+    :return: bool
+    """
     return "^" in str and "$" in str
 
 
 def elem_in_coll_matches_conn(coll, conn):
+    """检查集合中是否有正则元素匹配给定的连接字符串。
+
+    :param coll: 字符串集合（可能含正则模式）
+    :param conn: 连接简写字符串
+    :return: bool
+    """
     for elem in coll:
         if regex_match(elem, conn):
             return True
@@ -538,6 +754,18 @@ cached_owmeta_data = None
 
 
 def _get_cell_info(bnd, cells):
+    """从 owmeta Bundle 或本地缓存获取细胞的详细注释信息。
+
+    返回两个 OrderedDict：神经元信息和肌肉信息。
+    每个条目包含 ``(cell, types, receptor, neurotransmitter, short, color)``。
+
+    当 ``bnd`` 为 None 时使用本地 JSON 缓存文件
+    （``data/owmeta_cache.json``）。
+
+    :param bnd: owmeta Bundle 对象，或 None（使用缓存）
+    :param cells: 要查询的细胞名称集合
+    :return: ``(all_neuron_info, all_muscle_info)`` 元组
+    """
     global cached_owmeta_data
     # print('------ Getting the cell info for %s'%cells)
     all_neuron_info = collections.OrderedDict()
@@ -557,8 +785,8 @@ def _get_cell_info(bnd, cells):
 
     else:
         ctx = bnd(Context)(ident="http://openworm.org/data").stored
-        # Go through our list and get the neuron object associated with each name.
-        # Store these in another list.
+        # 遍历细胞名称列表，获取每个名称对应的神经元对象
+        # 存入独立的信息字典
         fixed_up_names = []
         for name in cells:
             match = is_muscle(name)
@@ -596,8 +824,8 @@ def _get_cell_info(bnd, cells):
                 color = "0 0.6 0"
                 short = "Mu%s" % short
             else:
-                # At this point, we should only have Neurons and Muscles because the reader
-                # filters them out
+                # 此时应仅剩 Neuron 和 Muscle（数据读取器已过滤非神经/肌肉细胞）
+                # 因此遇到其他类型则抛出异常
                 raise Exception("Got an unexpected cell type")
 
             short = "(%s" % short
@@ -621,6 +849,14 @@ def _get_cell_info(bnd, cells):
 
 
 def set_param(params, param, value):
+    """设置或新增生物参数值。
+
+    若参数已存在且值不同则更新；若不存在则添加新参数。
+
+    :param params: 参数模型对象
+    :param param: 参数名称
+    :param value: 参数值字符串
+    """
     v = params.get_bioparameter(param, warn_if_missing=False)
     if v:
         if v == value:
@@ -633,6 +869,14 @@ def set_param(params, param, value):
 
 
 def mirror_param(params, k, v):
+    """为双向缝隙连接参数设置镜像值（A-B 和 B-A 使用相同参数）。
+
+    通过解析参数名中的 ``pre_to_post`` 模式来构建反向键。
+
+    :param params: 参数模型对象
+    :param k: 参数名称（含 ``pre_to_post`` 模式）
+    :param v: 参数值
+    """
     pattern = k.split("_")
     pre = pattern[0]
     pattern[0] = "%s"
@@ -673,6 +917,44 @@ def generate(
     param_overrides={},
     target_directory="./",
 ):
+    """c302 网络生成主入口，将连接组数据转化为完整的 NeuroML2 网络。
+
+    主要步骤：
+    1. 处理参数覆盖（param_overrides）并创建模型组件
+    2. 初始化 NeuroML 文档和网络对象
+    3. 遍历连接组数据创建神经元种群（Population/Instance）
+    4. 为每个神经元加载形态文件并分配 3D 坐标
+    5. 创建偏置电流刺激输入
+    6. 遍历神经元间连接创建突触投射
+    7. 处理连接数量覆盖/缩放和极性覆盖
+    8. 创建肌肉种群和神经元-肌肉连接
+    9. 输出 ``.net.nml`` 和 ``LEMS_*.xml`` 文件
+    10. 返回 NeuroML 文档对象
+
+    :param net_id: 网络唯一标识
+    :param params: 参数化模型对象
+    :param data_reader: 数据读取器模块路径
+    :param cells: 包含的细胞列表（None 表示全部）
+    :param cells_to_plot: 需要绘图的细胞列表
+    :param cells_to_stimulate: 需要刺激的细胞列表
+    :param muscles_to_include: 包含的肌肉列表
+    :param conns_to_include: 包含的连接列表
+    :param conns_to_exclude: 排除的连接列表
+    :param conn_number_override: 连接数量覆盖字典
+    :param conn_number_scaling: 连接数量缩放字典
+    :param conn_polarity_override: 连接极性覆盖字典
+    :param duration: 仿真时长（ms）
+    :param dt: 时间步长（ms）
+    :param vmin: 绘图电压下限（mV）
+    :param vmax: 绘图电压上限（mV）
+    :param seed: 随机数种子
+    :param test: 是否为测试模式
+    :param verbose: 是否输出详细日志
+    :param print_connections: 是否打印连接信息
+    :param param_overrides: 参数覆盖字典
+    :param target_directory: 输出目录
+    :return: ``NeuroMLDocument`` 对象
+    """
     validate = not (
         params.is_level_B()
         or params.is_level_C0()
@@ -682,6 +964,7 @@ def generate(
 
     root_dir = os.path.dirname(os.path.abspath(__file__))
 
+    # ── 步骤 1：处理参数覆盖（param_overrides）──
     regex_param_overrides = {"mirrored_elec_conn_params": {}}
     if param_overrides:
         for k, v in param_overrides.items():
@@ -702,8 +985,10 @@ def generate(
             else:
                 set_param(params, k, v)
 
+    # ── 步骤 2：创建所有细胞和突触模型组件 ──
     params.create_models()
 
+    # ── 步骤 3：设置绘图电压范围默认值 ──
     if vmin is None:
         if params.is_level_A() or params.is_level_B():
             vmin = -52
@@ -759,6 +1044,7 @@ def generate(
         print_(info)
     info += "\n%s\n" % (params.bioparameter_info("    "))
 
+    # ── 步骤 4：初始化 NeuroML 文档和网络对象 ──
     nml_doc = NeuroMLDocument(id=net_id, notes=info)
 
     if params.is_level_A() or params.is_level_B() or params.level == "BC1":
@@ -788,9 +1074,10 @@ def generate(
         else:
             nml_doc.fixed_factor_concentration_models.append(params.concentration_model)
 
+    # ── 步骤 5：读取连接组数据，创建神经元种群（Population） ──
     cell_names, conns = get_cell_names_and_connection(data_reader)
 
-    # To hold all Cell NeuroML objects vs. names
+    # 存储所有 Cell NeuroML 对象（键为细胞名称）
     all_cells = {}
 
     # lems_file = ""
@@ -885,7 +1172,7 @@ def generate(
             inst = Instance(id="0")
 
             if not params.is_level_D():
-                # build a Population data structure out of the cell name
+                # 用细胞名称构建 Population 数据结构（非 D 级使用通用神经元组件）
                 pop0 = Population(
                     id=cell,
                     component=params.generic_neuron_cell.id,
@@ -894,13 +1181,13 @@ def generate(
                 )
                 cell_id = params.generic_neuron_cell.id
             else:
-                # build a Population data structure out of the cell name
+                # D 级使用细胞本身作为 Population 组件（多室模型，每个细胞独立）
                 pop0 = Population(
                     id=cell, component=cell, type="populationList", size="1"
                 )
                 cell_id = cell
 
-            # neuron, neuron.type(), neuron.receptor(), neuron.neurotransmitter(), short, color
+            # 从 owmeta 信息中提取颜色、类型、受体和神经递质属性
             if all_neuron_info is not None:
                 pop0.properties.append(Property("color", all_neuron_info[cell][5]))
                 types = sorted(all_neuron_info[cell][1])
@@ -914,7 +1201,7 @@ def generate(
 
             pop0.instances.append(inst)
 
-            # put that Population into the Network data structure from above
+            # 将 Population 加入网络数据结构
             net.populations.append(pop0)
 
             if cell in cells_vs_name:
@@ -923,8 +1210,8 @@ def generate(
                 )
                 pop0.properties.append(p)
 
-            # also use the cell name to grab the morphology file, as a NeuroML data structure
-            #  into the 'all_cells' dict
+            # 同时使用细胞名加载形态文件（NeuroML 格式），
+            # 存入 all_cells 字典
             cell_file_path = (
                 root_dir + "/../" if test else root_dir + "/"
             )  # if running test
@@ -1030,6 +1317,7 @@ def generate(
     if verbose:
         print_("Finished loading %i cells" % count)
 
+    # ── 步骤 6：创建肌肉种群 ──
     mneurons, all_muscles, muscle_conns = get_cell_muscle_names_and_connection(
         data_reader
     )
@@ -1048,7 +1336,7 @@ def generate(
         for muscle in muscles_to_include:
             inst = Instance(id="0")
 
-            # build a Population data structure out of the cell name
+            # 为肌肉构建 Population 数据结构
             pop0 = Population(
                 id=muscle,
                 component=params.generic_muscle_cell.id,
@@ -1058,11 +1346,11 @@ def generate(
             pop0.properties.append(Property("color", "0 .6 0"))
             pop0.instances.append(inst)
 
-            # put that Population into the Network data structure from above
+            # 将肌肉 Population 加入网络数据结构
             net.populations.append(pop0)
 
             if muscle in cells_vs_name:
-                # No muscles adopted yet, but just in case they are in future...
+                # 目前尚无被领养的肌肉，但预留接口以防将来有
                 p = Property(
                     tag="OpenWormBackerAssignedName", value=cells_vs_name[muscle]
                 )
@@ -1150,20 +1438,20 @@ def generate(
         if verbose:
             print_("Finished creating %i muscles" % muscle_count)
 
-    existing_synapses = {}
+    # ── 步骤 7：遍历神经元间连接，创建突触投射 ──
+    existing_synapses = {}  # 突触原型缓存，避免重复注册
 
     for conn in conns:
         if conn.pre_cell in lems_info["cells"] and conn.post_cell in lems_info["cells"]:
-            # take information about each connection and package it into a
-            # NeuroML Projection data structure
+            # 将每条连接信息封装为 NeuroML Projection 数据结构
             proj_id = get_projection_id(
                 conn.pre_cell, conn.post_cell, conn.synclass, conn.syntype
             )
             conn_shorthand = "%s-%s" % (conn.pre_cell, conn.post_cell)
 
-            elect_conn = False
-            analog_conn = False
-            nonneuroml_conn = False
+            elect_conn = False  # 是否为电突触（缝隙连接）
+            analog_conn = False  # 是否为模拟突触
+            nonneuroml_conn = False  # 是否为非 NeuroML 自定义连接
 
             conn_type = "neuron_to_neuron"
             conn_pol = "exc"
@@ -1192,7 +1480,7 @@ def generate(
 
                     if new_param in param_overrides:
                         continue
-                    # add regex param unless there is a specific param
+                    # 若无精确参数覆盖则添加正则匹配的参数
                     set_param(params, new_param, new_param_v)
 
             if "mirrored_elec_conn_params" in regex_param_overrides:
@@ -1222,17 +1510,17 @@ def generate(
                             in param_overrides["mirrored_elec_conn_params"]
                         ):
                             continue
-                        # add regex param unless there is a specific param
+                        # 若无精确参数覆盖则添加正则匹配的镜像参数
                         mirror_param(params, new_param, new_param_v)
 
             if conns_to_include and conn_shorthand not in conns_to_include:
-                # conn_shorthand not in conns_to_include. if there is a regex in conns_to_include which matches the current conn_shorthand -> include
+                # conn_shorthand 不在白名单中，检查正则：若有匹配则保留，否则跳过
                 if not elem_in_coll_matches_conn(conns_to_include, conn_shorthand):
                     continue
             if conns_to_exclude:
                 if conn_shorthand in conns_to_exclude:
                     continue
-                # conn_shorthand not in conns_to_exclude. if there is a regex in conns_to_exclude which matches the current conn_shorthand -> exclude
+                # conn_shorthand 不在黑名单精确列表中，检查正则：若匹配则排除
                 if elem_in_coll_matches_conn(conns_to_exclude, conn_shorthand):
                     continue
 
@@ -1290,9 +1578,8 @@ def generate(
                 # print("Scaling by %s"%scale)
                 number_syns = math.pow(number_syns, scale)
 
+            # 连接数量覆盖：精确匹配或正则匹配覆盖连接数量
             if conn_number_override:
-                # number_syns = conn_number_override[conn_shorthand]
-
                 for conn_num_override in conn_number_override.keys():
                     if conn_num_override == conn_shorthand:
                         number_syns = conn_number_override[conn_shorthand]
@@ -1387,7 +1674,7 @@ def generate(
 
                 # print_("Conn %s -> %s"%(pre_cell_id,post_cell_id))
 
-                # Add a Connection with the closest locations
+                # 创建加权电连接实例
                 conn0 = ElectricalConnectionInstanceW(
                     id="0",
                     pre_cell=pre_cell_id,
@@ -1444,6 +1731,7 @@ def generate(
 
                 proj0.connection_wds.append(conn0)
 
+    # ── 步骤 8：遍历神经元-肌肉/肌肉-肌肉连接 ──
     if len(muscles_to_include) > 0:
         for conn in muscle_conns:
             if conn.post_cell not in muscles_to_include:
@@ -1454,8 +1742,7 @@ def generate(
             ):
                 continue
 
-            # take information about each connection and package it into a
-            # NeuroML Projection data structure
+            # 将每条连接信息封装为 NeuroML Projection 数据结构
             proj_id = get_projection_id(
                 conn.pre_cell, conn.post_cell, conn.synclass, conn.syntype
             )
@@ -1497,7 +1784,7 @@ def generate(
 
                     if new_param in param_overrides:
                         continue
-                    # add regex param unless there is a specific param
+                    # 若无精确参数覆盖则添加正则匹配的参数
                     set_param(params, new_param, new_param_v)
 
             if "mirrored_elec_conn_params" in regex_param_overrides:
@@ -1527,17 +1814,17 @@ def generate(
                             in param_overrides["mirrored_elec_conn_params"]
                         ):
                             continue
-                        # add regex param unless there is a specific param
+                        # 若无精确参数覆盖则添加正则匹配的镜像参数
                         mirror_param(params, new_param, new_param_v)
 
             if conns_to_include and conn_shorthand not in conns_to_include:
-                # conn_shorthand not in conns_to_include. if there is a regex in conns_to_include which matches the current conn_shorthand -> include
+                # conn_shorthand 不在白名单中，检查正则：若有匹配则保留，否则跳过
                 if not elem_in_coll_matches_conn(conns_to_include, conn_shorthand):
                     continue
             if conns_to_exclude:
                 if conn_shorthand in conns_to_exclude:
                     continue
-                # conn_shorthand not in conns_to_exclude. if there is a regex in conns_to_exclude which matches the current conn_shorthand -> exclude
+                # conn_shorthand 不在黑名单精确列表中，检查正则：若匹配则排除
                 if elem_in_coll_matches_conn(conns_to_exclude, conn_shorthand):
                     continue
 
@@ -1669,7 +1956,7 @@ def generate(
 
                 # print_("Conn %s -> %s"%(pre_cell_id,post_cell_id))
 
-                # Add a Connection with the closest locations
+                # 创建加权电连接实例（最近距离连接）
                 conn0 = ElectricalConnectionInstanceW(
                     id="0",
                     pre_cell=pre_cell_id,
@@ -1713,7 +2000,7 @@ def generate(
 
                 net.projections.append(proj0)
 
-                # Add a Connection with the closest locations
+                # 创建事件驱动化学突触连接
 
                 pre_cell_id = get_cell_id_string(conn.pre_cell, params)
                 post_cell_id = get_cell_id_string(conn.post_cell, params, muscle=True)
@@ -1731,6 +2018,7 @@ def generate(
 
     # import pprint
     # pprint.pprint(lems_info)
+    # ── 步骤 9：输出 .net.nml 和 LEMS 仿真文件 ──
     template_path = root_dir + "/../" if test else root_dir + "/"  # if running test
     write_to_file(
         nml_doc,
@@ -1752,6 +2040,11 @@ def generate(
 
 
 def parse_list_arg(list_arg):
+    """解析 CLI 列表参数字符串为 Python 列表。
+
+    :param list_arg: CLI 列表参数字符串，或 None
+    :return: 字符串列表，或 None/空列表
+    """
     if list_arg is None:
         return None
     if list_arg == []:
@@ -1769,6 +2062,13 @@ def parse_list_arg(list_arg):
 
 
 def parse_dict_arg(dict_arg):
+    """解析 CLI 字典参数字符串为 Python 字典。
+
+    值尝试转为 float，失败则保留为字符串。
+
+    :param dict_arg: CLI 字典参数字符串，或 None
+    :return: 字典，或 None
+    """
     if dict_arg is None or dict_arg == "None":
         return None
     ret = {}
@@ -1783,6 +2083,11 @@ def parse_dict_arg(dict_arg):
 
 
 def main():
+    """c302 CLI 主入口，解析命令行参数并调用 ``generate()``。
+
+    动态导入指定参数层级模块，实例化 ``ParameterisedModel``，
+    然后将全部 CLI 参数传递给 ``generate()``。
+    """
     import importlib
 
     print("Starting c302 v%s..." % __version__)
