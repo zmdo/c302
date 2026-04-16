@@ -1,3 +1,18 @@
+# =============================================================================
+# 功能描述：
+#   c302 仿真编排脚本。
+#   提供 ``run_c302()`` 函数，串联网络生成、LEMS 仿真和结果绘图的完整流程。
+#   支持 jNeuroML 和 jNeuroML_NEURON 两种仿真后端。
+#   ``__main__`` 块提供丰富的 CLI 快捷参数（如 ``-fullC1``、``-oscB``）。
+#
+# 类与方法索引：
+#   run_c302                             (L33)   — c302 仿真编排主函数：生成网络 → 运行仿真 → 绘制结果
+#
+# 更新日志：
+#   2026-04-16  Copilot  添加中文 docstring 和行内注释
+#
+# 当前维护者：Copilot
+# =============================================================================
 import errno
 import sys
 import os
@@ -10,9 +25,9 @@ from pyneuroml import pynml
 import c302
 from c302 import c302_utils
 
-save_fig_dir = "summary/"
+save_fig_dir = "summary/"          # 结果图像保存目录
 save_image_dir = "images"
-save_image_full_dir = "%s/%s" % (save_fig_dir, save_image_dir)
+save_image_full_dir = "%s/%s" % (save_fig_dir, save_image_dir)  # 完整输出路径
 
 
 def run_c302(
@@ -34,6 +49,33 @@ def run_c302(
     target_directory="examples",
     save_fig_to=None,
 ):
+    """c302 仿真编排主函数：生成网络 → 运行仿真 → 绘制结果。
+
+    完整工作流程：
+    1. 导入指定配置模块并调用其 ``setup()`` 生成 NeuroML 网络
+    2. 使用 jNeuroML 或 jNeuroML_NEURON 后端执行 LEMS 仿真
+    3. 调用 ``plot_c302_results()`` 绘制膜电位和活性图
+    4. 可选生成连接矩阵可视化
+
+    :param config: 配置名称（如 ``Full``、``Syns``、``Oscillator``）
+    :param parameter_set: 参数层级（``A``/``B``/``C``/``C0``/``C1``/``C2``/``D``/``D1``/``W2D``）
+    :param prefix: 文件名前缀（通常为空字符串）
+    :param duration: 仿真时长（毫秒）
+    :param dt: 仿真时间步长（毫秒）
+    :param simulator: 仿真后端，``'jNeuroML'`` 或 ``'jNeuroML_NEURON'``
+    :param save: 是否保存图片
+    :param show_plot_already: 是否立即显示图形窗口
+    :param data_reader: 数据读取器名称
+    :param verbose: 是否输出详细日志
+    :param plot_ca: 是否绘制钙浓度/活性图
+    :param plot_connectivity: 是否绘制连接矩阵
+    :param param_overrides: 生物参数覆盖字典
+    :param config_param_overrides: 配置级参数覆盖字典
+    :param config_package: 配置模块包路径（默认 ``'c302'``）
+    :param target_directory: 输出目录
+    :param save_fig_to: 图片保存目录覆盖
+    :return: ``(cells, cells_to_stimulate, params, muscles)`` 四元组
+    """
     if save_fig_to:
         global save_fig_dir
         save_fig_dir = save_fig_to
@@ -46,6 +88,7 @@ def run_c302(
     if not config_package:
         config_package = "c302"
 
+    # ── 步骤 1：导入配置模块并生成 NeuroML 网络 ──────────────
     setup = IM.import_module("%s.c302_%s" % (config_package, config)).setup
 
     try:
@@ -71,13 +114,14 @@ def run_c302(
     os.chdir(target_directory)
 
     try:
-        os.makedirs(save_fig_dir)
+        os.makedirs(save_fig_dir)  # 确保图像保存目录存在
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise
 
     lems_file = "LEMS_c302_%s_%s.xml" % (parameter_set, config)
 
+    # ── 步骤 2：运行 LEMS 仿真 ────────────────────────────
     if simulator == "jNeuroML":
         results = pynml.run_lems_with_jneuroml(
             lems_file, nogui=True, load_saved_data=True, verbose=verbose
@@ -89,6 +133,7 @@ def run_c302(
 
     c302.print_("Finished simulation of %s and have reloaded results" % lems_file)
 
+    # ── 步骤 3：绘制仿真结果 ────────────────────────────
     c302_utils.plot_c302_results(
         results,
         config,
@@ -108,6 +153,7 @@ def run_c302(
     return cells, cells_to_stimulate, params, muscles
 
 
+# ── CLI 快捷入口：每个 elif 分支对应一种“配置 + 参数集 + 后端”组合 ──
 if __name__ == "__main__":
     if "-full" in sys.argv:
         run_c302("Full", "C", "", 300, 0.05, "jNeuroML_NEURON")

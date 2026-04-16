@@ -1,3 +1,22 @@
+# =============================================================================
+# 功能描述：
+#   c302 仿真结果可视化工具集。
+#   提供膜电位/活性热图、轨迹叠加图和连接矩阵热图的绘制功能，
+#   支持神经元与肌肉分组显示、自动保存 PNG、自然排序等。
+#
+# 类与方法索引：
+#   natsort                              (L31)   — 对字符串进行自然排序的辅助键函数
+#   plots                                (L48)   — 将仿真数据矩阵绘制为热图（pcolormesh）
+#   generate_traces_plot                 (L130)  — 使用 pyNeuroML 绘制各细胞的膜电位或活性轨迹叠加图
+#   plot_c302_results                    (L177)  — c302 仿真结果的主绘图函数
+#   _show_conn_matrix                    (L453)  — 内部辅助函数：显示单个连接矩阵热图
+#   generate_conn_matrix                 (L539)  — 从 NeuroML 文档生成完整的连接矩阵可视化
+#
+# 更新日志：
+#   2026-04-16  Copilot  添加中文 docstring 和行内注释
+#
+# 当前维护者：Copilot
+# =============================================================================
 import sys
 import os
 import re
@@ -10,21 +29,39 @@ import c302
 
 
 def natsort(s):
+    """对字符串进行自然排序的辅助键函数。
+
+    将字符串按数字和非数字片段拆分，数字部分转为整数，
+    使得 ``VB2`` 排在 ``VB11`` 之前（而非字典序的 ``VB11 < VB2``）。
+
+    :param s: 待排序的字符串
+    :return: 可用于 ``sorted(key=...)`` 的混合类型列表
+    """
     return [int(t) if t.isdigit() else t for t in re.split(r"(\d+)", s)]
 
 
-default_figsize = (6.4, 4.8)
+default_figsize = (6.4, 4.8)  # matplotlib 默认图形尺寸（英寸）
 
-paramsets_no_calcium = ["A", "W2D"]
+paramsets_no_calcium = ["A", "W2D"]  # 无钙动力学的参数集，跳过 [Ca2+] 绘图
 
 
 def plots(a_n, info, cells, dt):
+    """将仿真数据矩阵绘制为热图（pcolormesh）。
+
+    当细胞数量超过 24 个时自动增大图形高度以保证标签可读。
+    X 轴为时间（ms），Y 轴为各细胞名称。
+
+    :param a_n: 二维 numpy 数组，行为细胞、列为时间步
+    :param info: 图表标题字符串
+    :param cells: 细胞名称列表（与矩阵行对应）
+    :param dt: 仿真时间步长（秒）
+    """
     c302.print_("Generating plots for: %s" % info)
 
     heightened = False
     matrix_height_in = None
 
-    if len(cells) > 24:
+    if len(cells) > 24:  # 细胞数较多时增大图形高度以保证标签可读
         matrix_height_in = 10
         heightened = True
     if len(cells) > 100:
@@ -52,9 +89,9 @@ def plots(a_n, info, cells, dt):
 
     # fig = plt.figure()
     # ax = fig.gca()
-    downscale = 10
+    downscale = 10  # 降采样倍率，减少渲染点数
 
-    a_n_ = a_n[:, ::downscale]
+    a_n_ = a_n[:, ::downscale]  # 对时间轴降采样
 
     cmap = plt.colormaps["jet"]
     plot0 = ax.pcolormesh(a_n_, cmap=cmap)
@@ -71,7 +108,7 @@ def plots(a_n, info, cells, dt):
 
     fig.canvas.draw()
 
-    labels = []  # issue is with unicode
+    labels = []  # 将刻度标签从采样索引转换为毫秒单位
     for label in ax.get_xticklabels():
         if len(label.get_text()) > 0:
             labels.append(float(str((label.get_text()))) * dt * downscale * 1000)
@@ -102,6 +139,19 @@ def generate_traces_plot(
     voltage,
     muscles,
 ):
+    """使用 pyNeuroML 绘制各细胞的膜电位或活性轨迹叠加图。
+
+    :param config: 配置名称（如 ``Full``、``Syns``）
+    :param parameter_set: 参数集名称（如 ``A``、``C1``）
+    :param xvals: 时间序列列表（每个细胞一条）
+    :param yvals: 电压/活性值列表
+    :param info: 图表标题
+    :param labels: 曲线标签列表
+    :param save: 是否保存为 PNG 文件
+    :param save_fig_path: 保存路径模板
+    :param voltage: ``True`` 绘制膜电位，``False`` 绘制活性/钙浓度
+    :param muscles: ``True`` 表示绘制肌肉数据
+    """
     file_name = "traces_%s%s_%s_%s.png" % (
         ("muscles" if muscles else "neuron"),
         ("" if voltage else "_activity"),
@@ -134,6 +184,23 @@ def plot_c302_results(
     data_reader=c302.DEFAULT_DATA_READER,
     plot_ca=True,
 ):
+    """c302 仿真结果的主绘图函数。
+
+    从 LEMS 仿真结果字典中提取神经元和肌肉数据，依次生成：
+    1. 神经元膜电位热图和轨迹图
+    2. 肌肉膜电位热图和轨迹图
+    3. 神经元活性/钙浓度热图和轨迹图（可选）
+    4. 肌肉活性/钙浓度热图和轨迹图（可选）
+
+    :param lems_results: LEMS 仿真结果字典，键为变量路径，值为时间序列
+    :param config: 配置名称
+    :param parameter_set: 参数集名称
+    :param directory: 图片保存目录
+    :param save: 是否保存图片
+    :param show_plot_already: 是否立即显示图形窗口
+    :param data_reader: 数据读取器名称
+    :param plot_ca: 是否绘制活性/钙浓度图
+    """
     params = {"legend.fontsize": 8, "font.size": 10}
     plt.rcParams.update(params)
 
@@ -159,17 +226,17 @@ def plot_c302_results(
     c302.print_("All cells: %s" % cells)
     dt = lems_results["t"][1]
 
-    ################################################
-    ## Plot voltages cells
+    # ── 第 1 段：绘制神经元膜电位 ──────────────────────────
 
     if len(cells) > 0:
         c302.print_("Plotting neuron voltages")
 
+        # 不同参数集对应不同的 NeuroML 路径模板
         template = "{0}/0/GenericNeuronCell/{1}"
         if parameter_set.startswith("A") or parameter_set.startswith("B"):
-            template = "{0}/0/generic_neuron_iaf_cell/{1}"
+            template = "{0}/0/generic_neuron_iaf_cell/{1}"  # IAF 模型
         if parameter_set.startswith("D"):
-            template = "{0}/0/{0}/{1}"
+            template = "{0}/0/{0}/{1}"  # 多室模型
 
         xvals = []
         yvals = []
@@ -214,8 +281,7 @@ def plot_c302_results(
             muscles=False,
         )
 
-    ################################################
-    ## Plot voltages muscles
+    # ── 第 2 段：绘制肌肉膜电位 ──────────────────────────
 
     muscles.sort(key=natsort)
     muscles.reverse()
@@ -269,8 +335,7 @@ def plot_c302_results(
             muscles=True,
         )
 
-    ################################################
-    ## Plot activity/[Ca2+] in cells
+    # ── 第 3 段：绘制神经元活性 / [Ca2+] ────────────────────
 
     if plot_ca and parameter_set not in paramsets_no_calcium and len(cells) > 0:
         c302.print_("Plotting neuron activities ([Ca2+])")
@@ -323,8 +388,7 @@ def plot_c302_results(
             muscles=False,
         )
 
-    ################################################
-    ## Plot activity/[Ca2+] in muscles
+    # ── 第 4 段：绘制肌肉活性 / [Ca2+] ─────────────────────
 
     if plot_ca and parameter_set not in paramsets_no_calcium and len(muscles) > 0:
         c302.print_("Plotting muscle activities ([Ca2+])")
@@ -397,6 +461,21 @@ def _show_conn_matrix(
     figsize=default_figsize,
     colormap=None,
 ):
+    """内部辅助函数：显示单个连接矩阵热图。
+
+    当矩阵数据全为零时直接返回。否则使用 imshow 绘制热图，
+    突触前细胞为 Y 轴、突触后细胞为 X 轴。
+
+    :param data: 二维 numpy 连接权重矩阵
+    :param t: 图表副标题
+    :param all_info_pre: 突触前细胞信息有序字典
+    :param all_info_post: 突触后细胞信息有序字典
+    :param type: 网络 ID（用于图表主标题）
+    :param save_figure_to: 保存路径，``False`` 表示不保存
+    :param verbose: 是否输出详细日志
+    :param figsize: 图形尺寸元组
+    :param colormap: matplotlib 色彩映射名称
+    """
     if data.shape[0] > 0 and data.shape[1] > 0 and np.amax(data) > 0:
         ##norm = matplotlib.colors.LogNorm(vmin=1, vmax=np.amax(data))
         maxn = int(np.amax(data))
@@ -428,7 +507,7 @@ def _show_conn_matrix(
     im = plt.imshow(data, cmap=cmap, interpolation="nearest", norm=None)
 
     ax = plt.gca()
-    # Gridlines based on minor ticks
+    # 基于次刻度绘制网格线（细胞数 < 40 时显示）
     if data.shape[0] < 40:
         ax.grid(which="minor", color="grey", linestyle="-", linewidth=0.3)
 
@@ -465,11 +544,23 @@ def generate_conn_matrix(
     order_by_type=False,
     colormap=None,
 ):
+    """从 NeuroML 文档生成完整的连接矩阵可视化。
+
+    解析网络中的所有连续投射（化学突触）和电投射（缝隙连接），
+    按兴奋性/抑制性和神经元/肌肉四象限分别绘制热图。
+
+    :param nml_doc: NeuroML 文档对象
+    :param save_fig_dir: 图片保存目录，``None`` 表示不保存
+    :param verbose: 是否输出详细日志
+    :param figsize: 图形尺寸元组
+    :param order_by_type: 是否按细胞类型排序（保留未实现）
+    :param colormap: matplotlib 色彩映射名称
+    """
     net = nml_doc.networks[0]
 
-    cc_exc_conns = {}
-    cc_inh_conns = {}
-    all_cells = []
+    cc_exc_conns = {}   # 兴奋性化学突触连接字典 {pre: {post: weight}}
+    cc_inh_conns = {}   # 抑制性化学突触连接字典
+    all_cells = []      # 所有参与连接的细胞名称
 
     for cp in net.continuous_projections:
         if cp.presynaptic_population not in cc_exc_conns.keys():
@@ -492,7 +583,7 @@ def generate_conn_matrix(
                     float(c.weight)
                 )
 
-    gj_conns = {}
+    gj_conns = {}  # 电突触（缝隙连接）字典 {pre: {post: weight}}
     for ep in net.electrical_projections:
         if ep.presynaptic_population not in gj_conns.keys():
             gj_conns[ep.presynaptic_population] = {}
@@ -545,11 +636,12 @@ def generate_conn_matrix(
         print('Swapping %s with %s'%(all_neuron_info,ordered_all_neuron_info))
         all_neuron_info = ordered_all_neuron_info"""
 
-    data_exc_n = np.zeros((len(all_neurons), len(all_neurons)))
-    data_exc_m = np.zeros((len(all_neurons), len(all_muscles)))
+    # 构建四象限连接权重矩阵：兴奋/抑制 × 神经元/肌肉
+    data_exc_n = np.zeros((len(all_neurons), len(all_neurons)))  # 兴奋→神经元
+    data_exc_m = np.zeros((len(all_neurons), len(all_muscles)))  # 兴奋→肌肉
 
-    data_inh_n = np.zeros((len(all_neurons), len(all_neurons)))
-    data_inh_m = np.zeros((len(all_neurons), len(all_muscles)))
+    data_inh_n = np.zeros((len(all_neurons), len(all_neurons)))  # 抑制→神经元
+    data_inh_m = np.zeros((len(all_neurons), len(all_muscles)))  # 抑制→肌肉
 
     for pre in cc_exc_conns.keys():
         for post in cc_exc_conns[pre].keys():
