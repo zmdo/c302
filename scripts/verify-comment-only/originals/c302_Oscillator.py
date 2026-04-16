@@ -1,16 +1,3 @@
-# =============================================================================
-# 功能描述：
-#   神经振荡器配置脚本。
-#   选取 DB/VB 类运动神经元构建振荡回路，验证节律性活动。
-#
-# 类与方法索引：
-#   setup                                (L19)   — 振荡回路配置的 setup 函数
-#
-# 更新日志：
-#   2026-04-16  Copilot  添加中文 docstring 和行内注释
-#
-# 当前维护者：Copilot
-# =============================================================================
 import c302
 import sys
 import importlib
@@ -27,22 +14,6 @@ def setup(
     config_param_overrides={},
     verbose=True,
 ):
-    """振荡回路配置的 setup 函数。
-
-    配置 AVB/DB/VB 等神经元构成的振荡回路。
-    通过交互抑制和兴奋产生节律性振荡活动。
-
-    :param parameter_set: 参数层级（``A``/``B``/``C``/``C0``/``C1``/``C2``/``D``/``D1``/``W2D``）
-    :param generate: 是否生成 NeuroML 文件
-    :param duration: 仿真时长（毫秒）
-    :param dt: 仿真时间步长（毫秒）
-    :param target_directory: 输出目录
-    :param data_reader: 数据读取器名称
-    :param param_overrides: 生物参数覆盖字典
-    :param config_param_overrides: 配置级参数覆盖字典
-    :param verbose: 是否输出详细日志
-    :return: ``(cells, cells_to_stimulate, params, muscles, nml_doc)`` 五元组
-    """
     ParameterisedModel = getattr(
         importlib.import_module("c302.parameters_%s" % parameter_set),
         "ParameterisedModel",
@@ -57,7 +28,6 @@ def setup(
         "unphysiological_offset_current_dur", "800 ms", "Testing Osc", "0"
     )
 
-    # --- 突触参数调整：拉长抑制衰减 / 降低抑制反转电位 ---
     # params.set_bioparameter("chem_exc_syn_gbase", ".02 nS", "BlindGuess", "0.1")
     params.set_bioparameter("chem_exc_syn_decay", "5 ms", "BlindGuess", "0.1")
 
@@ -67,7 +37,8 @@ def setup(
 
     # params.set_bioparameter("elec_syn_gbase", "0.001 nS", "BlindGuess", "0.1")
 
-    # --- 运动神经元全集：DB/DD(背侧) + VB/VD(腹侧) ---
+    # Any neurons connected to muscles
+
     cells = [
         "DB1",
         "DB2",
@@ -108,7 +79,6 @@ def setup(
 
     cells = ["DB3", "VB3", "DD3", "VD3", "DB4", "VB4", "DD4", "VD4"]
 
-    # 覆盖为精简子集：DB2-3/VB2-3/DD2-3/VD2-3 + DA2-3/VA2-3
     cells = ["DB2", "VB2", "DD2", "VD2", "DB3", "VB3", "DD3", "VD3"]
     cells += ["DA2", "VA2", "DA3", "VA3"]
     # cells = ['DB3', 'VB3', 'DB4', 'VB4']
@@ -117,7 +87,7 @@ def setup(
     # cells+=[]
     # cells+=['PVCL', 'PVCR','AVBL','AVBR']
     # cells+=['PLML', 'PLMR','AVAL','AVAR']
-    cells += ["AVBL", "AVBR"]  # 添加命令中间神经元作为振荡驱动源
+    cells += ["AVBL", "AVBR"]
     # cells=None  # implies all cells...
 
     # cells_to_stimulate = ['PVCL','PVCR']

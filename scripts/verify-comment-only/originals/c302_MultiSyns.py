@@ -1,16 +1,3 @@
-# =============================================================================
-# 功能描述：
-#   多突触连接测试配置脚本。
-#   选取少量神经元验证突触连接生成，仅含 __main__ 执行块，无函数定义。
-#
-# 类与方法索引：
-#   （脚本无函数定义，仅含 __main__ 执行块）
-#
-# 更新日志：
-#   2026-04-16  Copilot  添加中文 docstring 和行内注释
-#
-# 当前维护者：Copilot
-# =============================================================================
 from c302 import generate, add_new_input, print_
 
 import neuroml.writers as writers
@@ -28,7 +15,6 @@ if __name__ == "__main__":
     )
     params = ParameterisedModel()
 
-    # 选取具有多种突触连接类型的 6 个神经元
     cells = ["URYDL", "SMDDR", "ADAL", "RIML", "IL2VL", "RIPL"]
     cells_to_stimulate = []
 
@@ -47,7 +33,6 @@ if __name__ == "__main__":
         verbose=True,
     )
 
-    # 分时段向 3 个神经元施加阶跃电流，间隔 300ms
     stim_amplitude = "0.35nA"
     add_new_input(nml_doc, "URYDL", "100ms", "200ms", stim_amplitude, params)
     add_new_input(nml_doc, "ADAL", "400ms", "200ms", stim_amplitude, params)

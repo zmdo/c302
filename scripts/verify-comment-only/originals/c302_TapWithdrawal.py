@@ -1,17 +1,3 @@
-# =============================================================================
-# 功能描述：
-#   触碰回缩反射配置脚本（开发中）。
-#   构建触觉感觉→中间→运动神经元回路，模拟触碰回缩行为。
-#
-# 类与方法索引：
-#   range_incl                           (L28)   — 生成包含终止值的整数范围
-#   setup                                (L40)   — 触碰退缩反射配置的 setup 函数
-#
-# 更新日志：
-#   2026-04-16  Copilot  添加中文 docstring 和行内注释
-#
-# 当前维护者：Copilot
-# =============================================================================
 """
 
 Tap-Withdrawal circuit still under development - it does not produce the correct behavior!
@@ -26,14 +12,6 @@ import neuroml.writers as writers
 
 
 def range_incl(start, end):
-    """生成包含终止值的整数范围。
-
-    等效于 ``range(start, end + 1)``。
-
-    :param start: 起始值（含）
-    :param end: 终止值（含）
-    :return: range 对象
-    """
     return range(start, end + 1)
 
 
@@ -48,24 +26,6 @@ def setup(
     config_param_overrides={},
     verbose=True,
 ):
-    """触碰退缩反射配置的 setup 函数。
-
-    配置触碰退缩（Tap Withdrawal）回路。
-    包含 ALM、AVM、PLM 等触觉感觉神经元和 AVA/AVB/AVD 等
-    命令中间神经元，模拟触碰退缩/前行决策。
-    注意：该回路仍在开发中，尚不能产生正确行为。
-
-    :param parameter_set: 参数层级（``A``/``B``/``C``/``C0``/``C1``/``C2``/``D``/``D1``/``W2D``）
-    :param generate: 是否生成 NeuroML 文件
-    :param duration: 仿真时长（毫秒）
-    :param dt: 仿真时间步长（毫秒）
-    :param target_directory: 输出目录
-    :param data_reader: 数据读取器名称
-    :param param_overrides: 生物参数覆盖字典
-    :param config_param_overrides: 配置级参数覆盖字典
-    :param verbose: 是否输出详细日志
-    :return: ``(cells, cells_to_stimulate, params, muscles, nml_doc)`` 五元组
-    """
     ParameterisedModel = getattr(
         importlib.import_module("c302.parameters_%s" % parameter_set),
         "ParameterisedModel",
@@ -82,33 +42,31 @@ def setup(
         "unphysiological_offset_current_dur", "2000 ms", "Testing TapWithdrawal", "0"
     )
 
-    # --- 运动神经元分组 ---
-    VA_motors = ["VA%s" % c for c in range_incl(1, 12)]    # 腹侧 A 类（12 个）
-    VB_motors = ["VB%s" % c for c in range_incl(1, 11)]    # 腹侧 B 类（11 个）
-    DA_motors = ["DA%s" % c for c in range_incl(1, 9)]     # 背侧 A 类（9 个）
-    DB_motors = ["DB%s" % c for c in range_incl(1, 7)]     # 背侧 B 类（7 个）
-    DD_motors = ["DD%s" % c for c in range_incl(1, 6)]     # 背侧 D 类抑制（6 个）
-    VD_motors = ["VD%s" % c for c in range_incl(1, 13)]    # 腹侧 D 类抑制（13 个）
+    VA_motors = ["VA%s" % c for c in range_incl(1, 12)]
+    VB_motors = ["VB%s" % c for c in range_incl(1, 11)]
+    DA_motors = ["DA%s" % c for c in range_incl(1, 9)]
+    DB_motors = ["DB%s" % c for c in range_incl(1, 7)]
+    DD_motors = ["DD%s" % c for c in range_incl(1, 6)]
+    VD_motors = ["VD%s" % c for c in range_incl(1, 13)]
     AS_motors = ["AS%s" % c for c in range_incl(1, 11)]
-    AS_motors = []  # 覆盖：实际不包含 AS 神经元
-    # --- 触碰回缩回路核心神经元：命令/感觉/中间 ---
+    AS_motors = []
     TW_cells = [
         "AVAL",
-        "AVAR",    # 后退命令神经元
+        "AVAR",
         "AVBL",
-        "AVBR",    # 前行命令神经元
+        "AVBR",
         "PVCL",
-        "PVCR",    # 前行输入中间神经元
+        "PVCR",
         "AVDL",
-        "AVDR",    # 后退输入中间神经元
+        "AVDR",
         "DVA",
         "PVDL",
-        "PVDR",    # 身体触觉感觉神经元
+        "PVDR",
         "PLML",
-        "PLMR",    # 尾部触觉感觉神经元
+        "PLMR",
         "AVM",
         "ALML",
-        "ALMR",    # 前部触觉感觉神经元
+        "ALMR",
     ]
     # TW_sensory = ["PLML", "PLMR", "AVM", "ALML", "ALMR"]
     all_motors = list(
@@ -161,12 +119,6 @@ def setup(
     # cells_to_plot += motors
     reference = "c302_%s_TapWithdrawal" % parameter_set
 
-    # ====================================================================
-    # 连接极性覆盖字典 —— 手动指定每对神经元的突触极性
-    # 格式: "前-后": "exc"|"inh"
-    # ====================================================================
-
-    # --- ALM/AVM 感觉神经元 → 命令神经元 ---
     conn_polarity_override = {
         "ALML-ALML": "inh",
         "ALML-PVCL": "inh",
@@ -179,7 +131,6 @@ def setup(
         "AVM-AVBR": "inh",
         "AVM-AVDL": "inh",  ##
         "AVM-AVDR": "inh",  ##
-        # --- PVD 触觉神经元 → 命令神经元 ---
         "PVDL-PVDR": "inh",
         "PVDL-PVCL": "exc",
         "PVDL-PVCR": "exc",
@@ -194,7 +145,6 @@ def setup(
         "PVDR-AVAL": "inh",
         "PVDR-AVAR": "inh",
         "PVDR-AVDL": "inh",
-        # --- DVA 中间神经元 → 命令神经元 ---
         "DVA-PVCL": "inh",  #
         "DVA-PVCR": "inh",  #
         "DVA-AVAL": "inh",
@@ -202,7 +152,6 @@ def setup(
         "DVA-AVBL": "inh",  #
         "DVA-AVBR": "inh",  #
         "DVA-AVDR": "inh",
-        # --- PVC(前行) ↔ 命令神经元 ---
         "PVCL-DVA": "exc",
         "PVCL-PVCL": "inh",
         "PVCL-PVCR": "inh",
@@ -222,7 +171,6 @@ def setup(
         "PVCR-AVBR": "exc",
         "PVCR-AVDL": "inh",
         "PVCR-AVDR": "inh",
-        # --- AVA(后退) → 其他命令神经元 ---
         "AVAL-PVCL": "inh",
         "AVAL-PVCR": "inh",
         "AVAL-AVAR": "inh",
@@ -236,7 +184,6 @@ def setup(
         "AVAR-AVBR": "inh",
         "AVAR-AVDL": "inh",
         "AVAR-AVDR": "inh",
-        # --- AVB(前行) → 其他命令神经元 ---
         "AVBL-DVA": "inh",
         "AVBL-PVCR": "inh",
         "AVBL-AVAL": "inh",
@@ -247,7 +194,6 @@ def setup(
         "AVBR-AVAR": "inh",
         "AVBR-AVBL": "inh",
         "AVBR-AVDL": "inh",
-        # --- AVD(后退输入) → AVA/AVD ---
         "AVDL-PVCL": "inh",
         "AVDL-AVAL": "exc",
         "AVDL-AVAR": "exc",
@@ -257,7 +203,6 @@ def setup(
         "AVDR-AVAR": "exc",
         "AVDR-AVBL": "inh",
         "AVDR-AVDL": "exc",
-        # --- 命令神经元 → DA 运动神经元（抑制） ---
         "DA9-DVA": "inh",
         "DVA-DA2": "inh",
         "PVCL-DA5": "inh",
@@ -283,7 +228,6 @@ def setup(
         "AVDR-DA4": "inh",
         "AVDR-DA5": "inh",
         "AVDR-DA8": "inh",
-        # --- DB → DA 交叉抑制 ---
         "DB1-DA1": "inh",
         "DB1-DA2": "inh",
         "DB2-DA2": "inh",
@@ -301,7 +245,6 @@ def setup(
         "AVAR-DB2": "inh",
         "AVAR-DB3": "inh",
         "AVAL-DB7": "inh",
-        # --- DA → DB 交叉抑制 ---
         "DA1-DB1": "inh",
         "DA2-DA3": "inh",
         "DA2-DB1": "inh",
@@ -312,7 +255,6 @@ def setup(
         "DA7-DB6": "inh",
         "DA8-DB7": "inh",
         "DA9-DB7": "inh",
-        # --- 命令神经元 → VA 运动神经元（抑制） ---
         "DVA-VA2": "inh",
         "DVA-VA6": "inh",
         "DVA-VA8": "inh",
@@ -332,7 +274,6 @@ def setup(
         "AVDR-VA3": "inh",
         "AVDR-VA5": "inh",
         "AVDR-VA11": "inh",
-        # --- VB → VA 交叉抑制 ---
         "VB1-VA1": "inh",
         "VB1-VA2": "inh",
         "VB1-VA3": "inh",
@@ -354,7 +295,6 @@ def setup(
         "VB11-VA12": "inh",
         "VB11-PVCR": "inh",
         "VB4-VB5": "inh",
-        # --- VA → VB/AVD 交叉抑制 ---
         "VA2-VB1": "inh",
         "VA2-VB2": "inh",
         "VA3-VB2": "inh",
@@ -384,10 +324,6 @@ def setup(
         #'DD3-DA5':'inh',
     }
 
-    # ====================================================================
-    # 连接数量覆盖字典 —— 针对间隙连接比例缩放
-    # 值 = 原始突触数 × 缩放因子 (0.01 = 1%)
-    # ====================================================================
     conn_number_override = {
         #'PVCL-AVDL':7*0.1,
         #'PVCL-AVDR':11*0.1,
@@ -395,7 +331,6 @@ def setup(
         #'PVCR-AVDR':6*0.1,
         #'PVCR-AVDR_GJ':2 * 0.01,
         #'AVDR-PVCR_GJ':2 * 0.01,
-        # --- PVC ↔ AVA/AVR 间隙连接 ---
         "PVCL-AVAL_GJ": 5 * 0.01,
         "AVAL-PVCL_GJ": 5 * 0.01,
         "PVCL-AVAR_GJ": 10 * 0.01,
@@ -404,7 +339,6 @@ def setup(
         "AVAL-PVCR_GJ": 15 * 0.01,
         "PVCR-AVAR_GJ": 22 * 0.01,
         "AVAR-PVCR_GJ": 22 * 0.01,
-        # --- PVC ↔ PLM 间隙连接 ---
         "PVCL-PLML_GJ": 4 * 0.01,  ##
         "PVCR-PLMR_GJ": 8 * 0.01,  ##
         #'AVDL-AVM_GJ':8 * 0.01,
@@ -425,17 +359,14 @@ def setup(
         # 'AVAR-AVDR_GJ':15*0.1,
         # 'ALMR-AVDR_GJ':2*5,
         # 'AVDR-ALMR_GJ':2*5,
-        # --- 命令神经元间间隙连接 ---
         "AVAR-AVBL_GJ": 3 * 0.01,
         "AVBL-AVAR_GJ": 3 * 0.01,
         # 'AVAR-AVAL_GJ':18*2,
         # 'AVAL-AVAR_GJ':18*2,
-        # --- PVD ↔ AVA 间隙连接 ---
         "PVDL-AVAR_GJ": 4 * 0.01,
         "AVAR-PVDL_GJ": 4 * 0.01,
         "PVDR-AVAL_GJ": 6 * 0.01,
         "AVAL-PVDR_GJ": 6 * 0.01,
-        # --- 命令/中间神经元 ↔ 运动神经元间隙连接 ---
         "AVBL-VA11_GJ": 1 * 0.01,
         "VA11-AVBL_GJ": 1 * 0.01,
         "AVBR-VA11_GJ": 3 * 0.01,
@@ -464,7 +395,6 @@ def setup(
         "DA9-DVA_GJ": 3 * 0.01,
         "PVCR-DA9_GJ": 3 * 0.01,
         "DA9-PVCR_GJ": 3 * 0.01,
-        # --- 运动神经元之间间隙连接 ---
         "DB7-VA10_GJ": 1 * 0.01,
         "VA10-DB7_GJ": 1 * 0.01,
         "VA4-VB3_GJ": 1 * 0.01,
@@ -500,7 +430,6 @@ def setup(
         # stim_amplitude = "6pA"
         # stim_amplitude = "5.135697186048022pA"
 
-        # 向 VB/DB 运动神经元施加正弦波刺激（周期 150ms）
         for vb in VB_motors:
             c302.add_new_sinusoidal_input(
                 nml_doc,

@@ -1,16 +1,3 @@
-# =============================================================================
-# 功能描述：
-#   RIA 中间神经元配置脚本。
-#   选取 RIAL/RIAR 及连接神经元，验证 RIA 中间层信号处理。
-#
-# 类与方法索引：
-#   setup                                (L20)   — RIA 单细胞测试配置的 setup 函数
-#
-# 更新日志：
-#   2026-04-16  Copilot  添加中文 docstring 和行内注释
-#
-# 当前维护者：Copilot
-# =============================================================================
 import c302
 import sys
 import neuroml.writers as writers
@@ -27,29 +14,12 @@ def setup(
     param_overrides={},
     verbose=True,
 ):
-    """RIA 单细胞测试配置的 setup 函数。
-
-    配置 RIA 中间神经元的单细胞测试。
-    仅包含 RIAL/RIAR 两个细胞，用于验证单细胞模型响应。
-
-    :param parameter_set: 参数层级（``A``/``B``/``C``/``C0``/``C1``/``C2``/``D``/``D1``/``W2D``）
-    :param generate: 是否生成 NeuroML 文件
-    :param duration: 仿真时长（毫秒）
-    :param dt: 仿真时间步长（毫秒）
-    :param target_directory: 输出目录
-    :param data_reader: 数据读取器名称
-    :param param_overrides: 生物参数覆盖字典
-    :param config_param_overrides: 配置级参数覆盖字典
-    :param verbose: 是否输出详细日志
-    :return: ``(cells, cells_to_stimulate, params, muscles, nml_doc)`` 五元组
-    """
     ParameterisedModel = getattr(
         importlib.import_module("c302.parameters_%s" % parameter_set),
         "ParameterisedModel",
     )
     params = ParameterisedModel()
 
-    # RIA 左/右 + SMD 辅助神经元（用于验证 RIA 信号传播）
     my_cells = ["RIAL", "RIAR", "SMDDL", "SMDVL"]
     muscles_to_include = []
 
@@ -74,7 +44,6 @@ def setup(
             data_reader=data_reader,
         )
 
-        # 两阶段刺激：100ms 刺激 SMDDL，400ms 刺激 SMDVL
         start1 = "100ms"
         dur1 = "100ms"
         stim_amplitude1 = "4pA"

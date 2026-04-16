@@ -1,3 +1,16 @@
+# =============================================================================
+# 功能描述：
+#   正弦波肌肉刺激配置脚本。
+#   向体壁肌肉施加正弦波电流，模拟节律性收缩。
+#
+# 类与方法索引：
+#   setup                                (L19)   — 正弦驱动肌肉配置的 setup 函数
+#
+# 更新日志：
+#   2026-04-16  Copilot  添加中文 docstring 和行内注释
+#
+# 当前维护者：Copilot
+# =============================================================================
 import c302
 import sys
 import importlib
@@ -14,6 +27,23 @@ def setup(
     config_param_overrides={},
     verbose=True,
 ):
+    """正弦驱动肌肉配置的 setup 函数。
+
+    配置使用正弦波信号驱动的肌肉网络。
+    对运动神经元施加正弦波电流刺激，
+    验证肌肉系统对周期性输入的响应。
+
+    :param parameter_set: 参数层级（``A``/``B``/``C``/``C0``/``C1``/``C2``/``D``/``D1``/``W2D``）
+    :param generate: 是否生成 NeuroML 文件
+    :param duration: 仿真时长（毫秒）
+    :param dt: 仿真时间步长（毫秒）
+    :param target_directory: 输出目录
+    :param data_reader: 数据读取器名称
+    :param param_overrides: 生物参数覆盖字典
+    :param config_param_overrides: 配置级参数覆盖字典
+    :param verbose: 是否输出详细日志
+    :return: ``(cells, cells_to_stimulate, params, muscles, nml_doc)`` 五元组
+    """
     ParameterisedModel = getattr(
         importlib.import_module("c302.parameters_%s" % parameter_set),
         "ParameterisedModel",
@@ -24,6 +54,7 @@ def setup(
         "unphysiological_offset_current", "0pA", "Disabling offset current", "0"
     )
 
+    # --- 突触衰减参数调整 ---
     # params.set_bioparameter("exc_syn_conductance", ".20 nS", "BlindGuess", "0.1")
     params.set_bioparameter("chem_exc_syn_decay", "5 ms", "BlindGuess", "0.1")
 
@@ -32,8 +63,7 @@ def setup(
 
     # params.set_bioparameter("elec_syn_gbase", "0.001 nS", "BlindGuess", "0.1")
 
-    # Any neurons connected to muscles
-
+    # --- 运动神经元全集（与 c302_Muscles 相同）---
     cells = [
         "AS1",
         "AS10",
@@ -163,7 +193,7 @@ def setup(
         "VD9",
     ]
 
-    cells += ["AVAL", "AVAR", "AVBL", "AVBR", "AVDL", "AVDR", "PVCL", "PVCR"]
+    cells += ["AVAL", "AVAR", "AVBL", "AVBR", "AVDL", "AVDR", "PVCL", "PVCR"]  # 命令中间神经元
     # cells=None  # implies all cells...
 
     ## Some random set of neurons
@@ -202,7 +232,7 @@ def setup(
 
     reference = "c302_%s_MusclesSine" % parameter_set
 
-    muscles_to_include = True  # includes all muscles in plots
+    muscles_to_include = True  # True 表示包含所有肌肉并绘图
     nml_doc = None
 
     if generate:
@@ -221,11 +251,12 @@ def setup(
             data_reader=data_reader,
         )
 
+    # --- 正弦波电流发生器：用于代替阶跃电流刺激 ---
     # Import from libNeuroML
     from neuroml import SineGenerator, InputList, Input
     import neuroml.writers as writers
 
-    # Create the sine wave current generator & add to NeuroML document
+    # 创建正弦波发生器（周期 200ms、幅值 4.5pA）
     sw_input = SineGenerator(
         id="NewSineWaveInput",
         delay="100ms",
@@ -237,10 +268,10 @@ def setup(
 
     nml_doc.sine_generators.append(sw_input)
 
-    # Which cell to stimulate
+    # 将正弦波刺激添加到 AVBL 神经元
     cell = "AVBL"
 
-    # create an InputList and add one Input to that cell
+    # 创建 InputList 并绑定到目标神经元的突触端
     input_list = InputList(
         id="Input_%s_%s" % (cell, sw_input.id),
         component=sw_input.id,

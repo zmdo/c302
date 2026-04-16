@@ -1,17 +1,3 @@
-# =============================================================================
-# 功能描述：
-#   正向运动（Forward locomotion）配置脚本。
-#   选取 DB/VB 类运动神经元及中间神经元，构建正向运动回路。
-#
-# 类与方法索引：
-#   range_incl                           (L26)   — 生成包含终止值的整数范围
-#   setup                                (L38)   — 前行运动回路配置的 setup 函数
-#
-# 更新日志：
-#   2026-04-16  Copilot  添加中文 docstring 和行内注释
-#
-# 当前维护者：Copilot
-# =============================================================================
 import sys
 import os
 import importlib
@@ -24,14 +10,6 @@ import neuroml.writers as writers
 
 
 def range_incl(start, end):
-    """生成包含终止值的整数范围。
-
-    等效于 ``range(start, end + 1)``。
-
-    :param start: 起始值（含）
-    :param end: 终止值（含）
-    :return: range 对象
-    """
     return range(start, end + 1)
 
 
@@ -46,23 +24,6 @@ def setup(
     verbose=True,
     config_param_overrides={},
 ):
-    """前行运动回路配置的 setup 函数。
-
-    配置 c302 前行（Forward）运动回路。
-    选取 AVB、DB、VB 等前行运动相关神经元，
-    通过参数覆盖调节突触连接权重以产生前行波。
-
-    :param parameter_set: 参数层级（``A``/``B``/``C``/``C0``/``C1``/``C2``/``D``/``D1``/``W2D``）
-    :param generate: 是否生成 NeuroML 文件
-    :param duration: 仿真时长（毫秒）
-    :param dt: 仿真时间步长（毫秒）
-    :param target_directory: 输出目录
-    :param data_reader: 数据读取器名称
-    :param param_overrides: 生物参数覆盖字典
-    :param config_param_overrides: 配置级参数覆盖字典
-    :param verbose: 是否输出详细日志
-    :return: ``(cells, cells_to_stimulate, params, muscles, nml_doc)`` 五元组
-    """
     ParameterisedModel = getattr(
         importlib.import_module("c302.parameters_%s" % parameter_set),
         "ParameterisedModel",
@@ -74,16 +35,14 @@ def setup(
     DA_motors = ["DA%s" % c for c in range_incl(1, 9)]
     AS_motors = ["AS%s" % c for c in range_incl(1, 11)]"""
 
-    # --- 前行运动神经元分组 ---
-    VB_motors = ["VB%s" % c for c in range_incl(1, 11)]   # 腹侧 B 类（11 个）
-    DB_motors = ["DB%s" % c for c in range_incl(1, 7)]     # 背侧 B 类（7 个）
-    DD_motors = ["DD%s" % c for c in range_incl(1, 6)]     # 背侧 D 类抑制（6 个）
-    VD_motors = ["VD%s" % c for c in range_incl(1, 13)]   # 腹侧 D 类抑制（13 个）
+    VB_motors = ["VB%s" % c for c in range_incl(1, 11)]
+    DB_motors = ["DB%s" % c for c in range_incl(1, 7)]
+    DD_motors = ["DD%s" % c for c in range_incl(1, 6)]
+    VD_motors = ["VD%s" % c for c in range_incl(1, 13)]
 
-    # AVB 命令神经元 + 各类运动神经元
     cells = list(["AVBL", "AVBR"] + DB_motors + VD_motors + VB_motors + DD_motors)
 
-    muscles_to_include = True  # True 表示包含所有肌肉
+    muscles_to_include = True  # True to include all muscles
 
     cells_to_stimulate = []
 
@@ -95,16 +54,14 @@ def setup(
         "VB2-VB4_GJ",
         "VB4-VB2_GJ",
     ]
-    # --- 连接极性覆盖：DB→DD / VB→VD 均设为抑制性 ---
     conn_polarity_override = {
-        r"^DB\d+-DD\d+$": "inh",    # 背侧 B→D 交叉抑制
-        r"^VB\d+-VD\d+$": "inh",    # 腹侧 B→D 交叉抑制
+        r"^DB\d+-DD\d+$": "inh",
+        r"^VB\d+-VD\d+$": "inh",
     }
     conn_number_override = {
-        "^.+-.+$": 1,  # 所有连接均归一化为 1 个突触
+        "^.+-.+$": 1,
     }
 
-    # --- 手动定义肌肉刺激，随后通过循环追加 ---
     input_list = []
 
     """dur = '250ms'
@@ -128,7 +85,6 @@ def setup(
         input_list.append((mdlx, startd, dur, amp))
         input_list.append((mdrx, startd, dur, amp))"""
 
-    # 腹侧右侧肌肉 MVR10-15：山形幅值 (1,2,3,3,2,1 pA)
     input_list.append(("MVR10", "0ms", "150ms", "1pA"))
     input_list.append(("MVR11", "0ms", "150ms", "2pA"))
     input_list.append(("MVR12", "0ms", "150ms", "3pA"))
@@ -136,7 +92,6 @@ def setup(
     input_list.append(("MVR14", "0ms", "150ms", "2pA"))
     input_list.append(("MVR15", "0ms", "150ms", "1pA"))
 
-    # 腹侧左侧肌肉 MVL10-15
     input_list.append(("MVL10", "0ms", "150ms", "1pA"))
     input_list.append(("MVL11", "0ms", "150ms", "2pA"))
     input_list.append(("MVL12", "0ms", "150ms", "3pA"))
@@ -152,7 +107,6 @@ def setup(
     amp = "4pA"
     dur = "250ms"
 
-    # 循环生成波浪状肌肉刺激：15 轮× 7 块肌肉，背侧/腹侧交替
     for stim_num in range(15):
         for muscle_num in range(7):
             mdlx = "MDL0%s" % (muscle_num + 1)
@@ -166,9 +120,7 @@ def setup(
                 mvlx = "MVL%s" % (muscle_num + 1)
                 mvrx = "MVR%s" % (muscle_num + 1)
 
-            # 背侧肌肉起始时间 = 轮次*800ms + 肌肉序号*30ms
             startd = "%sms" % (stim_num * 800 + muscle_num * 30)
-            # 腹侧肌肉比背侧晚 400ms
             startv = "%sms" % ((stim_num * 800 + 400) + muscle_num * 30)
 
             input_list.append((mdlx, startd, dur, amp))
@@ -177,19 +129,16 @@ def setup(
                 input_list.append((mvlx, startv, dur, amp))
                 input_list.append((mvrx, startv, dur, amp))
 
-    d_v_delay = 400  # 背-腹侧交替延迟（ms）
+    d_v_delay = 400
 
-    start = 190  # 运动神经元刺激起始时间
+    start = 190
     motor_dur = "250ms"
 
-    # AVB 持续高幅值背景电流（全程驱动）
     input_list.append(("AVBL", "0ms", "1e9ms", "15pA"))
     input_list.append(("AVBR", "0ms", "1e9ms", "15pA"))
-    # DB1/VB1 交替脉冲，间隔 d_v_delay
     input_list.append(("DB1", "%sms" % (start), motor_dur, "3pA"))
     input_list.append(("VB1", "%sms" % (start + d_v_delay), motor_dur, "3pA"))
 
-    # 循环生成 DB1/VB1 交替脉冲序列（14 对）
     i = start + 2 * d_v_delay
     j = start + 3 * d_v_delay
     for pulse_num in range(1, 15):
@@ -204,9 +153,7 @@ def setup(
 
     config_param_overrides["input"] = input_list
 
-    # --- 参数覆盖：突触权重/间隙连接精细调控 ---
     param_overrides = {
-        # -- 间隙连接电导（镜像对称）--
         "mirrored_elec_conn_params": {
             r"^AVB._to_DB\d+\_GJ$_elec_syn_gbase": "0.001 nS",
             r"^AVB._to_VB\d+\_GJ$_elec_syn_gbase": "0.001 nS",
@@ -226,14 +173,12 @@ def setup(
             "DD1_to_MVL08_elec_syn_gbase": "0 nS",
             "VD2_to_MDL09_elec_syn_gbase": "0 nS",
         },
-        # -- VB 同类突触参数 --
         r"^VB\d+_to_VB\d+$_exc_syn_conductance": "18 nS",
         r"^VB\d+_to_VB\d+$_exc_syn_ar": "0.19 per_s",
         r"^VB\d+_to_VB\d+$_exc_syn_ad": "73 per_s",
         r"^VB\d+_to_VB\d+$_exc_syn_beta": "2.81 per_mV",
         r"^VB\d+_to_VB\d+$_exc_syn_vth": "-22 mV",
         r"^VB\d+_to_VB\d+$_exc_syn_erev": "10 mV",
-        # -- DB 同类突触参数 --
         r"^DB\d+_to_DB\d+$_exc_syn_conductance": "20 nS",
         r"^DB\d+_to_DB\d+$_exc_syn_ar": "0.08 per_s",
         r"^DB\d+_to_DB\d+$_exc_syn_ad": "18 per_s",
@@ -250,7 +195,6 @@ def setup(
         #'^VB\d+_to_VD\d+$_exc_syn_conductance': '0 nS',
         #'^VD\d+_to_VB\d+$_inh_syn_conductance': '0 nS',
         "DD1_to_VB2_inh_syn_conductance": "0 nS",
-        # -- 神经肌肉接头参数 --
         "neuron_to_muscle_exc_syn_conductance": "0.5 nS",
         r"^DB\d+_to_MDL\d+$_exc_syn_conductance": "0.4 nS",
         r"^DB\d+_to_MDR\d+$_exc_syn_conductance": "0.4 nS",

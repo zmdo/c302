@@ -1,19 +1,5 @@
-# =============================================================================
-# 功能描述：
-#   含肌肉的全连接组配置脚本。
-#   包含 302 神经元和全部 96 块体壁肌肉，验证神经-肌肉连接。
-#
-# 类与方法索引：
-#   setup                                (L20)   — 神经肌肉控制配置的 setup 函数
-#
-# 更新日志：
-#   2026-04-16  Copilot  添加中文 docstring 和行内注释
-#
-# 当前维护者：Copilot
-# =============================================================================
 import c302
 import sys
-
 import importlib
 
 
@@ -28,41 +14,16 @@ def setup(
     config_param_overrides={},
     verbose=True,
 ):
-    """神经肌肉控制配置的 setup 函数。
-
-    配置包含运动神经元和体壁肌肉的网络。
-    选取 DA/DB/DD/VA/VB/VD 运动神经元及对应肌肉，
-    验证神经肌肉系统的协调控制。
-
-    :param parameter_set: 参数层级（``A``/``B``/``C``/``C0``/``C1``/``C2``/``D``/``D1``/``W2D``）
-    :param generate: 是否生成 NeuroML 文件
-    :param duration: 仿真时长（毫秒）
-    :param dt: 仿真时间步长（毫秒）
-    :param target_directory: 输出目录
-    :param data_reader: 数据读取器名称
-    :param param_overrides: 生物参数覆盖字典
-    :param config_param_overrides: 配置级参数覆盖字典
-    :param verbose: 是否输出详细日志
-    :return: ``(cells, cells_to_stimulate, params, muscles, nml_doc)`` 五元组
-    """
     ParameterisedModel = getattr(
         importlib.import_module("c302.parameters_%s" % parameter_set),
         "ParameterisedModel",
     )
     params = ParameterisedModel()
 
-    # --- 背侧偏置电流：证体壁肌肉单元的基本反应 ---
     params.set_bioparameter(
-        "unphysiological_offset_current", "5pA", "Testing IClamp", "0"
-    )
-    params.set_bioparameter(
-        "unphysiological_offset_current_del", "50 ms", "Testing IClamp", "0"
-    )
-    params.set_bioparameter(
-        "unphysiological_offset_current_dur", "900 ms", "Testing IClamp", "0"
+        "unphysiological_offset_current", "0pA", "Disabling offset current", "0"
     )
 
-    # --- 突触衰减参数调整 ---
     # params.set_bioparameter("exc_syn_conductance", ".20 nS", "BlindGuess", "0.1")
     params.set_bioparameter("chem_exc_syn_decay", "5 ms", "BlindGuess", "0.1")
 
@@ -71,7 +32,8 @@ def setup(
 
     # params.set_bioparameter("elec_syn_gbase", "0.001 nS", "BlindGuess", "0.1")
 
-    # --- 运动神经元全集（AS/DA/DB/DD/VA/VB/VC/VD + 辅助神经元）---
+    # Any neurons connected to muscles
+
     cells = [
         "AS1",
         "AS10",
@@ -201,7 +163,7 @@ def setup(
         "VD9",
     ]
 
-    cells += ["AVAL", "AVAR", "AVBL", "AVBR", "AVDL", "AVDR", "PVCL", "PVCR"]  # 命令中间神经元
+    cells += ["AVAL", "AVAR", "AVBL", "AVBR", "AVDL", "AVDR", "PVCL", "PVCR"]
     # cells=None  # implies all cells...
 
     ## Some random set of neurons
@@ -215,33 +177,14 @@ def setup(
             cells_to_stimulate.append(cell)"""
     # cells_to_stimulate = ['DB1', 'VB1']
 
-    # 多次覆盖刺激目标（保留实验记录），最终选用 AVB 命令神经元
-    cells_to_stimulate = ["PVCL", "AVBL"]
-    cells_to_stimulate.extend(["DB1", "VB1"])
-    cells_to_stimulate = ["PVCL", "PVCR"]
-    cells_to_stimulate = ["PLML", "PLMR"]
+    # cells_to_stimulate = ['PVCL', 'AVBL']
+    # cells_to_stimulate.extend(['DB1', 'VB1'])
+    # cells_to_stimulate = ['PVCL','PVCR']
+    # cells_to_stimulate = ['PLML','PLMR']
     cells_to_stimulate = ["AVBL", "AVBR"]
 
     # Plot some directly stimulated & some not stimulated
-    cells_to_plot = [
-        "AS1",
-        "AS10",
-        "AVFL",
-        "DA1",
-        "DB1",
-        "DB4",
-        "DB7",
-        "IL1DL",
-        "RID",
-        "RIML",
-        "SMBDL",
-        "SMBDR",
-        "VB1",
-        "VB5",
-        "VB10",
-        "VC1",
-        "VC2",
-    ]
+    # cells_to_plot      = ['AS1', 'AS10', 'AVFL', 'DA1','DB1','DB4','DB7','IL1DL','RID', 'RIML','SMBDL', 'SMBDR', 'VB1', 'VB5', 'VB10','VC1', 'VC2']
     cells_to_plot = [
         "AVBL",
         "AVBR",
@@ -257,9 +200,9 @@ def setup(
         "VD2",
     ]
 
-    reference = "c302_%s_Muscles" % parameter_set
+    reference = "c302_%s_MusclesSine" % parameter_set
 
-    muscles_to_include = None  # None 表示包含所有 96 块体壁肌肉
+    muscles_to_include = True  # includes all muscles in plots
     nml_doc = None
 
     if generate:
@@ -277,6 +220,42 @@ def setup(
             verbose=verbose,
             data_reader=data_reader,
         )
+
+    # Import from libNeuroML
+    from neuroml import SineGenerator, InputList, Input
+    import neuroml.writers as writers
+
+    # Create the sine wave current generator & add to NeuroML document
+    sw_input = SineGenerator(
+        id="NewSineWaveInput",
+        delay="100ms",
+        phase="0",
+        duration="800ms",
+        amplitude="4.5pA",
+        period="200ms",
+    )
+
+    nml_doc.sine_generators.append(sw_input)
+
+    # Which cell to stimulate
+    cell = "AVBL"
+
+    # create an InputList and add one Input to that cell
+    input_list = InputList(
+        id="Input_%s_%s" % (cell, sw_input.id),
+        component=sw_input.id,
+        populations="%s" % cell,
+    )
+    input_list.input.append(
+        Input(id=0, target="../%s/0/GenericNeuronCell" % cell, destination="synapses")
+    )
+    nml_doc.networks[0].input_lists.append(input_list)
+
+    # Write over network file created already...
+    nml_file = target_directory + "/" + reference + ".net.nml"
+    writers.NeuroMLWriter.write(nml_doc, nml_file)
+
+    c302.print_("(Re)written network file to: " + nml_file)
 
     return cells, cells_to_stimulate, params, muscles_to_include, nml_doc
 
