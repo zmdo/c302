@@ -98,3 +98,11 @@
 | connection_number_override | 连接数覆盖 | 通过正则表达式批量设置突触连接权重的机制 | __init__ |
 | BioParameter | 生物参数 | 封装参数名、值、来源和确信度的数据类 | bioparameters |
 | include_nonconnected_cells | 包含非连接细胞 | 是否将无连接的神经元也加入网络 | __init__, ConnectomeReader |
+| neuromuscular junction | 神经肌肉接头 | 运动神经元与肌肉细胞之间的突触连接 | __init__, c302_MuscleTest |
+| presynaptic | 突触前 | 突触连接中发送信号的一侧 | ConnectomeReader |
+| postsynaptic | 突触后 | 突触连接中接收信号的一侧 | ConnectomeReader |
+| unphysiological_offset_current | 偏置电流 | 施加于神经元的非生理性恒定电流，用于测试 | c302_Full, c302_IClamp |
+| event-driven synapse | 事件驱动突触 | 通过离散脉冲事件而非连续信号传递的突触模型 | __init__ |
+| leading zero | 前导零 | 神经元编号中的补零（如 VB01 vs VB1） | ConnectomeReader |
+| rhythmic activity | 节律性活动 | 神经元或肌肉的周期性重复放电模式 | c302_Oscillator |
+| gap junction / 间隙连接 | 缝隙连接（同义） | 同 gap junction，部分注释中使用"间隙连接"译法 | ConnectomeReader |
