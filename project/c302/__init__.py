@@ -6,8 +6,8 @@
 #
 # 类与方法索引：
 #   print_                               (L137)  — 带 ``c302`` 前缀的调试输出，用于区分框架自身的日志信息
-#   load_data_reader                     (L148)  — Imports and returns data reader module
-#   get_str_from_exponential             (L163)  — Returns a formatted string representing a floating point number, e.g. 1*0.00001 would result into 1e-05. Returning 0.00001.
+#   load_data_reader                     (L148)  — 动态导入并返回指定名称的数据读取器模块
+#   get_str_from_exponential             (L163)  — 将浮点数格式化为 15 位小数的字符串表示（如 1e-05 → "0.000010000000000")
 #   get_muscle_position                  (L174)  — 根据肌肉名称计算其在虫体中的三维坐标
 #   is_muscle                            (L210)  — 判断细胞名称是否为肌肉（匹配 ``M[VD][LR]<digits>`` 模式）
 #   process_args                         (L219)  — Parse command-line arguments.
