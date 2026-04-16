@@ -5,16 +5,17 @@
 #   两个模块，通过参数化差异（文件名）实现统一的读取器类。
 #
 # 类与方法索引：
-#   _is_neuron_csv                       (L33)   — CSV 格式中判断细胞是否为神经元
-#   _get_body_wall_muscle_prefixes_csv   (L43)   — CSV 格式体壁肌肉前缀
-#   _is_body_wall_muscle_csv             (L51)   — CSV 格式判断是否体壁肌肉
-#   _get_old_muscle_name                 (L60)   — 将 vBWM/dBWM 格式转换为标准 MVL/MDR 格式
-#   _get_syntype                         (L79)   — 将 CSV 突触类型映射为标准形式
-#   _get_synclass                        (L94)   — 根据细胞名称和突触类型推断神经递质
-#   _parse_row                           (L112)  — 解析 CSV 单行数据
-#   CsvDataReader                        (L127)  — CSV 格式连接组数据读取器
-#     read_data                          (L143)  — 从 CSV 读取神经元连接数据
-#     read_muscle_data                   (L179)  — 从 CSV 读取神经肌肉连接数据
+#   _is_neuron_csv                       (L39)   — CSV 格式中判断细胞是否为神经元
+#   _get_body_wall_muscle_prefixes_csv   (L50)   — CSV 格式体壁肌肉前缀
+#   _is_body_wall_muscle_csv             (L58)   — CSV 格式判断是否为体壁肌肉
+#   _get_old_muscle_name                 (L67)   — 将 ``vBWML05`` / ``dBWMR23`` 格式转换为标准 ``MVL05`` / ``MDR23`` 格式
+#   _get_syntype                         (L87)   — 将 CSV 中的突触类型字符串映射为标准形式
+#   _get_synclass                        (L102)  — 根据突触前细胞名称和突触类型推断神经递质分类
+#   _parse_row                           (L118)  — 解析 CSV 中的单行数据
+#   CsvDataReader                        (L132)  — CSV 格式连接组数据读取器
+#     read_data                          (L148)  — 从 CSV 读取神经元连接数据
+#     read_muscle_data                   (L189)  — 从 CSV 读取神经肌肉连接数据
+#   CsvDataReaderModified                (L234)  — 使用手工修正版 CSV 的读取器
 #
 # 更新日志：
 #   2026-04-17  yi  初始创建：合并 UpdatedSpreadsheetDataReader + V2

@@ -4,9 +4,11 @@
 #   线虫神经元连接数据的数据读取器。继承 BaseDataReader 抽象基类。
 #
 # 类与方法索引：
-#   SpreadsheetDataReader                (L30)   — XLS 格式连接组数据读取器
-#     read_data                          (L44)   — 从 XLS 文件读取神经元连接数据
-#     read_muscle_data                   (L114)  — 从 XLS 第 1 工作表读取神经肌肉连接数据
+#   SpreadsheetDataReader                (L33)   — XLS 格式连接组数据读取器
+#     read_data                          (L43)   — 从 XLS 文件读取神经元连接数据
+#     _read_neuron_connect               (L58)   — 从 NeuronConnectFormatted.xlsx 读取
+#     _read_ce_tables                    (L87)   — 从 CElegansNeuronTables.xls 读取
+#     read_muscle_data                   (L125)  — 从 CElegansNeuronTables.xls 第 1 工作表读取神经肌肉连接数据
 #
 # 更新日志：
 #   2026-04-17  yi  初始创建：从 SpreadsheetDataReader.py 重写

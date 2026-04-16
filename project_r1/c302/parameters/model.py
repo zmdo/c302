@@ -6,24 +6,32 @@
 #   各层级 ParameterisedModel 子类实现具体的细胞/突触创建逻辑。
 #
 # 类与方法索引：
-#   ParameterisedModelPrototype           (L37)  — 参数集合管理基类
-#     __init__                            (L39)  — 创建空参数列表
-#     print_                              (L43)  — 带前缀的调试输出
-#     add_bioparameter                    (L50)  — 注册或更新参数
-#     add_bioparameter_obj                (L68)  — 直接注册 BioParameter 对象
-#     get_bioparameter                    (L78)  — 按名称查找参数
-#     set_bioparameter                    (L93)  — 更新已有参数
-#     bioparameter_info                   (L104) — 返回格式化参数摘要
-#   NonNeuroMLCustomType                  (L114) — 非 NeuroML 自定义突触类型
-#   c302ModelPrototype                    (L124) — 模型创建接口基类
-#     __init__                            (L125) — 初始化模型组件属性
-#     is_level_A ~ is_level_X             (L141) — 层级判断方法
-#     get_conn_param                      (L183) — 获取特定连接参数
-#     get_syn                             (L207) — 按极性分发突触获取
-#     create_n_connection_synapse         (L220) — 幂等注册突触到文档
-#     is_nonneuroml_conn                  (L252) — 判断非 NeuroML 连接
-#     is_analog_conn                      (L256) — 判断模拟型突触
-#     is_elec_conn                        (L260) — 判断电突触
+#   ParameterisedModelPrototype          (L50)   — 参数集合管理基类，提供 BioParameter 列表的增删改查
+#     __init__                           (L53)   — 创建空的生物参数列表
+#     print_                             (L57)   — 带 ``c302`` 前缀的调试输出
+#     add_bioparameter                   (L65)   — 注册或更新一个生物参数
+#     add_bioparameter_obj               (L89)   — 直接注册 BioParameter 对象，若同名已存在则先移除旧对象
+#     get_bioparameter                   (L99)   — 按名称查找生物参数
+#     set_bioparameter                   (L118)  — 更新已有参数的值/来源/确定性，参数不存在则静默忽略
+#     bioparameter_info                  (L134)  — 返回所有参数的格式化摘要，按名称字典序排列
+#   NonNeuroMLCustomType                 (L146)  — 非 NeuroML 自定义突触类型占位符
+#     __init__                           (L154)  — 初始化，仅存储 ID
+#   c302ModelPrototype                   (L162)  — c302 网络构建原型，定义模型创建接口和连接参数查询
+#     __init__                           (L165)  — 初始化模型组件属性为默认空值
+#     is_level_A                         (L180)  — 判断层级是否为 A
+#     is_level_B                         (L187)  — 判断层级是否为 B
+#     is_level_C                         (L194)  — 判断层级是否属于 C 系列
+#     is_level_C0                        (L201)  — 判断层级是否为 C0
+#     is_level_C2                        (L208)  — 判断层级是否为 C2
+#     is_level_D1                        (L215)  — 判断层级是否为 D1
+#     is_level_D                         (L222)  — 判断层级是否属于 D 系列
+#     is_level_X                         (L229)  — 判断层级是否为 X 系列
+#     get_conn_param                     (L236)  — 获取特定连接参数，优先精确匹配，否则返回默认值
+#     get_syn                            (L267)  — 按极性分发到对应的突触获取方法
+#     create_n_connection_synapse        (L283)  — 幂等注册突触原型到 NeuroML 文档
+#     is_nonneuroml_conn                 (L314)  — 判断突触是否为非 NeuroML 自定义类型
+#     is_analog_conn                     (L322)  — 判断突触是否为模拟型（GradedSynapse）
+#     is_elec_conn                       (L330)  — 判断突触是否为电突触（GapJunction）
 #
 # 更新日志：
 #   2026-04-17  Copilot  计划3阶段三：从 bioparameters.py 提取并重写

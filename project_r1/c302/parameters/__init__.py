@@ -4,9 +4,8 @@
 #   支持的层级：A, B, BC1, C, C0, C1, C2, D, D1, W2D。
 #
 # 类与方法索引：
-#   _LEVEL_REGISTRY                       (L27)  — 层级名称到 YAML 映射
-#   get_parameter_set                     (L42)  — 按层级加载参数集
-#   list_parameter_sets                   (L55)  — 列出所有可用层级
+#   get_parameter_set                    (L40)   — 按层级名称加载参数集
+#   list_parameter_sets                  (L55)   — 列出所有可用的参数层级名称
 #
 # 更新日志：
 #   2026-04-17  Copilot  计划3阶段三：新建参数集注册表

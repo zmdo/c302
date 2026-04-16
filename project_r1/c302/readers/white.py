@@ -5,9 +5,9 @@
 #   通过参数化选择不同数据集。
 #
 # 类与方法索引：
-#   WhiteDataReader                      (L29)   — cect White 连接组数据读取器
-#     read_data                          (L54)   — 读取神经元连接数据
-#     read_muscle_data                   (L67)   — 读取神经肌肉连接数据
+#   _get_cect_instance                   (L34)   — 动态导入 cect 读取器并获取实例
+#   _convert_conns                       (L45)   — 将 cect ConnectionInfo 转换为本项目的 ConnectionInfo
+#   _make_white_reader                   (L57)   — 为指定数据集创建 White 读取器类
 #
 # 更新日志：
 #   2026-04-17  yi  初始创建：合并 White_whole + White_A + White_L4

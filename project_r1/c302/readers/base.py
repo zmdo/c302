@@ -4,25 +4,25 @@
 #   细胞类型判断工具函数，以及从 YAML 加载的神经元/肌肉名称常量。
 #
 # 类与方法索引：
-#   ConnectionInfo                       (L42)   — 两个细胞之间的一条突触连接记录
-#     __str__                            (L73)   — 格式化连接信息为可读字符串
-#     short                              (L83)   — 返回连接的简短文字描述
-#     __eq__                             (L92)   — 判断两个连接记录是否相等
-#     __lt__                             (L103)  — 按细胞名称拼接字符串排序
-#     __repr__                           (L111)  — repr 输出
-#   BaseDataReader                       (L115)  — 连接组数据读取器抽象基类
-#     read_data                          (L119)  — 读取神经元连接组数据（抽象方法）
-#     read_muscle_data                   (L131)  — 读取神经元-肌肉连接数据（抽象方法）
-#   _load_names                          (L143)  — 从 YAML 文件加载名称列表
-#   convert_to_preferred_muscle_name     (L159)  — 将 BWM-* 前缀的肌肉名称转换为标准格式
-#   get_all_muscle_prefixes              (L178)  — 返回所有已知肌肉名称前缀
-#   get_body_wall_muscle_prefixes        (L186)  — 返回体壁肌肉专属前缀
-#   is_muscle                            (L194)  — 判断给定细胞是否为肌肉细胞
-#   is_body_wall_muscle                  (L203)  — 判断给定细胞是否为体壁肌肉
-#   is_neuron                            (L212)  — 判断给定细胞是否为神经元
-#   remove_leading_index_zero            (L221)  — 去掉神经元编号的前导零
-#   check_neurons                        (L232)  — 将细胞列表与标准神经元名称做三路比对
-#   analyse_connections                  (L256)  — 打印连接组统计摘要
+#   ConnectionInfo                       (L45)   — 两个细胞之间的一条突触连接记录
+#     __str__                            (L61)   — 格式化连接信息为可读字符串
+#     short                              (L68)   — 返回连接的简短文字描述（不含突触计数）
+#     __eq__                             (L79)   — 判断两个连接记录是否相等
+#     __lt__                             (L91)   — 按细胞名称拼接字符串排序
+#     __repr__                           (L95)   — repr 输出
+#   BaseDataReader                       (L100)  — 连接组数据读取器抽象基类
+#     read_data                          (L105)  — 读取神经元连接组数据
+#     read_muscle_data                   (L117)  — 读取神经元-肌肉连接数据
+#   _load_names                          (L125)  — 从 YAML 文件加载名称列表
+#   convert_to_preferred_muscle_name     (L139)  — 将 ``BWM-*`` 前缀的肌肉名称转换为标准格式
+#   get_all_muscle_prefixes              (L160)  — 返回所有已知肌肉名称前缀（含体壁肌肉和咽部肌肉）
+#   get_body_wall_muscle_prefixes        (L168)  — 返回体壁肌肉专属前缀（不含咽部肌肉）
+#   is_muscle                            (L176)  — 判断给定细胞名称是否为肌肉细胞（含体壁肌肉和咽部肌肉）
+#   is_body_wall_muscle                  (L185)  — 判断给定细胞名称是否为体壁肌肉（排除咽部肌肉）
+#   is_neuron                            (L194)  — 判断给定细胞是否为神经元（非体壁肌肉即视为神经元）
+#   remove_leading_index_zero            (L203)  — 去掉神经元编号的前导零
+#   check_neurons                        (L216)  — 将细胞列表与标准神经元名称集合做三路比对
+#   analyse_connections                  (L235)  — 打印连接组完整统计摘要，用于调试和验证数据读取器输出
 #
 # 更新日志：
 #   2026-04-17  yi  初始创建：从 ConnectomeReader.py 提取重写

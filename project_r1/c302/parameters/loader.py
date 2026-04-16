@@ -5,10 +5,10 @@
 #   data/parameters/ 目录加载 level_*.yaml 文件，解析为 BioParameter 列表。
 #
 # 类与方法索引：
-#   ParameterLoader                       (L30)  — YAML 参数集加载器
-#     __init__                            (L32)  — 初始化缓存字典
-#     load_raw                            (L37)  — 加载原始 YAML 数据（带缓存）
-#     load_parameters                     (L56)  — 加载参数集并处理继承逻辑
+#   ParameterLoader                      (L29)   — YAML 参数集加载器，支持继承和覆盖机制
+#     __init__                           (L32)   — 初始化加载器，创建缓存字典
+#     load_raw                           (L36)   — 加载原始 YAML 数据，带缓存
+#     load_parameters                    (L55)   — 加载指定层级的参数集，处理继承逻辑
 #
 # 更新日志：
 #   2026-04-17  Copilot  计划3阶段三：新建 YAML 参数加载器

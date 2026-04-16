@@ -1,4 +1,39 @@
-"""ParameterisedModelPrototype 和 c302ModelPrototype 的单元测试。"""
+# =============================================================================
+# 功能描述：
+#   ParameterisedModelPrototype 和 c302ModelPrototype 的单元测试。
+#   覆盖参数管理、层级判断、连接参数查找等场景。
+#
+# 类与方法索引：
+#   TestParameterisedModelPrototype      (L47)   — ParameterisedModelPrototype 参数管理测试
+#     test_init_empty                    (L50)   — 初始化时参数列表为空
+#     test_add_bioparameter_new          (L55)   — 添加新参数
+#     test_add_bioparameter_update       (L63)   — 同名参数就地更新
+#     test_add_bioparameter_obj          (L72)   — 直接注册 BioParameter 对象
+#     test_add_bioparameter_obj_replace  (L80)   — 同名 BioParameter 对象替换旧对象
+#     test_get_bioparameter_found        (L89)   — 按名称找到参数
+#     test_get_bioparameter_not_found    (L97)   — 按名称未找到返回 None
+#     test_get_bioparameter_warn         (L103)  — 未找到时打印警告
+#     test_set_bioparameter_exists       (L111)  — 更新已有参数
+#     test_set_bioparameter_missing      (L119)  — 更新不存在的参数静默忽略
+#     test_bioparameter_info             (L125)  — 格式化参数摘要
+#     test_multiple_params               (L135)  — 管理多个参数
+#   TestC302ModelPrototype               (L144)  — c302ModelPrototype 层级判断和连接参数测试
+#     test_default_level                 (L147)  — 默认层级未设置
+#     test_is_level_a                    (L153)  — Level A 判断
+#     test_is_level_b                    (L161)  — Level B 判断（包含 BC1）
+#     test_is_level_c_variants           (L167)  — C 系列层级判断
+#     test_is_level_d                    (L178)  — D 系列层级判断
+#     test_get_conn_param_default        (L187)  — 连接参数使用默认模板
+#     test_get_conn_param_specific       (L199)  — 连接参数使用精确匹配
+#     test_get_conn_param_missing        (L212)  — 连接参数均不存在返回 None
+#     test_is_nonneuroml_conn            (L222)  — 非 NeuroML 突触判断
+#     test_nonneuroml_custom_type_id     (L228)  — NonNeuroMLCustomType 存储 ID
+#
+# 更新日志：
+#   2026-04-17  Copilot  计划3阶段三：新建模型层单元测试
+#
+# 当前维护者：Copilot
+# =============================================================================
 import pytest
 
 from c302.parameters.bio import BioParameter

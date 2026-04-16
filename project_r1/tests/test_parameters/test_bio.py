@@ -1,4 +1,37 @@
-"""BioParameter 数据类及 split_neuroml_quantity 工具函数的单元测试。"""
+# =============================================================================
+# 功能描述：
+#   BioParameter 数据类及 split_neuroml_quantity 工具函数的单元测试。
+#   覆盖参数创建、数值提取、单位解析、数值修改等场景。
+#
+# 类与方法索引：
+#   TestSplitNeuromlQuantity             (L40)   — split_neuroml_quantity() 测试
+#     test_with_space                    (L43)   — 含空格的标准格式
+#     test_without_space                 (L49)   — 无空格的紧凑格式
+#     test_scientific_notation           (L55)   — 科学计数法
+#     test_compound_unit                 (L61)   — 复合单位
+#     test_integer                       (L67)   — 纯整数值
+#     test_no_space_unit                 (L73)   — 无空格带单位
+#     test_zero                          (L79)   — 零值
+#     test_leading_dot                   (L85)   — 以小数点开头
+#     test_per_unit                      (L91)   — per_ 风格单位
+#     test_negative_integer              (L97)   — 负整数
+#   TestBioParameter                     (L104)  — BioParameter 类测试
+#     test_creation                      (L107)  — 创建参数对象
+#     test_str                           (L115)  — 字符串表示
+#     test_repr                          (L124)  — repr 与 str 一致
+#     test_x_with_unit                   (L129)  — 提取数值部分（含单位）
+#     test_x_with_space                  (L134)  — 提取数值部分（含空格）
+#     test_x_no_unit                     (L139)  — 提取数值部分（无单位）
+#     test_x_scientific                  (L144)  — 提取科学计数法数值
+#     test_change_magnitude              (L149)  — 修改数值，保留单位
+#     test_change_magnitude_preserves_unit (L156)  — 修改整数值，保留无单位
+#     test_change_magnitude_negative     (L162)  — 修改为负数
+#
+# 更新日志：
+#   2026-04-17  Copilot  计划3阶段三：新建参数层单元测试
+#
+# 当前维护者：Copilot
+# =============================================================================
 import pytest
 
 from c302.parameters.bio import BioParameter, split_neuroml_quantity

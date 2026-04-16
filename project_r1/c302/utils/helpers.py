@@ -4,17 +4,17 @@
 #   和随机颜色生成等基础工具。所有函数均无 NeuroML 或仿真域的依赖。
 #
 # 类与方法索引：
-#   get_project_root                 (L24)   — 获取项目根目录（包含 pyproject.toml）
-#   get_data_dir                     (L40)   — 获取 data/ 目录路径
-#   get_morphology_dir               (L49)   — 获取 data/morphology/ 目录路径
-#   get_xml_dir                      (L58)   — 获取 data/xml/ 目录路径
-#   get_connectome_dir               (L67)   — 获取 data/connectome/ 目录路径
-#   get_parameters_dir               (L76)   — 获取 data/parameters/ 目录路径
-#   get_str_from_exponential         (L85)   — 将浮点数格式化为 15 位小数字符串
-#   get_random_colour_hex            (L97)   — 生成随机 #RRGGBB 颜色字符串
-#   is_regex_string                  (L116)  — 判断字符串是否为正则格式
-#   regex_match                      (L126)  — 对正则格式的模式执行匹配
-#   elem_in_coll_matches_conn        (L138)  — 检查集合中是否有正则元素匹配连接字符串
+#   get_project_root                     (L32)   — 获取项目根目录（包含 pyproject.toml 的目录）
+#   get_data_dir                         (L47)   — 获取数据目录路径
+#   get_morphology_dir                   (L55)   — 获取细胞形态文件目录
+#   get_xml_dir                          (L63)   — 获取 XML 资源目录
+#   get_connectome_dir                   (L71)   — 获取连接组数据目录
+#   get_parameters_dir                   (L79)   — 获取参数文件目录
+#   get_str_from_exponential             (L87)   — 将浮点数格式化为 15 位小数的字符串表示
+#   get_random_colour_hex                (L98)   — 生成随机十六进制颜色字符串（``#RRGGBB``），用于绘图颜色分配
+#   is_regex_string                      (L110)  — 判断字符串是否为正则表达式格式（同时含 ``^`` 和 ``$``）
+#   regex_match                          (L119)  — 当 pattern 为正则表达式时执行匹配
+#   elem_in_coll_matches_conn            (L135)  — 检查集合中是否有正则元素匹配给定的连接字符串
 #
 # 更新日志：
 #   2026-04-17  yi  初始创建

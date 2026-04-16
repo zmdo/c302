@@ -6,13 +6,13 @@
 #   NeuroML 量字符串拆分为 (数值, 单位) 元组。
 #
 # 类与方法索引：
-#   split_neuroml_quantity                (L30)  — 将 NeuroML 数量字符串拆分为 (数值, 单位) 元组
-#   BioParameter                          (L53)  — 生物物理参数数据类
-#     __init__                            (L68)  — 初始化参数，存储名称、值、来源和确定性
-#     __str__                             (L82)  — 返回人类可读的参数字符串表示
-#     __repr__                            (L93)  — 返回与 __str__ 相同的调试表示
-#     change_magnitude                    (L97)  — 用 Decimal 精度替换参数数值部分，保留单位
-#     x                                   (L112) — 以 float 返回参数数值部分（去除单位）
+#   split_neuroml_quantity               (L25)   — 将 NeuroML 数量字符串拆分为 (数值, 单位) 元组
+#   BioParameter                         (L47)   — 生物物理参数
+#     __init__                           (L59)   — 初始化参数，存储名称、值、来源和确定性
+#     __str__                            (L72)   — 返回人类可读的参数字符串表示
+#     __repr__                           (L84)   — 返回与 __str__ 相同的调试表示
+#     change_magnitude                   (L91)   — 用 Decimal 精度替换参数数值部分，保留单位
+#     x                                  (L101)  — 以 float 返回参数数值部分（去除单位）
 #
 # 更新日志：
 #   2026-04-17  Copilot  计划3阶段三：从 bioparameters.py 提取并重写
