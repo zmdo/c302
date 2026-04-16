@@ -1,0 +1,36 @@
+# Level B 参数集 — IafActivityCell + 真实 GapJunction
+# 继承 A 的 IaF/化学突触/偏置电流参数，丢弃 A 的电突触事件参数，
+# 新增 tau1 和真实 GapJunction gbase
+
+level: B
+custom_component_types_definitions: "cell_B.xml"
+
+inherits: level_a
+
+parameter_removals:
+  # 丢弃 A 级电突触事件参数（B 级用真实 GapJunction 替代）
+  # gbase 不需要删除，由 overrides 直接覆盖新值即可
+  - "elec_syn_erev"
+  - "elec_syn_rise"
+  - "elec_syn_decay"
+
+parameter_overrides:
+  # tau1：activity 变量的恢复时间常数
+  - name: "neuron_iaf_tau1"
+    value: "50ms"
+    source: "BlindGuess"
+    certainty: "0.1"
+  - name: "muscle_iaf_tau1"
+    value: "50ms"
+    source: "BlindGuess"
+    certainty: "0.1"
+
+  # 真实 GapJunction 电导
+  - name: "neuron_to_neuron_elec_syn_gbase"
+    value: "0.01 nS"
+    source: "BlindGuess"
+    certainty: "0.1"
+  - name: "neuron_to_muscle_elec_syn_gbase"
+    value: "0.01 nS"
+    source: "BlindGuess"
+    certainty: "0.1"

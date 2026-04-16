@@ -130,6 +130,6 @@ openworm/
 /project_r1/data/morphology/
 /project_r1/data/connectome/
 /project_r1/data/xml/
-/project_r1/data/parameters/
+/project_r1/data/parameters/*.py
 /project_r1/tests/reference_outputs/
 /project_r1/.pytest_cache/

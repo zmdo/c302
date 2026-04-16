@@ -1,0 +1,41 @@
+# Level W2D 参数集 — 2D 虫体运动模型，参数极少
+# CellW2D + OutputSynapse + GapJunction
+
+level: W2D
+custom_component_types_definitions:
+  - "cell_W2D.xml"
+  - "custom_synapses.xml"
+
+parameters:
+  - name: "initial_memb_pot"
+    value: "-45 mV"
+    source: "BlindGuess"
+    certainty: "0.1"
+
+  # 电突触
+  - name: "neuron_to_neuron_elec_syn_gbase"
+    value: "1 nS"
+    source: "BlindGuess"
+    certainty: "0.1"
+  - name: "neuron_to_muscle_elec_syn_gbase"
+    value: "1 nS"
+    source: "BlindGuess"
+    certainty: "0.1"
+  - name: "muscle_to_muscle_elec_syn_gbase"
+    value: "1 nS"
+    source: "BlindGuess"
+    certainty: "0.1"
+
+  # 偏置电流
+  - name: "unphysiological_offset_current"
+    value: "0 pA"
+    source: "KnownError"
+    certainty: "0"
+  - name: "unphysiological_offset_current_del"
+    value: "0 ms"
+    source: "KnownError"
+    certainty: "0"
+  - name: "unphysiological_offset_current_dur"
+    value: "2000 ms"
+    source: "KnownError"
+    certainty: "0"
