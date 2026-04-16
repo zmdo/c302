@@ -146,12 +146,10 @@ def print_(msg, print_it=True):  # print_it=False when not verbose
 
 
 def load_data_reader(data_reader):
-    """
-    Imports and returns data reader module
-    Args:
-        data_reader (str): The name of the data reader
-    Returns:
-        reader (obj): The data reader object
+    """动态导入并返回指定名称的数据读取器模块。
+
+    :param data_reader: 数据读取器模块路径字符串（如 ``"cect.readers.SpreadsheetDataReader"``）
+    :return: 数据读取器实例（cect 系列）或模块对象
     """
     if "cect" in data_reader:
         dr = importlib.import_module("%s" % data_reader)
@@ -161,12 +159,12 @@ def load_data_reader(data_reader):
 
 
 def get_str_from_exponential(num):
-    """
-    Returns a formatted string representing a floating point number, e.g. 1*0.00001 would result into 1e-05. Returning 0.00001.
-    Args:
-        num (float): A number. Can be of type int or float,  float can have exponential notation.
-    Returns:
-       (str): A string representing a float with 15 fractional digits.
+    """将浮点数格式化为 15 位小数的字符串表示。
+
+    例如 ``1e-05`` 会被格式化为 ``"0.000010000000000"``。
+
+    :param num: 待格式化的数值（int 或 float，可含科学计数法）
+    :return: 含 15 位小数的字符串
     """
     return "{0:.15f}".format(num)
 
