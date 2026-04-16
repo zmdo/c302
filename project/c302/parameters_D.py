@@ -1,3 +1,17 @@
+#
+# 类与方法索引：
+#   ParameterisedModel                   (L41)   — ParameterisedModel 类
+#     __init__                           (L42)   — 初始化 Level D 参数模型，使用多室导电模型和 HH 型离子通道
+#     set_default_bioparameters          (L59)   — 设置 Level D 的默认生物参数，与 C 相似但新增 ``resistivity`` 参数
+#     create_models                      (L151)  — 按顺序创建所有网络组件模型
+#     create_generic_muscle_cell         (L159)  — 创建 D 级单室导电肌肉细胞（``Cell``）
+#     create_neuron_cell                 (L267)  — 从 NeuroML 多室形态文件加载特定神经元细胞，并为其配置生物物理属性
+#     create_offsetcurrent_concentrationmodel (L364)  — 创建偏置电流生成器和钙浓度模型（``FixedFactorConcentrationModel``）
+#     create_neuron_to_neuron_syn        (L381)  — 创建神经元间化学突触（``ExpTwoSynapse``）和缝隙连接（``GapJunction``）
+#     create_neuron_to_muscle_syn        (L404)  — 创建神经元到肌肉的化学突触（``ExpTwoSynapse``）和缝隙连接
+#     get_elec_syn                       (L427)  — 根据连接类型获取缝隙连接（``GapJunction``）对象
+#     get_exc_syn                        (L460)  — 根据连接类型获取兴奋性双指数事件突触（``ExpTwoSynapse``）对象
+#     get_inh_syn                        (L517)  — 根据连接类型获取抑制性双指数事件突触（``ExpTwoSynapse``）对象
 """
 
 Parameters D:
@@ -40,6 +54,16 @@ from c302.bioparameters import c302ModelPrototype
 
 class ParameterisedModel(c302ModelPrototype):
     def __init__(self):
+        """初始化 Level D 参数模型，使用多室导电模型和 HH 型离子通道。
+
+        Level D 相对于 C 的核心改进：
+        - 细胞为多室模型，需要从 ``_D.cell.nml`` 文件加载细胞形态（segment morphology）
+        - 新增 ``resistivity``（胞质电阻率）参数，控制细胞内阻
+        - ``create_neuron_cell()`` 需要从形态文件加载细胞，而非程序化构建
+
+        已知问题：胞质电阻率影响较大——低内阻时所有突触位点等电位，
+        高内阻时膜电位变化局限于树突近端。见 GitHub issue #71。
+        """
         super(ParameterisedModel, self).__init__()
         self.level = "D"
         self.custom_component_types_definitions = "cell_C.xml"
@@ -47,6 +71,7 @@ class ParameterisedModel(c302ModelPrototype):
         self.set_default_bioparameters()
 
     def set_default_bioparameters(self):
+        """设置 Level D 的默认生物参数，与 C 相似但新增 ``resistivity`` 参数。"""
         self.add_bioparameter("cell_diameter", "5", "BlindGuess", "0.1")
         self.add_bioparameter("muscle_length", "20", "BlindGuess", "0.1")
 
@@ -56,6 +81,7 @@ class ParameterisedModel(c302ModelPrototype):
             "specific_capacitance", "1 uF_per_cm2", "BlindGuess", "0.1"
         )
 
+        # D 级新增参数：胞质电阻率（多室模型专有），控制细胞内轴向阻力
         self.add_bioparameter("resistivity", "12 kohm_cm", "BlindGuess", "0.1")
 
         self.add_bioparameter("muscle_spike_thresh", "-26 mV", "BlindGuess", "0.1")
@@ -98,6 +124,7 @@ class ParameterisedModel(c302ModelPrototype):
             "ca_conc_rho", "0.000238919 mol_per_m_per_A_per_s", "BlindGuess", "0.1"
         )
 
+        # ExpTwoSynapse 兴奋性化学突触（双指数上升/衰减，事件驱动）
         self.add_bioparameter(
             "neuron_to_neuron_chem_exc_syn_gbase", ".01 nS", "BlindGuess", "0.1"
         )
@@ -109,6 +136,7 @@ class ParameterisedModel(c302ModelPrototype):
         self.add_bioparameter("chem_exc_syn_rise", "1 ms", "BlindGuess", "0.1")
         self.add_bioparameter("chem_exc_syn_decay", "5 ms", "BlindGuess", "0.1")
 
+        # ExpTwoSynapse 抑制性化学突触（erev=-60 mV，衰减更慢 40 ms）
         self.add_bioparameter(
             "neuron_to_neuron_chem_inh_syn_gbase", "3 nS", "BlindGuess", "0.1"
         )
@@ -120,6 +148,7 @@ class ParameterisedModel(c302ModelPrototype):
         self.add_bioparameter("chem_inh_syn_rise", "2 ms", "BlindGuess", "0.1")
         self.add_bioparameter("chem_inh_syn_decay", "40 ms", "BlindGuess", "0.1")
 
+        # 缝隙连接（GapJunction）
         self.add_bioparameter(
             "neuron_to_neuron_elec_syn_gbase", "0.0005 nS", "BlindGuess", "0.1"
         )
@@ -138,6 +167,7 @@ class ParameterisedModel(c302ModelPrototype):
         )
 
     def create_models(self):
+        """按顺序创建所有网络组件模型。"""
         self.create_generic_muscle_cell()
 
         self.create_offsetcurrent_concentrationmodel()
@@ -145,6 +175,10 @@ class ParameterisedModel(c302ModelPrototype):
         self.create_neuron_to_muscle_syn()
 
     def create_generic_muscle_cell(self):
+        """创建 D 级单室导电肌肉细胞（``Cell``）。
+
+        肌肉细胞仍是单室的（非多室），形态仍由代码生成，不从文件加载。
+        """
         self.generic_muscle_cell = Cell(id="GenericMuscleCell")
 
         morphology = Morphology()
@@ -249,6 +283,14 @@ class ParameterisedModel(c302ModelPrototype):
         ip.species.append(species)
 
     def create_neuron_cell(self, cell_name, morphology):
+        """从 NeuroML 多室形态文件加载特定神经元细胞，并为其配置生物物理属性。
+
+        与 Level C 不同，Level D 的神经元细胞形态从 ``{cell_name}_D.cell.nml`` 文件读取，
+        支持真实的树突/轴突多室结构。离子通道密度则从生物参数表读取。
+
+        :param cell_name: 神经元标准名称（如 ``"ADAL"``），用于定位形态文件
+        :return: 配置好的 NeuroML ``Cell`` 对象
+        """
         cell = Cell(id=cell_name)
 
         cell.notes = "Cell model created by c302 with custom electrical parameters"
@@ -338,6 +380,7 @@ class ParameterisedModel(c302ModelPrototype):
         return cell
 
     def create_offsetcurrent_concentrationmodel(self):
+        """创建偏置电流生成器和钙浓度模型（``FixedFactorConcentrationModel``）。"""
         self.offset_current = PulseGenerator(
             id="offset_current",
             delay=self.get_bioparameter("unphysiological_offset_current_del").value,
@@ -354,6 +397,7 @@ class ParameterisedModel(c302ModelPrototype):
         )
 
     def create_neuron_to_neuron_syn(self):
+        """创建神经元间化学突触（``ExpTwoSynapse``）和缝隙连接（``GapJunction``）。"""
         self.neuron_to_neuron_exc_syn = ExpTwoSynapse(
             id="neuron_to_neuron_exc_syn",
             gbase=self.get_bioparameter("neuron_to_neuron_chem_exc_syn_gbase").value,
@@ -376,6 +420,7 @@ class ParameterisedModel(c302ModelPrototype):
         )
 
     def create_neuron_to_muscle_syn(self):
+        """创建神经元到肌肉的化学突触（``ExpTwoSynapse``）和缝隙连接。"""
         self.neuron_to_muscle_exc_syn = ExpTwoSynapse(
             id="neuron_to_muscle_exc_syn",
             gbase=self.get_bioparameter("neuron_to_muscle_chem_exc_syn_gbase").value,
@@ -398,6 +443,13 @@ class ParameterisedModel(c302ModelPrototype):
         )
 
     def get_elec_syn(self, pre_cell, post_cell, type):
+        """根据连接类型获取缝隙连接（``GapJunction``）对象。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串
+        :return: 配置好的 ``GapJunction`` 对象
+        """
         self.found_specific_param = False
         if type == "neuron_to_neuron":
             gbase = self.get_conn_param(
@@ -424,6 +476,13 @@ class ParameterisedModel(c302ModelPrototype):
         return GapJunction(id=conn_id, conductance=gbase)
 
     def get_exc_syn(self, pre_cell, post_cell, type):
+        """根据连接类型获取兴奋性双指数事件突触（``ExpTwoSynapse``）对象。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串
+        :return: 配置好的 ``ExpTwoSynapse`` 兴奋性突触对象
+        """
         self.found_specific_param = False
 
         specific_param_template = "%s_to_%s_chem_exc_syn_%s"
@@ -474,6 +533,13 @@ class ParameterisedModel(c302ModelPrototype):
         )
 
     def get_inh_syn(self, pre_cell, post_cell, type):
+        """根据连接类型获取抑制性双指数事件突触（``ExpTwoSynapse``）对象。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串
+        :return: 配置好的 ``ExpTwoSynapse`` 抑制性突触对象
+        """
         self.found_specific_param = False
 
         specific_param_template = "%s_to_%s_chem_inh_syn_%s"

@@ -1,0 +1,163 @@
+- file: project/c302/parameters_D.py
+  functions:
+    - name: ParameterisedModel.__init__
+      docstring: |
+        初始化 Level D 参数模型，使用多室导电模型和 HH 型离子通道。
+
+        Level D 相对于 C 的核心改进：
+        - 细胞为多室模型，需要从 ``_D.cell.nml`` 文件加载细胞形态（segment morphology）
+        - 新增 ``resistivity``（胞质电阻率）参数，控制细胞内阻
+        - ``create_neuron_cell()`` 需要从形态文件加载细胞，而非程序化构建
+
+        已知问题：胞质电阻率影响较大——低内阻时所有突触位点等电位，
+        高内阻时膜电位变化局限于树突近端。见 GitHub issue #71。
+
+    - name: ParameterisedModel.set_default_bioparameters
+      docstring: |
+        设置 Level D 的默认生物参数，与 C 相似但新增 ``resistivity`` 参数。
+
+    - name: ParameterisedModel.create_models
+      docstring: |
+        按顺序创建所有网络组件模型。
+
+    - name: ParameterisedModel.create_generic_muscle_cell
+      docstring: |
+        创建 D 级单室导电肌肉细胞（``Cell``）。
+
+        肌肉细胞仍是单室的（非多室），形态仍由代码生成，不从文件加载。
+
+    - name: ParameterisedModel.create_neuron_cell
+      docstring: |
+        从 NeuroML 多室形态文件加载特定神经元细胞，并为其配置生物物理属性。
+
+        与 Level C 不同，Level D 的神经元细胞形态从 ``{cell_name}_D.cell.nml`` 文件读取，
+        支持真实的树突/轴突多室结构。离子通道密度则从生物参数表读取。
+
+        :param cell_name: 神经元标准名称（如 ``"ADAL"``），用于定位形态文件
+        :return: 配置好的 NeuroML ``Cell`` 对象
+
+    - name: ParameterisedModel.create_offsetcurrent_concentrationmodel
+      docstring: |
+        创建偏置电流生成器和钙浓度模型（``FixedFactorConcentrationModel``）。
+
+    - name: ParameterisedModel.create_neuron_to_neuron_syn
+      docstring: |
+        创建神经元间化学突触（``ExpTwoSynapse``）和缝隙连接（``GapJunction``）。
+
+    - name: ParameterisedModel.create_neuron_to_muscle_syn
+      docstring: |
+        创建神经元到肌肉的化学突触（``ExpTwoSynapse``）和缝隙连接。
+
+    - name: ParameterisedModel.get_elec_syn
+      docstring: |
+        根据连接类型获取缝隙连接（``GapJunction``）对象。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串
+        :return: 配置好的 ``GapJunction`` 对象
+
+    - name: ParameterisedModel.get_exc_syn
+      docstring: |
+        根据连接类型获取兴奋性双指数事件突触（``ExpTwoSynapse``）对象。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串
+        :return: 配置好的 ``ExpTwoSynapse`` 兴奋性突触对象
+
+    - name: ParameterisedModel.get_inh_syn
+      docstring: |
+        根据连接类型获取抑制性双指数事件突触（``ExpTwoSynapse``）对象。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串
+        :return: 配置好的 ``ExpTwoSynapse`` 抑制性突触对象
+
+- file: project/c302/parameters_D1.py
+  functions:
+    - name: ParameterisedModel.__init__
+      docstring: |
+        初始化 Level D1 参数模型，多室导电模型 + 模拟突触（GradedSynapse）。
+
+        D1 是 D 的模拟突触变体（类似于 C→C1 的关系）：
+        - 细胞仍为多室模型，继承 D 的形态加载机制
+        - 突触从事件驱动改为模拟型（``GradedSynapse``），支持非放电神经元
+        - 可能是"完整规模"模型的中期目标，但仍有 D 级内阻问题（GitHub #71）
+
+    - name: ParameterisedModel.set_default_bioparameters
+      docstring: |
+        设置 Level D1 的默认生物参数，使用较低内阻（3 kohm_cm vs D 的 12 kohm_cm），
+        突触参数改为 GradedSynapse 类型。
+
+    - name: ParameterisedModel.create_neuron_to_neuron_syn
+      docstring: |
+        创建神经元间模拟突触（``GradedSynapse``）和缝隙连接（``GapJunction``）。
+
+    - name: ParameterisedModel.create_neuron_to_muscle_syn
+      docstring: |
+        创建神经元到肌肉的模拟突触（``GradedSynapse``）和缝隙连接。
+
+    - name: ParameterisedModel.get_elec_syn
+      docstring: |
+        根据连接类型获取缝隙连接（``GapJunction``）对象。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串
+        :return: 配置好的 ``GapJunction`` 对象
+
+    - name: ParameterisedModel.get_exc_syn
+      docstring: |
+        根据连接类型获取兴奋性模拟突触（``GradedSynapse``）对象。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串
+        :return: 对应的突触对象（``GradedSynapse`` 或 ``GradedSynapse2``）
+
+    - name: ParameterisedModel.get_inh_syn
+      docstring: |
+        根据连接类型获取抑制性模拟突触（``GradedSynapse``）对象。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串
+        :return: 配置好的 ``GradedSynapse`` 抑制性突触对象
+
+    - name: ParameterisedModel.create_n_connection_synapse
+      docstring: |
+        D1 层级重载此方法以支持 ``GradedSynapse2`` 的注册。
+
+        :param prototype_syn: 突触原型对象
+        :param n: 连接数（仅用于错误消息）
+        :param nml_doc: NeuroML 文档对象
+        :param existing_synapses: 已注册突触字典
+        :return: 已注册的突触原型对象
+
+    - name: ParameterisedModel.is_analog_conn
+      docstring: |
+        D1 层级扩展模拟突触判断，将 ``GradedSynapse2`` 也视为模拟连接。
+
+        :param syn: 突触对象
+        :return: ``True`` 若为 ``GradedSynapse`` 或 ``GradedSynapse2`` 实例
+
+    - name: GradedSynapse2.__init__
+      docstring: |
+        初始化 D1 层级自定义双分量模拟突触，存储 ID。
+
+        定义于 ``custom_synapses.xml``，允许两个激活分量叠加，
+        适合神经元间某些需要更精细突触动力学的连接。
+
+        :param id: 突触唯一标识符
+
+    - name: GradedSynapse2.export
+      docstring: |
+        将 D1 的 GradedSynapse2 以 NeuroML XML 格式写入输出流。
+
+        :param outfile: 可写的输出流对象
+        :param level: 缩进层级
+        :param namespace: XML 命名空间（保留）
+        :param name_: XML 元素名（保留）
+        :param pretty_print: 是否美化输出

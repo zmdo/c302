@@ -1,3 +1,53 @@
+#
+# 类与方法索引：
+#   ParameterisedModel                   (L40)   — ParameterisedModel 类
+#     __init__                           (L41)   — 初始化 Level C2 参数模型，还在开发中（under development）
+#     set_default_bioparameters          (L61)   — 设置 Level C2 的默认生物参数（仍在调整中）
+#     create_models                      (L609)  — 按顺序创建所有网络组件：偏置电流和浓度模型、肌肉细胞、神经元细胞、
+#     create_generic_muscle_cell         (L620)  — 创建 C2 层级的肌肉细胞（``Cell``），含独立的膜参数（容抗、阈值、漏/慢钾/快钾/钙通道）
+#     create_neuron_to_neuron_syn        (L730)  — 创建神经元间突触：兴奋性模拟突触、抑制性模拟突触、标准缝隙连接和延迟缝隙连接
+#     create_offsetcurrent_concentrationmodel (L775)  — 创建偏置电流和神经元/肌肉独立的钙浓度模型
+#     create_neuron_to_muscle_syn        (L832)  — 创建神经元到肌肉的模拟突触（兴奋性/抑制性）和缝隙连接
+#     create_muscle_to_muscle_syn        (L861)  — 创建肌肉到肌肉的缝隙连接（``GapJunction``）
+#     get_elec_syn                       (L868)  — 根据连接类型和参数覆盖获取电突触对象，支持多种特殊缝隙连接变体
+#     get_exc_syn                        (L1006) — 根据连接类型和参数覆盖获取兴奋性突触对象，支持多种模拟突触变体
+#     get_inh_syn                        (L1201) — 根据连接类型获取抑制性模拟突触（``GradedSynapse``）对象
+#     create_n_connection_synapse        (L1296) — C2 层级重载此方法以支持 ``DelayedGapJunction``、``ProprioGapJunction``、
+#     is_elec_conn                       (L1324) — C2 层级扩展电突触判断，将 ``DelayedGapJunction``、``ProprioGapJunction``、
+#     is_analog_conn                     (L1335) — C2 层级扩展模拟突触判断，将 ``NeuronMuscle``、``GradedSynapse2`` 也视为模拟连接
+#   SwitchedGapJunction                  (L1346) — SwitchedGapJunction 类
+#     __init__                           (L1347) — 初始化开关型缝隙连接（C2 自定义，由开关参数控制导通），存储 ID
+#     export                             (L1356) — 将 SwitchedGapJunction 以 NeuroML XML 格式写入输出流
+#   DelayedGapJunction                   (L1372) — DelayedGapJunction 类
+#     __init__                           (L1373) — 初始化延迟调制缝隙连接，其传递量由 sigmoid 函数在时间轴上调制
+#     export                             (L1391) — 将 DelayedGapJunction 以 NeuroML XML 格式写入输出流
+#     __repr__                           (L1406) — 返回 DelayedGapJunction 的字符串表示
+#   ProprioGapJunction                   (L1417) — ProprioGapJunction 类
+#     __init__                           (L1418) — 初始化本体感觉调制缝隙连接，传递量由本体感觉电导（p_conductance）叠加基础电导
+#     export                             (L1436) — 将 ProprioGapJunction 以 NeuroML XML 格式写入输出流
+#     __repr__                           (L1458) — 返回 ProprioGapJunction 的字符串表示
+#   ProprioGapJunction2                  (L1476) — ProprioGapJunction2 类
+#     __init__                           (L1477) — 初始化增强型本体感觉缝隙连接，支持时间门控（ar/ad/beta）和电压门控（vth）参数
+#     export                             (L1516) — 将 ProprioGapJunction2 以 NeuroML XML 格式写入输出流
+#     __repr__                           (L1543) — 返回 ProprioGapJunction2 的字符串表示
+#   DelayedGradedSynapse                 (L1566) — DelayedGradedSynapse 类
+#     __init__                           (L1567) — 初始化延迟型模拟突触，在标准 GradedSynapse 参数基础上增加时间调制参数
+#     export                             (L1599) — 将 DelayedGradedSynapse 以 NeuroML XML 格式写入输出流
+#     __repr__                           (L1624) — 返回 DelayedGradedSynapse 的字符串表示
+#   NeuronMuscle                         (L1645) — NeuronMuscle 类
+#     __init__                           (L1646) — 初始化肌肉本体感觉反馈类突触，包含激活/失活速率和阈值等参数
+#     export                             (L1667) — 将 NeuronMuscle 以 NeuroML XML 格式写入输出流
+#   MuscleConcentrationModel             (L1691) — MuscleConcentrationModel 类
+#     __init__                           (L1692) — 初始化肌肉钙浓度模型（简化版），包含衰减时间、转换系数等参数
+#     export                             (L1707) — 将 MuscleConcentrationModel 以 NeuroML XML 格式写入输出流
+#     __repr__                           (L1722) — 返回 MuscleConcentrationModel 的字符串表示
+#   MuscleConcentrationModel2            (L1733) — MuscleConcentrationModel2 类
+#     __init__                           (L1734) — 初始化扩展肌肉钙浓度模型，增加 sigmoid 浓度阈值调制参数
+#     export                             (L1780) — 将 MuscleConcentrationModel2 以 NeuroML XML 格式写入输出流
+#     __repr__                           (L1808) — 返回 MuscleConcentrationModel2 的字符串表示
+#   GradedSynapse2                       (L1832) — GradedSynapse2 类
+#     __init__                           (L1833) — 初始化双分量模拟突触（C2 特有），支持激活/失活速率门控
+#     export                             (L1852) — 将 GradedSynapse2 以 NeuroML XML 格式写入输出流
 """
 
 Parameters C2 for c302 still under developemnt!!
@@ -39,6 +89,14 @@ from c302.parameters_C import ParameterisedModel as ParameterisedModel_C
 
 class ParameterisedModel(ParameterisedModel_C):
     def __init__(self):
+        """初始化 Level C2 参数模型，还在开发中（under development）。
+
+        C2 在 C 基础上增加模拟突触，并引入延迟缝隙连接和本体感觉反馈连接，
+        用于探索具有时序传播特性的运动回路。
+        C2 可能会与 C 合并或升级为 D 变体，尚未稳定。
+
+        自定义组件文件：``cell_C.xml``、``custom_muscle_components.xml``、``custom_synapses.xml``。
+        """
         super(ParameterisedModel, self).__init__()
         self.level = "C2"
         self.custom_component_types_definitions = [
@@ -51,9 +109,22 @@ class ParameterisedModel(ParameterisedModel_C):
         self.print_("Set default parameters for %s" % self.level)
 
     def set_default_bioparameters(self):
+        """设置 Level C2 的默认生物参数（仍在调整中）。
+
+        参数分组（在标准 C 基础上的变化）：
+        - 肌肉/神经元分别使用独立的``initial_memb_pot``和``specific_capacitance``
+        - 肌肉和神经元分别拥有独立的漏电流反转电位（``muscle_leak_erev``）
+        - 肌肉和神经元的慢钾/快钾/钙通道分别拥有独立密度和反转电位
+        - 突触改为模拟型（``GradedSynapse``）且肌肉/神经元使用不同参数
+        - 新增延迟电突触参数（``neuron_to_motor_delayed_elec_syn_*``）
+        - 新增肌肉钙浓度参数（``ca_conc_*_muscle``）
+
+        大量注释掉的参数对应正在探索中的特定细胞对连接覆盖方案。
+        """
         self.add_bioparameter("cell_diameter", "5", "BlindGuess", "0.1")
         self.add_bioparameter("muscle_length", "20", "BlindGuess", "0.1")
 
+        # C2 中肌肉和神经元使用各自独立的静息膜电位
         self.add_bioparameter("initial_memb_pot", "-60 mV", "BlindGuess", "0.1")
         self.add_bioparameter("muscle_initial_memb_pot", "-28 mV", "BlindGuess", "0.1")
 
@@ -140,6 +211,7 @@ class ParameterisedModel(ParameterisedModel_C):
             "ca_conc_rho", "0.000238919 mol_per_m_per_A_per_s", "BlindGuess", "0.1"
         )
 
+        # C2 新增独立的肌肉钙浓度动力学参数（与神经元不同）
         self.add_bioparameter(
             "ca_conc_decay_time_muscle", "60.811870945509265 ms", "BlindGuess", "0.1"
         )
@@ -156,6 +228,7 @@ class ParameterisedModel(ParameterisedModel_C):
         # self.add_bioparameter("ca_conc_xSigmoidSlope_muscle", "1E-9 M", "BlindGuess", "0.1")
         # self.add_bioparameter("ca_conc_xDecay_muscle", "0.01 ms", "BlindGuess", "0.1")
 
+        # GradedSynapse 兴奋性突触参数：神经元间（conductance/delta/vth/erev/k）
         self.add_bioparameter(
             "neuron_to_neuron_exc_syn_conductance", "0.49 nS", "BlindGuess", "0.1"
         )
@@ -172,6 +245,7 @@ class ParameterisedModel(ParameterisedModel_C):
             "neuron_to_neuron_exc_syn_k", "0.5per_ms", "BlindGuess", "0.1"
         )
 
+        # GradedSynapse 兴奋性突触参数：神经元到肌肉（增加 sigma/mu 用于 GradedSynapse2）
         self.add_bioparameter(
             "neuron_to_muscle_exc_syn_conductance", "0.10 nS", "BlindGuess", "0.1"
         )
@@ -197,6 +271,7 @@ class ParameterisedModel(ParameterisedModel_C):
             "neuron_to_muscle_exc_syn_mu", "5 mV", "BlindGuess", "0.1"
         )
 
+        # GradedSynapse 抑制性突触（神经元间 erev=-70 / 神经元到肌肉 erev=-35）
         self.add_bioparameter(
             "neuron_to_neuron_inh_syn_conductance", "0.29 nS", "BlindGuess", "0.1"
         )
@@ -245,6 +320,7 @@ class ParameterisedModel(ParameterisedModel_C):
             "muscle_to_muscle_elec_syn_gbase", "0 nS", "BlindGuess", "0.1"
         )
 
+        # C2 新增延迟缝隙连接参数（DelayedGapJunction，由 sigmoid 函数调制传递时序）
         self.add_bioparameter(
             "neuron_to_motor_delayed_elec_syn_weight", "1", "BlindGuess", "0.1"
         )
@@ -587,6 +663,9 @@ class ParameterisedModel(ParameterisedModel_C):
             v += 1"""
 
     def create_models(self):
+        """按顺序创建所有网络组件：偏置电流和浓度模型、肌肉细胞、神经元细胞、
+        神经元间突触、神经元到肌肉突触、肌肉到肌肉突触。
+        """
         self.create_offsetcurrent_concentrationmodel()
         self.create_generic_muscle_cell()
         self.create_generic_neuron_cell()
@@ -595,6 +674,12 @@ class ParameterisedModel(ParameterisedModel_C):
         self.create_muscle_to_muscle_syn()
 
     def create_generic_muscle_cell(self):
+        """创建 C2 层级的肌肉细胞（``Cell``），含独立的膜参数（容抗、阈值、漏/慢钾/快钾/钙通道）。
+
+        与 C 级肌肉细胞相比，C2 使用肌肉专用的慢钾（``k_slow_muscle``）、
+        快钾（``k_fast_muscle``）和钙（``ca_boyle_muscle``）通道变体，
+        以及独立的钙池（``CaPoolMuscle``）。
+        """
         self.generic_muscle_cell = Cell(id="GenericMuscleCell")
 
         morphology = Morphology()
@@ -699,6 +784,11 @@ class ParameterisedModel(ParameterisedModel_C):
         ip.species.append(species)
 
     def create_neuron_to_neuron_syn(self):
+        """创建神经元间突触：兴奋性模拟突触、抑制性模拟突触、标准缝隙连接和延迟缝隙连接。
+
+        C2 新增了 ``DelayedGapJunction``（``neuron_to_motor_delayed_elec_syn``），
+        其传递量由 sigmoid 函数调制，引入了类时序传播的特性。
+        """
         self.neuron_to_neuron_exc_syn = GradedSynapse(
             id="neuron_to_neuron_exc_syn",
             conductance=self.get_bioparameter(
@@ -739,6 +829,12 @@ class ParameterisedModel(ParameterisedModel_C):
         )
 
     def create_offsetcurrent_concentrationmodel(self):
+        """创建偏置电流和神经元/肌肉独立的钙浓度模型。
+
+        C2 为神经元和肌肉分别创建钙浓度模型（``CaPool`` 和 ``CaPoolMuscle``），
+        若存在 ``ca_conc_xRho_muscle`` 参数则使用扩展的 ``MuscleConcentrationModel2``，
+        否则使用标准 ``FixedFactorConcentrationModel``。
+        """
         self.offset_current = PulseGenerator(
             id="offset_current",
             delay=self.get_bioparameter("unphysiological_offset_current_del").value,
@@ -790,6 +886,7 @@ class ParameterisedModel(ParameterisedModel_C):
         ]
 
     def create_neuron_to_muscle_syn(self):
+        """创建神经元到肌肉的模拟突触（兴奋性/抑制性）和缝隙连接。"""
         self.neuron_to_muscle_exc_syn = GradedSynapse(
             id="neuron_to_muscle_exc_syn",
             conductance=self.get_bioparameter(
@@ -818,12 +915,27 @@ class ParameterisedModel(ParameterisedModel_C):
         )
 
     def create_muscle_to_muscle_syn(self):
+        """创建肌肉到肌肉的缝隙连接（``GapJunction``）。"""
         self.muscle_to_muscle_elec_syn = GapJunction(
             id="muscle_to_muscle_elec_syn",
             conductance=self.get_bioparameter("muscle_to_muscle_elec_syn_gbase").value,
         )
 
     def get_elec_syn(self, pre_cell, post_cell, type):
+        """根据连接类型和参数覆盖获取电突触对象，支持多种特殊缝隙连接变体。
+
+        优先级：
+        1. 若存在 ``sigma`` 和 ``mu`` 但无 ``p_gbase``：返回 ``DelayedGapJunction``（时序调制）
+        2. 若存在 ``p_gbase`` 和 ``sigma``：
+           - 进一步存在 ``ar``/``ad``：返回 ``ProprioGapJunction2``（本体感觉反馈）
+           - 否则返回 ``ProprioGapJunction``
+        3. 默认返回标准 ``GapJunction``
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串
+        :return: 对应的缝隙连接对象
+        """
         self.found_specific_param = False
         sigma = mu = p_gbase = ar = ad = beta = gbase = vth = erev = conn_id = None
         if type == "neuron_to_neuron":
@@ -948,6 +1060,20 @@ class ParameterisedModel(ParameterisedModel_C):
         return GapJunction(id=conn_id, conductance=gbase)
 
     def get_exc_syn(self, pre_cell, post_cell, type):
+        """根据连接类型和参数覆盖获取兴奋性突触对象，支持多种模拟突触变体。
+
+        优先级：
+        1. 若存在 ``cath``：返回 ``NeuronMuscle``（肌肉本体感觉反馈类突触）
+        2. 若存在 ``ar``/``ad``/``beta``：返回 ``GradedSynapse2``（双分量模拟突触）
+        3. 默认返回标准 ``GradedSynapse``
+
+        支持 ``"neuron_to_neuron"``、``"neuron_to_muscle"``、``"muscle_to_neuron"`` 三种连接类型。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串
+        :return: 对应的突触对象
+        """
         self.found_specific_param = False
 
         specific_param_template = "%s_to_%s_exc_syn_%s"
@@ -1129,6 +1255,13 @@ class ParameterisedModel(ParameterisedModel_C):
         )
 
     def get_inh_syn(self, pre_cell, post_cell, type):
+        """根据连接类型获取抑制性模拟突触（``GradedSynapse``）对象。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串
+        :return: 配置好的 ``GradedSynapse`` 抑制性突触对象
+        """
         self.found_specific_param = False
 
         specific_param_template = "%s_to_%s_inh_syn_%s"
@@ -1217,6 +1350,15 @@ class ParameterisedModel(ParameterisedModel_C):
         )
 
     def create_n_connection_synapse(self, prototype_syn, n, nml_doc, existing_synapses):
+        """C2 层级重载此方法以支持 ``DelayedGapJunction``、``ProprioGapJunction``、
+        ``NeuronMuscle``、``GradedSynapse2`` 等 C2 特有突触类型的注册。
+
+        :param prototype_syn: 突触原型对象
+        :param n: 连接数（仅用于错误消息）
+        :param nml_doc: NeuroML 文档对象
+        :param existing_synapses: 已注册突触字典
+        :return: 已注册的突触原型对象
+        """
         if prototype_syn.id in existing_synapses:
             return existing_synapses[prototype_syn.id]
 
@@ -1236,11 +1378,22 @@ class ParameterisedModel(ParameterisedModel_C):
             )
 
     def is_elec_conn(self, syn):
+        """C2 层级扩展电突触判断，将 ``DelayedGapJunction``、``ProprioGapJunction``、
+        ``ProprioGapJunction2`` 也视为电突触。
+
+        :param syn: 突触对象
+        :return: ``True`` 若为任何 C2 支持的电突触类型
+        """
         return super(ParameterisedModel, self).is_elec_conn(syn) or isinstance(
             syn, (DelayedGapJunction, ProprioGapJunction, ProprioGapJunction2)
         )
 
     def is_analog_conn(self, syn):
+        """C2 层级扩展模拟突触判断，将 ``NeuronMuscle``、``GradedSynapse2`` 也视为模拟连接。
+
+        :param syn: 突触对象
+        :return: ``True`` 若为任何 C2 支持的模拟突触类型
+        """
         return super(ParameterisedModel, self).is_analog_conn(syn) or isinstance(
             syn, (NeuronMuscle, GradedSynapse2)
         )
@@ -1248,11 +1401,23 @@ class ParameterisedModel(ParameterisedModel_C):
 
 class SwitchedGapJunction:
     def __init__(self, id, conductance, delay):
+        """初始化开关型缝隙连接（C2 自定义，由开关参数控制导通），存储 ID。
+
+        :param id: 突触唯一标识符
+        """
         self.id = id
         self.conductance = conductance
         self.delay = delay
 
     def export(self, outfile, level, namespace, name_, pretty_print=True, **kwargs_):
+        """将 SwitchedGapJunction 以 NeuroML XML 格式写入输出流。
+
+        :param outfile: 可写的输出流对象
+        :param level: 缩进层级
+        :param namespace: XML 命名空间（保留）
+        :param name_: XML 元素名（保留）
+        :param pretty_print: 是否美化输出
+        """
         outfile.write(
             "    " * level
             + '<switchedGapJunction id="%s" conductance="%s" delay="%s" />\n'
@@ -1262,6 +1427,17 @@ class SwitchedGapJunction:
 
 class DelayedGapJunction:
     def __init__(self, id, conductance, sigma, mu, weight=1):
+        """初始化延迟调制缝隙连接，其传递量由 sigmoid 函数在时间轴上调制。
+
+        ``sigma`` 和 ``mu`` 参数控制 sigmoid 曲线的陡峭度和中点，
+        用于模拟运动神经元的时序传播特性。
+
+        :param id: 突触唯一标识符
+        :param conductance: 基础电导
+        :param weight: 权重系数
+        :param sigma: sigmoid 斜率
+        :param mu: sigmoid 中点值（时间/电压）
+        """
         self.id = id
         self.weight = weight
         self.conductance = conductance
@@ -1269,6 +1445,14 @@ class DelayedGapJunction:
         self.mu = mu
 
     def export(self, outfile, level, namespace, name_, pretty_print=True, **kwargs_):
+        """将 DelayedGapJunction 以 NeuroML XML 格式写入输出流。
+
+        :param outfile: 可写的输出流对象
+        :param level: 缩进层级
+        :param namespace: XML 命名空间（保留）
+        :param name_: XML 元素名（保留）
+        :param pretty_print: 是否美化输出
+        """
         outfile.write(
             "    " * level
             + '<delayedGapJunction id="%s" weight="%s" conductance="%s" sigma="%s" mu="%s" />\n'
@@ -1276,6 +1460,10 @@ class DelayedGapJunction:
         )
 
     def __repr__(self):
+        """返回 DelayedGapJunction 的字符串表示。
+
+        :return: 包含 ID 和关键参数的描述字符串
+        """
         return (
             "DelayedGapJunction(id=%s, weight=%s, conductance=%s, sigma=%s, mu=%s)"
             % (self.id, self.weight, self.conductance, self.sigma, self.mu)
@@ -1286,6 +1474,14 @@ class ProprioGapJunction:
     def __init__(
         self, id, conductance, p_conductance, mu, weight=1, sigma="0.3 per_mV"
     ):
+        """初始化本体感觉调制缝隙连接，传递量由本体感觉电导（p_conductance）叠加基础电导。
+
+        :param id: 突触唯一标识符
+        :param conductance: 固定基础电导
+        :param p_conductance: 本体感觉分量电导
+        :param sigma: sigmoid 调制斜率
+        :param mu: sigmoid 调制中点
+        """
         self.id = id
         self.weight = weight
         self.conductance = conductance
@@ -1294,6 +1490,14 @@ class ProprioGapJunction:
         self.mu = mu
 
     def export(self, outfile, level, namespace, name_, pretty_print=True, **kwargs_):
+        """将 ProprioGapJunction 以 NeuroML XML 格式写入输出流。
+
+        :param outfile: 可写的输出流对象
+        :param level: 缩进层级
+        :param namespace: XML 命名空间（保留）
+        :param name_: XML 元素名（保留）
+        :param pretty_print: 是否美化输出
+        """
         outfile.write(
             "    " * level
             + '<proprioGapJunction id="%s" weight="%s" conductance="%s" p_conductance="%s" sigma="%s" mu="%s" />\n'
@@ -1308,6 +1512,10 @@ class ProprioGapJunction:
         )
 
     def __repr__(self):
+        """返回 ProprioGapJunction 的字符串表示。
+
+        :return: 包含 ID 和关键参数的描述字符串
+        """
         return (
             "ProprioGapJunction(id=%s, weight=%s, conductance=%s, p_conductance=%s, sigma=%s mu=%s)"
             % (
@@ -1336,6 +1544,19 @@ class ProprioGapJunction2:
         weight=1,
         sigma="0.3 per_mV",
     ):
+        """初始化增强型本体感觉缝隙连接，支持时间门控（ar/ad/beta）和电压门控（vth）参数。
+
+        :param id: 突触唯一标识符
+        :param conductance: 固定基础电导
+        :param p_conductance: 本体感觉分量电导
+        :param ar: 激活速率（activation rate）
+        :param ad: 失活速率（deactivation rate）
+        :param beta: 门控敏感度系数
+        :param vth: 门控阈值电压
+        :param erev: 反转电位
+        :param sigma: sigmoid 调制斜率
+        :param mu: sigmoid 调制中点
+        """
         self.id = id
         self.weight = weight
         self.conductance = conductance
@@ -1349,6 +1570,14 @@ class ProprioGapJunction2:
         self.erev = erev
 
     def export(self, outfile, level, namespace, name_, pretty_print=True, **kwargs_):
+        """将 ProprioGapJunction2 以 NeuroML XML 格式写入输出流。
+
+        :param outfile: 可写的输出流对象
+        :param level: 缩进层级
+        :param namespace: XML 命名空间（保留）
+        :param name_: XML 元素名（保留）
+        :param pretty_print: 是否美化输出
+        """
         outfile.write(
             "    " * level
             + '<proprioGapJunction2 id="%s" weight="%s" ar="%s" ad="%s" beta="%s" vth="%s" erev="%s" conductance="%s" p_conductance="%s" sigma="%s" mu="%s" />\n'
@@ -1368,6 +1597,10 @@ class ProprioGapJunction2:
         )
 
     def __repr__(self):
+        """返回 ProprioGapJunction2 的字符串表示。
+
+        :return: 包含 ID 和关键参数的描述字符串
+        """
         return (
             "ProprioGapJunction2(id=%s, weight=%s, ar=%s, ad=%s, beta=%s, vth=%s, erev=%s, conductance=%s, p_conductance=%s, sigma=%s mu=%s)"
             % (
@@ -1399,6 +1632,16 @@ class DelayedGradedSynapse:
         sigma=None,
         mu=None,
     ):
+        """初始化延迟型模拟突触，在标准 GradedSynapse 参数基础上增加时间调制参数。
+
+        :param id: 突触唯一标识符
+        :param conductance: 突触电导
+        :param ar: 激活速率
+        :param ad: 失活速率
+        :param beta: 激活曲线敏感度
+        :param vth: 激活阈值电压
+        :param erev: 反转电位
+        """
         self.id = id
         self.weight = weight
         self.conductance = conductance
@@ -1410,6 +1653,14 @@ class DelayedGradedSynapse:
         self.mu = mu
 
     def export(self, outfile, level, namespace, name_, pretty_print=True, **kwargs_):
+        """将 DelayedGradedSynapse 以 NeuroML XML 格式写入输出流。
+
+        :param outfile: 可写的输出流对象
+        :param level: 缩进层级
+        :param namespace: XML 命名空间（保留）
+        :param name_: XML 元素名（保留）
+        :param pretty_print: 是否美化输出
+        """
         outfile.write(
             "    " * level
             + '<delayedGradedSynapse id="%s" weight="%s" conductance="%s" delta="%s" vth="%s" k="%s" erev="%s" sigma="%s" mu="%s" />\n'
@@ -1427,6 +1678,10 @@ class DelayedGradedSynapse:
         )
 
     def __repr__(self):
+        """返回 DelayedGradedSynapse 的字符串表示。
+
+        :return: 包含 ID 和关键参数的描述字符串
+        """
         return (
             "DelayedGradedSynapse(id=%s, weight=%s, conductance=%s, delta=%s, vth=%s, k=%s, erev=%s, sigma=%s, mu=%s)"
             % (
@@ -1445,6 +1700,18 @@ class DelayedGradedSynapse:
 
 class NeuronMuscle:
     def __init__(self, id, conductance, ar, ad, beta, cath, erev):
+        """初始化肌肉本体感觉反馈类突触，包含激活/失活速率和阈值等参数。
+
+        ``NeuronMuscle`` 用于模拟肌肉向神经元的反向信号传递（本体感觉）。
+
+        :param id: 突触唯一标识符
+        :param conductance: 突触电导
+        :param ar: 激活速率
+        :param ad: 失活速率
+        :param beta: 激活敏感度系数
+        :param cath: 钙离子阈值浓度
+        :param erev: 反转电位
+        """
         self.id = id
         self.conductance = conductance
         self.ar = ar
@@ -1454,6 +1721,14 @@ class NeuronMuscle:
         self.erev = erev
 
     def export(self, outfile, level, namespace, name_, pretty_print=True, **kwargs_):
+        """将 NeuronMuscle 以 NeuroML XML 格式写入输出流。
+
+        :param outfile: 可写的输出流对象
+        :param level: 缩进层级
+        :param namespace: XML 命名空间（保留）
+        :param name_: XML 元素名（保留）
+        :param pretty_print: 是否美化输出
+        """
         outfile.write(
             "    " * level
             + '<proprio id="%s" conductance="%s" ar="%s" ad="%s" beta="%s" cath="%s" erev="%s"/>\n'
@@ -1471,6 +1746,14 @@ class NeuronMuscle:
 
 class MuscleConcentrationModel:
     def __init__(self, id, ion, resting_conc, decay_constant, rho):
+        """初始化肌肉钙浓度模型（简化版），包含衰减时间、转换系数等参数。
+
+        :param id: 浓度模型唯一 ID
+        :param ion: 离子种类（通常为 ``"ca"``）
+        :param resting_conc: 静息浓度
+        :param decay_constant: 浓度衰减的时间常数
+        :param rho: 电流到浓度的转换系数
+        """
         self.id = id
         self.ion = ion
         self.resting_conc = resting_conc
@@ -1478,6 +1761,14 @@ class MuscleConcentrationModel:
         self.rho = rho
 
     def export(self, outfile, level, namespace, name_, pretty_print=True, **kwargs_):
+        """将 MuscleConcentrationModel 以 NeuroML XML 格式写入输出流。
+
+        :param outfile: 可写的输出流对象
+        :param level: 缩进层级
+        :param namespace: XML 命名空间（保留）
+        :param name_: XML 元素名（保留）
+        :param pretty_print: 是否美化输出
+        """
         outfile.write(
             "    " * level
             + '<muscleConcentrationModel id="%s" ion="%s" restingConc="%s" decayConstant="%s" rho="%s" />\n'
@@ -1485,6 +1776,10 @@ class MuscleConcentrationModel:
         )
 
     def __repr__(self):
+        """返回 MuscleConcentrationModel 的字符串表示。
+
+        :return: 包含 ID 的描述字符串
+        """
         return (
             "MuscleConcentrationModel(id=%s, ion=%s, resting_conc=%s, decay_constant=%s, rho=%s)"
             % (self.id, self.ion, self.resting_conc, self.decay_constant, self.rho)
@@ -1507,6 +1802,24 @@ class MuscleConcentrationModel2:
         xSigmoidSlope="",
         xDecay="",
     ):
+        """初始化扩展肌肉钙浓度模型，增加 sigmoid 浓度阈值调制参数。
+
+        相对于 ``MuscleConcentrationModel``，新增 ``xRho``、``iCaSigmoidMid/Slope``、
+        ``xSigmoidMid/Slope``、``xDecay`` 等参数，用于更精细地建模 Ca²⁺ 动力学。
+
+        :param id: 浓度模型唯一 ID
+        :param ion: 离子种类
+        :param resting_conc: 静息浓度
+        :param decay_constant: 主衰减时间常数
+        :param rho: 电流-浓度转换系数
+        :param xRho: 扩展转换系数
+        :param iCaSigmoidMid: 钙电流 sigmoid 中点
+        :param iCaSigmoidSlope: 钙电流 sigmoid 斜率
+        :param xSigmoidMid: 浓度 sigmoid 中点
+        :param xSigmoidSlope: 浓度 sigmoid 斜率
+        :param xDecay: 扩展衰减时间常数
+        :param xrest: 扩展静息浓度
+        """
         self.id = id
         self.ion = ion
         self.resting_conc = resting_conc
@@ -1521,6 +1834,14 @@ class MuscleConcentrationModel2:
         self.xrest = xrest
 
     def export(self, outfile, level, namespace, name_, pretty_print=True, **kwargs_):
+        """将 MuscleConcentrationModel2 以 NeuroML XML 格式写入输出流。
+
+        :param outfile: 可写的输出流对象
+        :param level: 缩进层级
+        :param namespace: XML 命名空间（保留）
+        :param name_: XML 元素名（保留）
+        :param pretty_print: 是否美化输出
+        """
         outfile.write(
             "    " * level
             + '<muscleConcentrationModel2 id="%s" ion="%s" restingConc="%s" decayConstant="%s" rho="%s" xRho="%s" iCaSigmoidMid="%s" iCaSigmoidSlope="%s" xSigmoidMid="%s" xSigmoidSlope="%s" xDecay="%s" xrest="%s" />\n'
@@ -1541,6 +1862,10 @@ class MuscleConcentrationModel2:
         )
 
     def __repr__(self):
+        """返回 MuscleConcentrationModel2 的字符串表示。
+
+        :return: 包含 ID 的描述字符串
+        """
         return (
             "MuscleConcentrationModel2(id=%s, ion=%s, resting_conc=%s, decay_constant=%s, rho=%s, xRho=%s, iCaSigmoidMid=%s, iCaSigmoidSlope=%s xSigmoidMid=%s xSigmoidSlope=%s xDecay=%s xrest=%s)"
             % (
@@ -1562,6 +1887,16 @@ class MuscleConcentrationModel2:
 
 class GradedSynapse2:
     def __init__(self, id, conductance, ar, ad, beta, vth, erev):
+        """初始化双分量模拟突触（C2 特有），支持激活/失活速率门控。
+
+        :param id: 突触唯一标识符
+        :param conductance: 突触电导
+        :param ar: 激活速率
+        :param ad: 失活速率
+        :param beta: 敏感度系数
+        :param vth: 激活阈值电压
+        :param erev: 反转电位
+        """
         self.id = id
         self.conductance = conductance
         self.ar = ar
@@ -1571,6 +1906,14 @@ class GradedSynapse2:
         self.erev = erev
 
     def export(self, outfile, level, namespace, name_, pretty_print=True, **kwargs_):
+        """将 GradedSynapse2 以 NeuroML XML 格式写入输出流。
+
+        :param outfile: 可写的输出流对象
+        :param level: 缩进层级
+        :param namespace: XML 命名空间（保留）
+        :param name_: XML 元素名（保留）
+        :param pretty_print: 是否美化输出
+        """
         outfile.write(
             "    " * level
             + '<gradedSynapse2 id="%s" conductance="%s" ar="%s" ad="%s" beta="%s" vth="%s" erev="%s"/>\n'

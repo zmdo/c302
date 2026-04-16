@@ -1,3 +1,21 @@
+#
+# 类与方法索引：
+#   ParameterisedModel                   (L33)   — ParameterisedModel 类
+#     __init__                           (L34)   — 初始化 Level C0 参数模型，使用简化的 Morris-Lecar 类导电模型和模拟突触
+#     set_default_bioparameters          (L51)   — param_C = ParameterisedModel_C()
+#     create_models                      (L151)  — 按顺序创建所有网络组件模型
+#     create_generic_muscle_cell         (L159)  — 创建 C0 层级的简化导电肌肉细胞，含慢钾通道和简化钙通道
+#     create_generic_neuron_cell         (L258)  — 创建 C0 层级的简化导电神经元细胞，含慢钾通道和简化钙通道
+#     create_neuron_to_neuron_syn        (L354)  — 创建神经元间模拟突触（``GradedSynapse``）和缝隙连接（``GapJunction``）
+#     create_neuron_to_muscle_syn        (L389)  — 创建神经元到肌肉的模拟突触（``GradedSynapse``）和缝隙连接
+#     get_elec_syn                       (L420)  — 根据连接类型获取缝隙连接（``GapJunction``）对象
+#     get_exc_syn                        (L453)  — 根据连接类型获取兴奋性模拟突触（``GradedSynapse``）对象
+#     get_inh_syn                        (L528)  — 根据连接类型获取抑制性模拟突触（``GradedSynapse``）对象
+#     create_n_connection_synapse        (L604)  — C0 层级重载此方法以支持 GradedSynapse2（自定义双模拟突触）的注册
+#     is_analog_conn                     (L625)  — C0 层级重载此方法以同时识别 ``GradedSynapse2`` 为模拟连接
+#   GradedSynapse2                       (L636)  — GradedSynapse2 类
+#     __init__                           (L637)  — 初始化自定义双模拟突触（GradedSynapse2），存储突触 ID
+#     export                             (L653)  — 将 GradedSynapse2 以 NeuroML XML 格式写入输出流
 """
 
 Parameters C0:
@@ -32,6 +50,15 @@ from c302.parameters_C import ParameterisedModel as ParameterisedModel_C
 
 class ParameterisedModel(ParameterisedModel_C):
     def __init__(self):
+        """初始化 Level C0 参数模型，使用简化的 Morris-Lecar 类导电模型和模拟突触。
+
+        C0 相对于标准 C 的关键差异：
+        - 无快钾通道（``k_fast``），用简化钙通道（``ca_simple``）替代 Boyle 钙通道
+        - 无钙通道失活门控
+        - 无 Ca²⁺ 浓度依赖
+        - 突触改为模拟型（``GradedSynapse``），传递量连续依赖膜电位，无需动作电位
+        - 适合模拟 C. elegans 中常见的非放电（graded-potential）神经元
+        """
         super(ParameterisedModel, self).__init__()
         self.level = "C0"
         self.custom_component_types_definitions = ["cell_C.xml", "custom_synapses.xml"]
@@ -50,6 +77,7 @@ class ParameterisedModel(ParameterisedModel_C):
         self.add_bioparameter("cell_diameter", "5", "BlindGuess", "0.1")
         self.add_bioparameter("muscle_length", "20", "BlindGuess", "0.1")
 
+        # C0 肌肉和神经元使用各自独立的比膜电容（不共用 C 中的统一值）
         self.add_bioparameter(
             "muscle_specific_capacitance", ".6860 uF_per_cm2", "BlindGuess", "0.1"
         )
@@ -62,6 +90,7 @@ class ParameterisedModel(ParameterisedModel_C):
         self.add_bioparameter("muscle_spike_thresh", "-20 mV", "BlindGuess", "0.1")
         self.add_bioparameter("neuron_spike_thresh", "-20 mV", "BlindGuess", "0.1")
 
+        # 漏通道：C0 神经元漏电导比 C 高，有助于维持非放电状态
         self.add_bioparameter(
             "muscle_leak_cond_density", "0.00105 mS_per_cm2", "BlindGuess", "0.1"
         )
@@ -69,6 +98,7 @@ class ParameterisedModel(ParameterisedModel_C):
             "neuron_leak_cond_density", "0.05 mS_per_cm2", "BlindGuess", "0.1"
         )
 
+        # 慢钾通道（Kv）：C0 只有慢钾通道，无快钾通道（去掉 k_fast）
         self.add_bioparameter(
             "muscle_k_slow_cond_density", "0.3 mS_per_cm2", "BlindGuess", "0.1"
         )
@@ -76,6 +106,7 @@ class ParameterisedModel(ParameterisedModel_C):
             "neuron_k_slow_cond_density", "0.1 mS_per_cm2", "BlindGuess", "0.1"
         )
 
+        # 简化钙通道（ca_simple）：无失活门控，替代 C 中的 Boyle 钙通道
         self.add_bioparameter(
             "muscle_ca_simple_cond_density", "0.25 mS_per_cm2", "BlindGuess", "0.1"
         )
@@ -87,15 +118,18 @@ class ParameterisedModel(ParameterisedModel_C):
         self.add_bioparameter("k_slow_erev", "-80 mV", "BlindGuess", "0.1")
         self.add_bioparameter("ca_simple_erev", "50 mV", "BlindGuess", "0.1")
 
+        # 钙浓度动力学（FixedFactorConcentrationModel）
         self.add_bioparameter("ca_conc_decay_time", "20 ms", "BlindGuess", "0.1")
         self.add_bioparameter(
             "ca_conc_rho", "0.0002 mol_per_m_per_A_per_s", "BlindGuess", "0.1"
         )
 
+        # 全局连接强度功率缩放参数（实验性，0 时禁用）
         self.add_bioparameter(
             "global_connectivity_power_scaling", "0", "BlindGuess", "0.1"
         )
 
+        # GradedSynapse 参数：conductance 电导 / delta 平滑斜率 / Vth 激活阈值
         self.add_bioparameter(
             "neuron_to_neuron_exc_syn_conductance", "5 nS", "BlindGuess", "0.1"
         )
@@ -140,6 +174,7 @@ class ParameterisedModel(ParameterisedModel_C):
         )
 
     def create_models(self):
+        """按顺序创建所有网络组件模型。"""
         self.create_generic_muscle_cell()
         self.create_generic_neuron_cell()
         self.create_offsetcurrent_concentrationmodel()
@@ -147,6 +182,7 @@ class ParameterisedModel(ParameterisedModel_C):
         self.create_neuron_to_muscle_syn()
 
     def create_generic_muscle_cell(self):
+        """创建 C0 层级的简化导电肌肉细胞，含慢钾通道和简化钙通道。"""
         self.generic_muscle_cell = Cell(id="GenericMuscleCell")
 
         morphology = Morphology()
@@ -245,6 +281,7 @@ class ParameterisedModel(ParameterisedModel_C):
         ip.species.append(species)
 
     def create_generic_neuron_cell(self):
+        """创建 C0 层级的简化导电神经元细胞，含慢钾通道和简化钙通道。"""
         self.generic_neuron_cell = Cell(id="GenericNeuronCell")
 
         morphology = Morphology()
@@ -340,6 +377,11 @@ class ParameterisedModel(ParameterisedModel_C):
         ip.species.append(species)
 
     def create_neuron_to_neuron_syn(self):
+        """创建神经元间模拟突触（``GradedSynapse``）和缝隙连接（``GapJunction``）。
+
+        GradedSynapse 的传递量由 Vth 和 delta 参数控制的 sigmoid 函数确定，
+        允许在无放电的条件下传递连续级别的信号。
+        """
         self.neuron_to_neuron_exc_syn = GradedSynapse2(
             id="neuron_to_neuron_exc_syn",
             conductance=self.get_bioparameter(
@@ -370,6 +412,7 @@ class ParameterisedModel(ParameterisedModel_C):
         )
 
     def create_neuron_to_muscle_syn(self):
+        """创建神经元到肌肉的模拟突触（``GradedSynapse``）和缝隙连接。"""
         self.neuron_to_muscle_exc_syn = GradedSynapse2(
             id="neuron_to_muscle_exc_syn",
             conductance=self.get_bioparameter(
@@ -400,6 +443,13 @@ class ParameterisedModel(ParameterisedModel_C):
         )
 
     def get_elec_syn(self, pre_cell, post_cell, type):
+        """根据连接类型获取缝隙连接（``GapJunction``）对象。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串
+        :return: 配置好的 ``GapJunction`` 对象
+        """
         self.found_specific_param = False
         if type == "neuron_to_neuron":
             gbase = self.get_conn_param(
@@ -426,6 +476,13 @@ class ParameterisedModel(ParameterisedModel_C):
         return GapJunction(id=conn_id, conductance=gbase)
 
     def get_exc_syn(self, pre_cell, post_cell, type):
+        """根据连接类型获取兴奋性模拟突触（``GradedSynapse``）对象。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串
+        :return: 配置好的 ``GradedSynapse`` 兴奋性模拟突触对象
+        """
         self.found_specific_param = False
 
         specific_param_template = "%s_to_%s_exc_syn_%s"
@@ -494,6 +551,13 @@ class ParameterisedModel(ParameterisedModel_C):
         )
 
     def get_inh_syn(self, pre_cell, post_cell, type):
+        """根据连接类型获取抑制性模拟突触（``GradedSynapse``）对象。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串
+        :return: 配置好的 ``GradedSynapse`` 抑制性模拟突触对象
+        """
         self.found_specific_param = False
 
         specific_param_template = "%s_to_%s_inh_syn_%s"
@@ -563,6 +627,14 @@ class ParameterisedModel(ParameterisedModel_C):
         )
 
     def create_n_connection_synapse(self, prototype_syn, n, nml_doc, existing_synapses):
+        """C0 层级重载此方法以支持 GradedSynapse2（自定义双模拟突触）的注册。
+
+        :param prototype_syn: 突触原型对象
+        :param n: 连接数（仅用于错误消息）
+        :param nml_doc: NeuroML 文档对象
+        :param existing_synapses: 已注册突触字典
+        :return: 已注册的突触原型对象
+        """
         if prototype_syn.id in existing_synapses:
             return existing_synapses[prototype_syn.id]
 
@@ -576,6 +648,11 @@ class ParameterisedModel(ParameterisedModel_C):
             )
 
     def is_analog_conn(self, syn):
+        """C0 层级重载此方法以同时识别 ``GradedSynapse2`` 为模拟连接。
+
+        :param syn: 突触对象
+        :return: ``True`` 若为 ``GradedSynapse`` 或 ``GradedSynapse2`` 实例
+        """
         return super(ParameterisedModel, self).is_analog_conn(syn) or isinstance(
             syn, GradedSynapse2
         )
@@ -583,6 +660,13 @@ class ParameterisedModel(ParameterisedModel_C):
 
 class GradedSynapse2:
     def __init__(self, id, conductance, ar, ad, beta, vth, erev):
+        """初始化自定义双模拟突触（GradedSynapse2），存储突触 ID。
+
+        ``GradedSynapse2`` 是 C0 层级特有的扩展突触类型，
+        定义于 ``custom_synapses.xml``，允许两个分量叠加。
+
+        :param id: 突触唯一标识符
+        """
         self.id = id
         self.conductance = conductance
         self.ar = ar
@@ -592,6 +676,14 @@ class GradedSynapse2:
         self.erev = erev
 
     def export(self, outfile, level, namespace, name_, pretty_print=True, **kwargs_):
+        """将 GradedSynapse2 以 NeuroML XML 格式写入输出流。
+
+        :param outfile: 可写的输出流对象
+        :param level: 缩进层级
+        :param namespace: XML 命名空间（保留）
+        :param name_: XML 元素名（保留）
+        :param pretty_print: 是否美化输出
+        """
         outfile.write(
             "    " * level
             + '<gradedSynapse2 id="%s" conductance="%s" ar="%s" ad="%s" beta="%s" vth="%s" erev="%s"/>\n'

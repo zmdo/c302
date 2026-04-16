@@ -1,0 +1,87 @@
+- file: project/c302/parameters_C.py
+  functions:
+    - name: ParameterisedModel.__init__
+      docstring: |
+        初始化 Level C 参数模型，使用单室导电模型和 Hodgkin-Huxley 型离子通道。
+
+        Level C 相对于 A/B 的核心改进：
+        - 细胞采用标准 NeuroML ``Cell`` + ``BiophysicalProperties``，含钾、钙、漏三种离子通道
+        - 引入钙离子浓度动力学（``FixedFactorConcentrationModel``）
+        - 突触仍为事件驱动型（``ExpTwoSynapse``），需要细胞发放动作电位才能传递信号
+
+    - name: ParameterisedModel.set_default_bioparameters
+      docstring: |
+        设置 Level C 的默认生物参数，涵盖细胞形态、离子通道密度和突触参数。
+
+        参数分组：
+        - 形态参数：``cell_diameter``（细胞直径）、``muscle_length``（肌肉长度）
+        - 初始条件：``initial_memb_pot``、``specific_capacitance``
+        - 放电阈值：``muscle_spike_thresh``、``neuron_spike_thresh``
+        - 漏通道：``*_leak_cond_density``、``leak_erev``
+        - 慢钾通道（Kv）：``*_k_slow_cond_density``、``k_slow_erev``
+        - 快钾通道（Kv）：``*_k_fast_cond_density``、``k_fast_erev``
+        - 钙通道（Ca Boyle 模型）：``*_ca_boyle_cond_density``、``ca_boyle_erev``
+        - 钙浓度动力学：``ca_conc_decay_time``、``ca_conc_rho``
+        - 化学突触（兴奋性/抑制性）参数
+
+    - name: ParameterisedModel.create_models
+      docstring: |
+        按顺序创建所有网络组件模型。
+
+        调用顺序：通用肌肉细胞、神经元细胞、偏置电流与浓度模型、
+        神经元间突触、神经元到肌肉突触。
+
+    - name: ParameterisedModel.create_generic_muscle_cell
+      docstring: |
+        创建单室导电基础肌肉细胞（``Cell``），包含三类离子通道和钙浓度模型。
+
+        细胞形态为单个球形段，通道密度从生物参数表读取。
+        离子通道实现定义于 ``cell_C.xml`` 自定义组件文件。
+
+    - name: ParameterisedModel.create_generic_neuron_cell
+      docstring: |
+        创建单室导电基础神经元细胞（``Cell``），包含三类离子通道和钙浓度模型。
+
+        与肌肉细胞结构相同，但通道密度参数不同（神经元通道密度通常高于肌肉）。
+
+    - name: ParameterisedModel.create_offsetcurrent_concentrationmodel
+      docstring: |
+        创建偏置电流生成器和固定因子钙浓度模型（``FixedFactorConcentrationModel``）。
+
+        钙浓度模型（``ca_conc_decay_time``、``ca_conc_rho``）控制细胞内 Ca²⁺ 的衰减速率，
+        是钙通道门控和浓度反馈的基础。
+
+    - name: ParameterisedModel.create_neuron_to_neuron_syn
+      docstring: |
+        创建神经元间兴奋性、抑制性化学突触（``ExpTwoSynapse``）和缝隙连接（``GapJunction``）。
+
+    - name: ParameterisedModel.create_neuron_to_muscle_syn
+      docstring: |
+        创建神经元到肌肉的兴奋性、抑制性化学突触和缝隙连接。
+
+    - name: ParameterisedModel.get_elec_syn
+      docstring: |
+        根据连接类型获取缝隙连接（``GapJunction``）对象。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型（``"neuron_to_neuron"``、``"neuron_to_muscle"``、``"muscle_to_muscle"``）
+        :return: 配置好的 ``GapJunction`` 对象
+
+    - name: ParameterisedModel.get_exc_syn
+      docstring: |
+        根据连接类型获取兴奋性双指数事件突触（``ExpTwoSynapse``）对象。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串
+        :return: 配置好的 ``ExpTwoSynapse`` 兴奋性突触对象
+
+    - name: ParameterisedModel.get_inh_syn
+      docstring: |
+        根据连接类型获取抑制性双指数事件突触（``ExpTwoSynapse``）对象。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串
+        :return: 配置好的 ``ExpTwoSynapse`` 抑制性突触对象

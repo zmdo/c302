@@ -1,0 +1,151 @@
+- file: project/c302/parameters_BC1.py
+  functions:
+    - name: ParameterisedModel.__init__
+      docstring: |
+        初始化 Level BC1 参数模型，混合层级：B 级细胞 + C1 级模拟突触。
+
+        BC1 的设计动机：
+        - 保留 B 级简单的 ``IafActivityCell``（带 activity 变量），降低计算复杂度
+        - 但将突触改为 C1 级的 ``GradedSynapse``，允许非放电连续信号传递
+        - 适合需要模拟连续突触但不需要真实离子通道的场景
+
+        评估：长期而言可能不如 C0（简化导电 + 模拟突触）有用，见 ASSESSMENT 注释。
+
+    - name: ParameterisedModel.set_default_bioparameters
+      docstring: |
+        设置 Level BC1 的默认生物参数，同时包含 IaF 细胞参数和 GradedSynapse 参数。
+
+        参数分组：
+        - 肌肉/神经元 IaF 细胞参数（来自 Level B）
+        - 兴奋性模拟突触参数：conductance、delta、Vth、erev、k
+        - 抑制性模拟突触参数
+        - 电突触（缝隙连接）参数
+        - 偏置电流参数（默认幅度为 0）
+
+    - name: ParameterisedModel.create_generic_muscle_cell
+      docstring: |
+        创建带 activity 变量的肌肉细胞（``IafActivityCell``）。
+
+    - name: ParameterisedModel.create_generic_neuron_cell
+      docstring: |
+        创建带 activity 变量的神经元细胞（``IafActivityCell``）。
+
+    - name: ParameterisedModel.create_offset
+      docstring: |
+        创建偏置电流生成器（``PulseGenerator``）。
+
+    - name: ParameterisedModel.create_neuron_to_neuron_syn
+      docstring: |
+        创建神经元间模拟突触（``GradedSynapse``）和缝隙连接（``GapJunction``）。
+
+    - name: ParameterisedModel.create_neuron_to_muscle_syn
+      docstring: |
+        创建神经元到肌肉的模拟突触（``GradedSynapse``）和缝隙连接（``GapJunction``）。
+
+    - name: ParameterisedModel.create_models
+      docstring: |
+        按顺序创建所有网络组件：肌肉细胞、神经元细胞、偏置电流、神经元间突触、
+        神经元到肌肉突触。
+
+- file: project/c302/parameters_W2D.py
+  functions:
+    - name: ParameterisedModel.__init__
+      docstring: |
+        初始化 Level W2D 参数模型，使用 Worm2D 偏置-增益型细胞模型。
+
+        W2D 层级来源于二维虫体运动模型（Worm2D），其细胞模型非常简单：
+        每个神经元只有偏置（bias）和增益（gain）两个参数，
+        突触传递为连续型（``OutputSynapse``）。
+
+        该层级在多个 2D 虫体运动模型中经过测试，参数数量极少，适合探索运动电路架构。
+
+    - name: ParameterisedModel.set_default_bioparameters
+      docstring: |
+        设置 Level W2D 的默认生物参数（参数数量极少）。
+
+        当前参数：
+        - ``initial_memb_pot``：初始膜电位（用于设置初始状态）
+        - ``neuron_to_neuron_elec_syn_gbase``：神经元间电突触电导
+        - ``neuron_to_muscle_elec_syn_gbase``：神经元到肌肉电突触电导
+        - ``muscle_to_muscle_elec_syn_gbase``：肌肉间电突触电导
+        - 偏置电流参数（默认为 0）
+
+    - name: ParameterisedModel.create_models
+      docstring: |
+        按顺序创建所有网络组件：肌肉细胞、神经元细胞、偏置电流、神经元间突触、
+        神经元到肌肉突触、肌肉间突触。
+
+    - name: ParameterisedModel.create_generic_muscle_cell
+      docstring: |
+        创建 W2D 通用肌肉细胞（``CellW2D``）。
+
+    - name: ParameterisedModel.create_generic_neuron_cell
+      docstring: |
+        创建 W2D 通用神经元细胞（``CellW2D``）。
+
+    - name: ParameterisedModel.create_offsetcurrent
+      docstring: |
+        创建偏置电流生成器（``PulseGenerator``）。
+
+    - name: ParameterisedModel.create_neuron_to_neuron_syn
+      docstring: |
+        创建神经元间兴奋性/抑制性输出突触（``OutputSynapse``）和缝隙连接（``GapJunction``）。
+
+        ``OutputSynapse`` 是 W2D 专有的连续型突触，定义于 ``custom_synapses.xml``。
+
+    - name: ParameterisedModel.create_neuron_to_muscle_syn
+      docstring: |
+        创建神经元到肌肉的兴奋性/抑制性输出突触（``OutputSynapse``）和缝隙连接。
+
+    - name: ParameterisedModel.create_muscle_to_muscle_syn
+      docstring: |
+        创建肌肉间缝隙连接（``GapJunction``）。
+
+    - name: ParameterisedModel.get_elec_syn
+      docstring: |
+        根据连接类型获取缝隙连接（``GapJunction``）对象。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串
+        :return: 配置好的 ``GapJunction`` 对象
+
+    - name: ParameterisedModel.get_exc_syn
+      docstring: |
+        返回神经元间兴奋性输出突触（``OutputSynapse``）。
+
+        W2D 不区分连接类型，所有兴奋性突触共用同一对象。
+
+        :param pre_cell: 突触前细胞名称（未使用）
+        :param post_cell: 突触后细胞名称（未使用）
+        :param type: 连接类型字符串（未使用）
+        :return: ``neuron_to_neuron_exc_syn`` 或 ``neuron_to_muscle_exc_syn``
+
+    - name: ParameterisedModel.get_inh_syn
+      docstring: |
+        返回神经元间抑制性输出突触（``OutputSynapse``）。
+
+        W2D 不区分连接类型，所有抑制性突触共用同一对象。
+
+        :param pre_cell: 突触前细胞名称（未使用）
+        :param post_cell: 突触后细胞名称（未使用）
+        :param type: 连接类型字符串（未使用）
+        :return: ``neuron_to_neuron_inh_syn`` 或 ``neuron_to_muscle_inh_syn``
+
+    - name: CellW2D.__init__
+      docstring: |
+        初始化 W2D 神经元/肌肉细胞，存储 ID。
+
+        ``CellW2D`` 对应自定义 LEMS 组件类型 ``cellW2D``，
+        其核心参数为偏置（bias）和增益（gain），定义于 ``cell_W2D.xml``。
+
+        :param id: 细胞唯一标识符（如 ``"GenericNeuronCell"``）
+
+    - name: OutputSynapse.__init__
+      docstring: |
+        初始化 W2D 输出突触，存储 ID。
+
+        ``OutputSynapse`` 将突触前细胞的输出（activity）直接连续传递给突触后细胞，
+        定义于 ``custom_synapses.xml``。
+
+        :param id: 突触唯一标识符

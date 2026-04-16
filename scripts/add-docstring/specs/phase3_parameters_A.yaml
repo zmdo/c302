@@ -1,0 +1,85 @@
+- file: project/c302/parameters_A.py
+  functions:
+    - name: ParameterisedModel.__init__
+      docstring: |
+        初始化 Level A 参数模型，设置层级标识并调用默认参数初始化。
+
+        Level A 使用 ``IafCell`` 积分放电神经元和双指数事件突触，
+        是 c302 框架中最简单的参数层级，适合快速验证连接组结构，
+        但不具有 C. elegans 神经元的生物真实性。
+
+    - name: ParameterisedModel.set_default_bioparameters
+      docstring: |
+        设置 Level A 的全套默认生物参数。
+
+        参数分为以下几组：
+        - 神经元 / 肌肉 IaF 细胞参数（leakReversal、reset、thresh、C、conductance）
+        - 兴奋性化学突触参数（gbase、erev、rise、decay）
+        - 抑制性化学突触参数（gbase、erev、rise、decay）
+        - 电突触参数（用事件突触模拟，默认电导为 0）
+        - 非生理偏置电流参数（用于调试，默认幅度为 0）
+
+        所有参数 source 标为 ``"BlindGuess"``，certainty 为 ``"0.1"``，
+        表明这些值是初步估计值，需要进一步根据实验数据调整。
+
+    - name: ParameterisedModel.create_generic_muscle_cell
+      docstring: |
+        创建通用肌肉细胞模型（``IafCell``），从生物参数表读取各项膜特性。
+
+    - name: ParameterisedModel.create_generic_neuron_cell
+      docstring: |
+        创建通用神经元细胞模型（``IafCell``），从生物参数表读取各项膜特性。
+
+    - name: ParameterisedModel.create_offset
+      docstring: |
+        创建偏置电流生成器（``PulseGenerator``），用于向特定细胞注入固定幅度的偏置电流。
+
+        偏置电流参数（``unphysiological_offset_current``）在默认状态下幅度为 0，
+        可在测试脚本中手动覆盖以触发特定细胞的放电。
+
+    - name: ParameterisedModel.create_neuron_to_neuron_syn
+      docstring: |
+        创建神经元间兴奋性、抑制性和电突触（事件驱动 ``ExpTwoSynapse``）。
+
+        Level A 中的"电突触"实际上是兴奋性事件突触（gbase 默认为 0），
+        不是真正的缝隙连接，仅作占位用途。
+
+    - name: ParameterisedModel.create_neuron_to_muscle_syn
+      docstring: |
+        创建神经元到肌肉的兴奋性、抑制性和电突触（事件驱动 ``ExpTwoSynapse``）。
+
+    - name: ParameterisedModel.create_models
+      docstring: |
+        按顺序创建所有细胞和突触模型，供网络生成主循环调用。
+
+        调用顺序：创建肌肉细胞、神经元细胞、偏置电流、神经元到肌肉突触、神经元到神经元突触。
+
+    - name: ParameterisedModel.get_elec_syn
+      docstring: |
+        根据连接类型获取电突触对象（Level A 中为 ``ExpTwoSynapse`` 模拟）。
+
+        支持 ``"neuron_to_neuron"``、``"neuron_to_muscle"``、``"muscle_to_muscle"`` 三种类型。
+        若存在针对特定细胞对的精确参数覆盖，突触 ID 将使用 ``pre_to_post_elec_syn`` 格式。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串
+        :return: 配置好的 ``ExpTwoSynapse`` 对象
+
+    - name: ParameterisedModel.get_exc_syn
+      docstring: |
+        根据连接类型获取兴奋性化学突触对象（``ExpTwoSynapse``）。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串（``"neuron_to_neuron"`` 或 ``"neuron_to_muscle"``）
+        :return: 配置好的 ``ExpTwoSynapse`` 兴奋性突触对象
+
+    - name: ParameterisedModel.get_inh_syn
+      docstring: |
+        根据连接类型获取抑制性化学突触对象（``ExpTwoSynapse``）。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串（``"neuron_to_neuron"`` 或 ``"neuron_to_muscle"``）
+        :return: 配置好的 ``ExpTwoSynapse`` 抑制性突触对象

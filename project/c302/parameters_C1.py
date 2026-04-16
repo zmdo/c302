@@ -1,3 +1,13 @@
+#
+# 类与方法索引：
+#   ParameterisedModel                   (L19)   — ParameterisedModel 类
+#     __init__                           (L20)   — 初始化 Level C1 参数模型，使用 HH 型导电细胞和模拟突触（GradedSynapse）
+#     set_default_bioparameters          (L34)   — 设置 Level C1 的默认生物参数，从 C 继承细胞参数，替换突触参数为模拟型
+#     create_neuron_to_neuron_syn        (L77)   — 创建神经元间模拟突触（``GradedSynapse``）和缝隙连接（``GapJunction``）
+#     create_neuron_to_muscle_syn        (L106)  — 创建神经元到肌肉的模拟突触（``GradedSynapse``）和缝隙连接
+#     get_elec_syn                       (L135)  — 根据连接类型获取缝隙连接（``GapJunction``）对象
+#     get_exc_syn                        (L168)  — 根据连接类型获取兴奋性模拟突触（``GradedSynapse``）对象
+#     get_inh_syn                        (L232)  — 根据连接类型获取抑制性模拟突触（``GradedSynapse``）对象
 """
 
 Parameters C1:
@@ -18,6 +28,12 @@ from c302.parameters_C import ParameterisedModel as ParameterisedModel_C
 
 class ParameterisedModel(ParameterisedModel_C):
     def __init__(self):
+        """初始化 Level C1 参数模型，使用 HH 型导电细胞和模拟突触（GradedSynapse）。
+
+        C1 相对于 C 的关键差异：突触从事件驱动（``ExpTwoSynapse``）改为模拟型（``GradedSynapse``），
+        允许非放电神经元传递连续信号；细胞模型保留完整的 HH 通道（与 C 相同）。
+        这是 C0（简化细胞）和 C（事件突触）之间的混合方案。
+        """
         super(ParameterisedModel, self).__init__()
         self.level = "C1"
         self.custom_component_types_definitions = "cell_C.xml"
@@ -26,12 +42,19 @@ class ParameterisedModel(ParameterisedModel_C):
         self.print_("Set default parameters for %s" % self.level)
 
     def set_default_bioparameters(self):
+        """设置 Level C1 的默认生物参数，从 C 继承细胞参数，替换突触参数为模拟型。
+
+        继承 C 的所有非突触参数，新增 ``GradedSynapse`` 参数组：
+        ``conductance``、``delta``、``Vth``、``erev``、``k``。
+        """
         param_C = ParameterisedModel_C()
         param_C.set_default_bioparameters()
+        # C1 保留 C 的所有细胞（离子通道）参数，仅丢弃突触参数（由下方模拟突触替代）
         for b in param_C.bioparameters:
             if "syn" not in b.name:
                 self.add_bioparameter_obj(b)
 
+        # GradedSynapse 兴奋性参数：conductance 峰值电导，delta 斜率，Vth 激活阈值，erev 反转电位
         self.add_bioparameter(
             "neuron_to_neuron_exc_syn_conductance", "0.09 nS", "BlindGuess", "0.1"
         )
@@ -44,6 +67,7 @@ class ParameterisedModel(ParameterisedModel_C):
         self.add_bioparameter("exc_syn_erev", "0 mV", "BlindGuess", "0.1")
         self.add_bioparameter("exc_syn_k", "0.025per_ms", "BlindGuess", "0.1")
 
+        # GradedSynapse 抑制性参数：erev 为负值（-70 mV）以产生超极化效果
         self.add_bioparameter(
             "neuron_to_neuron_inh_syn_conductance", "0.09 nS", "BlindGuess", "0.1"
         )
@@ -56,6 +80,7 @@ class ParameterisedModel(ParameterisedModel_C):
         self.add_bioparameter("inh_syn_erev", "-70 mV", "BlindGuess", "0.1")
         self.add_bioparameter("inh_syn_k", "0.025per_ms", "BlindGuess", "0.1")
 
+        # 缝隙连接：与 C 相比电导值不变（GapJunction，双向电流）
         self.add_bioparameter(
             "neuron_to_neuron_elec_syn_gbase", "0.00052 nS", "BlindGuess", "0.1"
         )
@@ -64,6 +89,7 @@ class ParameterisedModel(ParameterisedModel_C):
         )
 
     def create_neuron_to_neuron_syn(self):
+        """创建神经元间模拟突触（``GradedSynapse``）和缝隙连接（``GapJunction``）。"""
         self.neuron_to_neuron_exc_syn = GradedSynapse(
             id="neuron_to_neuron_exc_syn",
             conductance=self.get_bioparameter(
@@ -92,6 +118,7 @@ class ParameterisedModel(ParameterisedModel_C):
         )
 
     def create_neuron_to_muscle_syn(self):
+        """创建神经元到肌肉的模拟突触（``GradedSynapse``）和缝隙连接。"""
         self.neuron_to_muscle_exc_syn = GradedSynapse(
             id="neuron_to_muscle_exc_syn",
             conductance=self.get_bioparameter(
@@ -120,6 +147,13 @@ class ParameterisedModel(ParameterisedModel_C):
         )
 
     def get_elec_syn(self, pre_cell, post_cell, type):
+        """根据连接类型获取缝隙连接（``GapJunction``）对象。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串
+        :return: 配置好的 ``GapJunction`` 对象
+        """
         self.found_specific_param = False
         if type == "neuron_to_neuron":
             gbase = self.get_conn_param(
@@ -146,6 +180,13 @@ class ParameterisedModel(ParameterisedModel_C):
         return GapJunction(id=conn_id, conductance=gbase)
 
     def get_exc_syn(self, pre_cell, post_cell, type):
+        """根据连接类型获取兴奋性模拟突触（``GradedSynapse``）对象。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串
+        :return: 配置好的 ``GradedSynapse`` 兴奋性突触对象
+        """
         self.found_specific_param = False
 
         specific_param_template = "%s_to_%s_exc_syn_%s"
@@ -203,6 +244,13 @@ class ParameterisedModel(ParameterisedModel_C):
         )
 
     def get_inh_syn(self, pre_cell, post_cell, type):
+        """根据连接类型获取抑制性模拟突触（``GradedSynapse``）对象。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串
+        :return: 配置好的 ``GradedSynapse`` 抑制性突触对象
+        """
         self.found_specific_param = False
 
         specific_param_template = "%s_to_%s_inh_syn_%s"

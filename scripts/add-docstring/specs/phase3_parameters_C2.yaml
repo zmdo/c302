@@ -1,0 +1,366 @@
+- file: project/c302/parameters_C2.py
+  functions:
+    - name: ParameterisedModel.__init__
+      docstring: |
+        初始化 Level C2 参数模型，还在开发中（under development）。
+
+        C2 在 C 基础上增加模拟突触，并引入延迟缝隙连接和本体感觉反馈连接，
+        用于探索具有时序传播特性的运动回路。
+        C2 可能会与 C 合并或升级为 D 变体，尚未稳定。
+
+        自定义组件文件：``cell_C.xml``、``custom_muscle_components.xml``、``custom_synapses.xml``。
+
+    - name: ParameterisedModel.set_default_bioparameters
+      docstring: |
+        设置 Level C2 的默认生物参数（仍在调整中）。
+
+        参数分组（在标准 C 基础上的变化）：
+        - 肌肉/神经元分别使用独立的``initial_memb_pot``和``specific_capacitance``
+        - 肌肉和神经元分别拥有独立的漏电流反转电位（``muscle_leak_erev``）
+        - 肌肉和神经元的慢钾/快钾/钙通道分别拥有独立密度和反转电位
+        - 突触改为模拟型（``GradedSynapse``）且肌肉/神经元使用不同参数
+        - 新增延迟电突触参数（``neuron_to_motor_delayed_elec_syn_*``）
+        - 新增肌肉钙浓度参数（``ca_conc_*_muscle``）
+
+        大量注释掉的参数对应正在探索中的特定细胞对连接覆盖方案。
+
+    - name: ParameterisedModel.create_models
+      docstring: |
+        按顺序创建所有网络组件：偏置电流和浓度模型、肌肉细胞、神经元细胞、
+        神经元间突触、神经元到肌肉突触、肌肉到肌肉突触。
+
+    - name: ParameterisedModel.create_generic_muscle_cell
+      docstring: |
+        创建 C2 层级的肌肉细胞（``Cell``），含独立的膜参数（容抗、阈值、漏/慢钾/快钾/钙通道）。
+
+        与 C 级肌肉细胞相比，C2 使用肌肉专用的慢钾（``k_slow_muscle``）、
+        快钾（``k_fast_muscle``）和钙（``ca_boyle_muscle``）通道变体，
+        以及独立的钙池（``CaPoolMuscle``）。
+
+    - name: ParameterisedModel.create_neuron_to_neuron_syn
+      docstring: |
+        创建神经元间突触：兴奋性模拟突触、抑制性模拟突触、标准缝隙连接和延迟缝隙连接。
+
+        C2 新增了 ``DelayedGapJunction``（``neuron_to_motor_delayed_elec_syn``），
+        其传递量由 sigmoid 函数调制，引入了类时序传播的特性。
+
+    - name: ParameterisedModel.create_offsetcurrent_concentrationmodel
+      docstring: |
+        创建偏置电流和神经元/肌肉独立的钙浓度模型。
+
+        C2 为神经元和肌肉分别创建钙浓度模型（``CaPool`` 和 ``CaPoolMuscle``），
+        若存在 ``ca_conc_xRho_muscle`` 参数则使用扩展的 ``MuscleConcentrationModel2``，
+        否则使用标准 ``FixedFactorConcentrationModel``。
+
+    - name: ParameterisedModel.create_neuron_to_muscle_syn
+      docstring: |
+        创建神经元到肌肉的模拟突触（兴奋性/抑制性）和缝隙连接。
+
+    - name: ParameterisedModel.create_muscle_to_muscle_syn
+      docstring: |
+        创建肌肉到肌肉的缝隙连接（``GapJunction``）。
+
+    - name: ParameterisedModel.get_elec_syn
+      docstring: |
+        根据连接类型和参数覆盖获取电突触对象，支持多种特殊缝隙连接变体。
+
+        优先级：
+        1. 若存在 ``sigma`` 和 ``mu`` 但无 ``p_gbase``：返回 ``DelayedGapJunction``（时序调制）
+        2. 若存在 ``p_gbase`` 和 ``sigma``：
+           - 进一步存在 ``ar``/``ad``：返回 ``ProprioGapJunction2``（本体感觉反馈）
+           - 否则返回 ``ProprioGapJunction``
+        3. 默认返回标准 ``GapJunction``
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串
+        :return: 对应的缝隙连接对象
+
+    - name: ParameterisedModel.get_exc_syn
+      docstring: |
+        根据连接类型和参数覆盖获取兴奋性突触对象，支持多种模拟突触变体。
+
+        优先级：
+        1. 若存在 ``cath``：返回 ``NeuronMuscle``（肌肉本体感觉反馈类突触）
+        2. 若存在 ``ar``/``ad``/``beta``：返回 ``GradedSynapse2``（双分量模拟突触）
+        3. 默认返回标准 ``GradedSynapse``
+
+        支持 ``"neuron_to_neuron"``、``"neuron_to_muscle"``、``"muscle_to_neuron"`` 三种连接类型。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串
+        :return: 对应的突触对象
+
+    - name: ParameterisedModel.get_inh_syn
+      docstring: |
+        根据连接类型获取抑制性模拟突触（``GradedSynapse``）对象。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串
+        :return: 配置好的 ``GradedSynapse`` 抑制性突触对象
+
+    - name: ParameterisedModel.create_n_connection_synapse
+      docstring: |
+        C2 层级重载此方法以支持 ``DelayedGapJunction``、``ProprioGapJunction``、
+        ``NeuronMuscle``、``GradedSynapse2`` 等 C2 特有突触类型的注册。
+
+        :param prototype_syn: 突触原型对象
+        :param n: 连接数（仅用于错误消息）
+        :param nml_doc: NeuroML 文档对象
+        :param existing_synapses: 已注册突触字典
+        :return: 已注册的突触原型对象
+
+    - name: ParameterisedModel.is_elec_conn
+      docstring: |
+        C2 层级扩展电突触判断，将 ``DelayedGapJunction``、``ProprioGapJunction``、
+        ``ProprioGapJunction2`` 也视为电突触。
+
+        :param syn: 突触对象
+        :return: ``True`` 若为任何 C2 支持的电突触类型
+
+    - name: ParameterisedModel.is_analog_conn
+      docstring: |
+        C2 层级扩展模拟突触判断，将 ``NeuronMuscle``、``GradedSynapse2`` 也视为模拟连接。
+
+        :param syn: 突触对象
+        :return: ``True`` 若为任何 C2 支持的模拟突触类型
+
+    - name: SwitchedGapJunction.__init__
+      docstring: |
+        初始化开关型缝隙连接（C2 自定义，由开关参数控制导通），存储 ID。
+
+        :param id: 突触唯一标识符
+
+    - name: SwitchedGapJunction.export
+      docstring: |
+        将 SwitchedGapJunction 以 NeuroML XML 格式写入输出流。
+
+        :param outfile: 可写的输出流对象
+        :param level: 缩进层级
+        :param namespace: XML 命名空间（保留）
+        :param name_: XML 元素名（保留）
+        :param pretty_print: 是否美化输出
+
+    - name: DelayedGapJunction.__init__
+      docstring: |
+        初始化延迟调制缝隙连接，其传递量由 sigmoid 函数在时间轴上调制。
+
+        ``sigma`` 和 ``mu`` 参数控制 sigmoid 曲线的陡峭度和中点，
+        用于模拟运动神经元的时序传播特性。
+
+        :param id: 突触唯一标识符
+        :param conductance: 基础电导
+        :param weight: 权重系数
+        :param sigma: sigmoid 斜率
+        :param mu: sigmoid 中点值（时间/电压）
+
+    - name: DelayedGapJunction.export
+      docstring: |
+        将 DelayedGapJunction 以 NeuroML XML 格式写入输出流。
+
+        :param outfile: 可写的输出流对象
+        :param level: 缩进层级
+        :param namespace: XML 命名空间（保留）
+        :param name_: XML 元素名（保留）
+        :param pretty_print: 是否美化输出
+
+    - name: DelayedGapJunction.__repr__
+      docstring: |
+        返回 DelayedGapJunction 的字符串表示。
+
+        :return: 包含 ID 和关键参数的描述字符串
+
+    - name: ProprioGapJunction.__init__
+      docstring: |
+        初始化本体感觉调制缝隙连接，传递量由本体感觉电导（p_conductance）叠加基础电导。
+
+        :param id: 突触唯一标识符
+        :param conductance: 固定基础电导
+        :param p_conductance: 本体感觉分量电导
+        :param sigma: sigmoid 调制斜率
+        :param mu: sigmoid 调制中点
+
+    - name: ProprioGapJunction.export
+      docstring: |
+        将 ProprioGapJunction 以 NeuroML XML 格式写入输出流。
+
+        :param outfile: 可写的输出流对象
+        :param level: 缩进层级
+        :param namespace: XML 命名空间（保留）
+        :param name_: XML 元素名（保留）
+        :param pretty_print: 是否美化输出
+
+    - name: ProprioGapJunction.__repr__
+      docstring: |
+        返回 ProprioGapJunction 的字符串表示。
+
+        :return: 包含 ID 和关键参数的描述字符串
+
+    - name: ProprioGapJunction2.__init__
+      docstring: |
+        初始化增强型本体感觉缝隙连接，支持时间门控（ar/ad/beta）和电压门控（vth）参数。
+
+        :param id: 突触唯一标识符
+        :param conductance: 固定基础电导
+        :param p_conductance: 本体感觉分量电导
+        :param ar: 激活速率（activation rate）
+        :param ad: 失活速率（deactivation rate）
+        :param beta: 门控敏感度系数
+        :param vth: 门控阈值电压
+        :param erev: 反转电位
+        :param sigma: sigmoid 调制斜率
+        :param mu: sigmoid 调制中点
+
+    - name: ProprioGapJunction2.export
+      docstring: |
+        将 ProprioGapJunction2 以 NeuroML XML 格式写入输出流。
+
+        :param outfile: 可写的输出流对象
+        :param level: 缩进层级
+        :param namespace: XML 命名空间（保留）
+        :param name_: XML 元素名（保留）
+        :param pretty_print: 是否美化输出
+
+    - name: ProprioGapJunction2.__repr__
+      docstring: |
+        返回 ProprioGapJunction2 的字符串表示。
+
+        :return: 包含 ID 和关键参数的描述字符串
+
+    - name: DelayedGradedSynapse.__init__
+      docstring: |
+        初始化延迟型模拟突触，在标准 GradedSynapse 参数基础上增加时间调制参数。
+
+        :param id: 突触唯一标识符
+        :param conductance: 突触电导
+        :param ar: 激活速率
+        :param ad: 失活速率
+        :param beta: 激活曲线敏感度
+        :param vth: 激活阈值电压
+        :param erev: 反转电位
+
+    - name: DelayedGradedSynapse.export
+      docstring: |
+        将 DelayedGradedSynapse 以 NeuroML XML 格式写入输出流。
+
+        :param outfile: 可写的输出流对象
+        :param level: 缩进层级
+        :param namespace: XML 命名空间（保留）
+        :param name_: XML 元素名（保留）
+        :param pretty_print: 是否美化输出
+
+    - name: DelayedGradedSynapse.__repr__
+      docstring: |
+        返回 DelayedGradedSynapse 的字符串表示。
+
+        :return: 包含 ID 和关键参数的描述字符串
+
+    - name: NeuronMuscle.__init__
+      docstring: |
+        初始化肌肉本体感觉反馈类突触，包含激活/失活速率和阈值等参数。
+
+        ``NeuronMuscle`` 用于模拟肌肉向神经元的反向信号传递（本体感觉）。
+
+        :param id: 突触唯一标识符
+        :param conductance: 突触电导
+        :param ar: 激活速率
+        :param ad: 失活速率
+        :param beta: 激活敏感度系数
+        :param cath: 钙离子阈值浓度
+        :param erev: 反转电位
+
+    - name: NeuronMuscle.export
+      docstring: |
+        将 NeuronMuscle 以 NeuroML XML 格式写入输出流。
+
+        :param outfile: 可写的输出流对象
+        :param level: 缩进层级
+        :param namespace: XML 命名空间（保留）
+        :param name_: XML 元素名（保留）
+        :param pretty_print: 是否美化输出
+
+    - name: MuscleConcentrationModel.__init__
+      docstring: |
+        初始化肌肉钙浓度模型（简化版），包含衰减时间、转换系数等参数。
+
+        :param id: 浓度模型唯一 ID
+        :param ion: 离子种类（通常为 ``"ca"``）
+        :param resting_conc: 静息浓度
+        :param decay_constant: 浓度衰减的时间常数
+        :param rho: 电流到浓度的转换系数
+
+    - name: MuscleConcentrationModel.export
+      docstring: |
+        将 MuscleConcentrationModel 以 NeuroML XML 格式写入输出流。
+
+        :param outfile: 可写的输出流对象
+        :param level: 缩进层级
+        :param namespace: XML 命名空间（保留）
+        :param name_: XML 元素名（保留）
+        :param pretty_print: 是否美化输出
+
+    - name: MuscleConcentrationModel.__repr__
+      docstring: |
+        返回 MuscleConcentrationModel 的字符串表示。
+
+        :return: 包含 ID 的描述字符串
+
+    - name: MuscleConcentrationModel2.__init__
+      docstring: |
+        初始化扩展肌肉钙浓度模型，增加 sigmoid 浓度阈值调制参数。
+
+        相对于 ``MuscleConcentrationModel``，新增 ``xRho``、``iCaSigmoidMid/Slope``、
+        ``xSigmoidMid/Slope``、``xDecay`` 等参数，用于更精细地建模 Ca²⁺ 动力学。
+
+        :param id: 浓度模型唯一 ID
+        :param ion: 离子种类
+        :param resting_conc: 静息浓度
+        :param decay_constant: 主衰减时间常数
+        :param rho: 电流-浓度转换系数
+        :param xRho: 扩展转换系数
+        :param iCaSigmoidMid: 钙电流 sigmoid 中点
+        :param iCaSigmoidSlope: 钙电流 sigmoid 斜率
+        :param xSigmoidMid: 浓度 sigmoid 中点
+        :param xSigmoidSlope: 浓度 sigmoid 斜率
+        :param xDecay: 扩展衰减时间常数
+        :param xrest: 扩展静息浓度
+
+    - name: MuscleConcentrationModel2.export
+      docstring: |
+        将 MuscleConcentrationModel2 以 NeuroML XML 格式写入输出流。
+
+        :param outfile: 可写的输出流对象
+        :param level: 缩进层级
+        :param namespace: XML 命名空间（保留）
+        :param name_: XML 元素名（保留）
+        :param pretty_print: 是否美化输出
+
+    - name: MuscleConcentrationModel2.__repr__
+      docstring: |
+        返回 MuscleConcentrationModel2 的字符串表示。
+
+        :return: 包含 ID 的描述字符串
+
+    - name: GradedSynapse2.__init__
+      docstring: |
+        初始化双分量模拟突触（C2 特有），支持激活/失活速率门控。
+
+        :param id: 突触唯一标识符
+        :param conductance: 突触电导
+        :param ar: 激活速率
+        :param ad: 失活速率
+        :param beta: 敏感度系数
+        :param vth: 激活阈值电压
+        :param erev: 反转电位
+
+    - name: GradedSynapse2.export
+      docstring: |
+        将 GradedSynapse2 以 NeuroML XML 格式写入输出流。
+
+        :param outfile: 可写的输出流对象
+        :param level: 缩进层级
+        :param namespace: XML 命名空间（保留）
+        :param name_: XML 元素名（保留）
+        :param pretty_print: 是否美化输出

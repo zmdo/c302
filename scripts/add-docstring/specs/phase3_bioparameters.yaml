@@ -1,0 +1,244 @@
+- file: project/c302/bioparameters.py
+  functions:
+    - name: split_neuroml_quantity
+      docstring: |
+        将 NeuroML 数量字符串分解为数值与单位两部分。
+
+        例如 ``"0.01 nS"`` → ``(0.01, "nS")``，``"-50mV"`` → ``(-50.0, "mV")``。
+        通过从右到左逐字符截断尝试将前缀解析为 float 来定位分界点。
+
+        :param quantity: NeuroML 格式的数量字符串，如 ``"3 ms"``、``"1 uF_per_cm2"``
+        :return: ``(magnitude, unit)`` 元组；magnitude 为 float，unit 为单位字符串
+
+    - name: BioParameter.__init__
+      docstring: |
+        初始化生物参数对象，存储名称、数值字符串、来源及确定性信息。
+
+        :param name: 参数名称，如 ``"neuron_iaf_thresh"``
+        :param value: 参数值字符串，含单位，如 ``"-30mV"``
+        :param source: 数据来源标识，如 ``"BlindGuess"``、``"Experimental"``
+        :param certainty: 确定性等级，0（完全未知）到 1（完全确定），通常为字符串 ``"0.1"``
+
+    - name: BioParameter.__str__
+      docstring: |
+        返回参数的人类可读字符串表示，包含名称、值、来源和确定性。
+
+        :return: 格式为 ``"BioParameter: name = value (SRC: source, certainty N)"`` 的字符串
+
+    - name: BioParameter.__repr__
+      docstring: |
+        返回与 ``__str__`` 相同的调试表示，便于在容器中查看。
+
+        :return: 与 ``__str__`` 相同的字符串
+
+    - name: BioParameter.change_magnitude
+      docstring: |
+        更新参数的数值部分，保留原有单位不变。
+
+        先将 magnitude 转换为 ``Decimal`` 以保留精度，再拼接原始单位字符串。
+
+        :param magnitude: 新的数值（float 或数字字符串）
+
+    - name: BioParameter.x
+      docstring: |
+        以 float 形式返回参数的数值（去除单位）。
+
+        :return: 参数数值的浮点表示
+
+    - name: ParameterisedModelPrototype.__init__
+      docstring: |
+        初始化参数化模型原型，创建空的生物参数列表。
+
+    - name: ParameterisedModelPrototype.print_
+      docstring: |
+        带 ``c302`` 前缀的调试输出，用于区分 c302 框架自身的日志信息。
+
+        :param msg: 要输出的消息字符串，支持多行（每行均加前缀）
+
+    - name: ParameterisedModelPrototype.add_bioparameter
+      docstring: |
+        注册或更新一个生物参数。
+
+        若同名参数已存在，则就地更新其值、来源和确定性；
+        若不存在，则创建新的 ``BioParameter`` 对象并追加到列表末尾。
+
+        :param name: 参数名称
+        :param value: 参数值字符串（含单位）
+        :param source: 数据来源标识
+        :param certainty: 确定性等级字符串
+
+    - name: ParameterisedModelPrototype.add_bioparameter_obj
+      docstring: |
+        直接注册 ``BioParameter`` 对象，若同名已存在则先移除旧对象。
+
+        与 ``add_bioparameter`` 的区别在于直接接受对象，适合复制另一模型的参数。
+
+        :param bioparameter: 要注册的 ``BioParameter`` 实例
+
+    - name: ParameterisedModelPrototype.get_bioparameter
+      docstring: |
+        按名称查找生物参数，返回第一个匹配项。
+
+        :param name: 要查找的参数名称
+        :param warn_if_missing: 为 ``True`` 时若未找到则打印警告信息
+        :return: 找到的 ``BioParameter`` 对象；未找到时返回 ``None``
+
+    - name: ParameterisedModelPrototype.set_bioparameter
+      docstring: |
+        更新已有生物参数的值、来源和确定性，若参数不存在则静默忽略。
+
+        :param name: 参数名称
+        :param value: 新的参数值字符串
+        :param source: 新的数据来源
+        :param certainty: 新的确定性等级
+
+    - name: ParameterisedModelPrototype.bioparameter_info
+      docstring: |
+        返回所有已注册生物参数的格式化摘要字符串，按名称字典序排列。
+
+        :param indent: 每行的缩进字符串，默认为空字符串
+        :return: 包含全部参数信息的多行字符串
+
+    - name: NonNeuroMLCustomType.__init__
+      docstring: |
+        初始化非 NeuroML 自定义突触类型，仅存储 ID。
+
+        用于表示无法用标准 NeuroML 元素描述的特殊突触类型（如 W2D 的 OutputSynapse），
+        在 ``create_n_connection_synapse`` 中会特判此类型跳过 NeuroML 文档注册。
+
+        :param id: 自定义类型的唯一标识符
+
+    - name: c302ModelPrototype.__init__
+      docstring: |
+        初始化 c302 网络构建原型，设置各网络组件属性的默认空值。
+
+        各属性将由子类的 ``create_models()`` 方法填充：
+        ``generic_neuron_cell``、``generic_muscle_cell`` 为细胞模型；
+        ``exc_syn``、``inh_syn``、``elec_syn`` 为三类突触；
+        ``offset_current`` 为偏置电流生成器。
+
+    - name: c302ModelPrototype.is_level_A
+      docstring: |
+        判断当前参数层级是否为 A（积分放电神经元 + 事件突触）。
+
+        Level A 是最简单的层级，适合快速连接组探索但不具生物真实性。
+
+        :return: ``True`` 若 level 以 ``"A"`` 开头
+
+    - name: c302ModelPrototype.is_level_B
+      docstring: |
+        判断当前参数层级是否为 B（带 activity 变量的积分放电 + 真实缝隙连接）。
+
+        Level B 在 A 的基础上引入了 activity 状态变量和真实 GapJunction 连接。
+
+        :return: ``True`` 若 level 以 ``"B"`` 开头
+
+    - name: c302ModelPrototype.is_level_C
+      docstring: |
+        判断当前参数层级是否属于 C 系列（单室导电模型 + HH 型离子通道）。
+
+        包含 C、C0、C1、C2 所有变体，用于需要离子通道动力学的场景。
+
+        :return: ``True`` 若 level 以 ``"C"`` 开头
+
+    - name: c302ModelPrototype.is_level_C0
+      docstring: |
+        判断是否为 C0（简化导电模型，无快钾通道，模拟突触，适合非放电神经元）。
+
+        :return: ``True`` 若 level 为精确字符串 ``"C0"``
+
+    - name: c302ModelPrototype.is_level_C2
+      docstring: |
+        判断是否为 C2（含专有缝隙连接类型和本体感觉反馈的高级导电模型）。
+
+        :return: ``True`` 若 level 为精确字符串 ``"C2"``
+
+    - name: c302ModelPrototype.is_level_D1
+      docstring: |
+        判断是否为 D1（多室导电模型 + 模拟突触变体）。
+
+        :return: ``True`` 若 level 为精确字符串 ``"D1"``
+
+    - name: c302ModelPrototype.is_level_D
+      docstring: |
+        判断是否属于 D 系列（多室导电模型，含细胞形态数据）。
+
+        多室模型对细胞内阻抗敏感，存在内阻高低权衡问题，见 GitHub #71。
+
+        :return: ``True`` 若 level 以 ``"D"`` 开头
+
+    - name: c302ModelPrototype.is_level_X
+      docstring: |
+        判断是否为 X 系列（扩展或实验性层级）。
+
+        :return: ``True`` 若 level 以 ``"X"`` 开头
+
+    - name: c302ModelPrototype.get_conn_param
+      docstring: |
+        获取特定细胞对连接的参数值，优先返回精确匹配，否则返回默认模板值。
+
+        查找顺序：先检查形如 ``"ADAL_to_ADAR_elec_syn_gbase"`` 的精确参数；
+        若无精确参数则退回到形如 ``"neuron_to_neuron_elec_syn_gbase"`` 的默认参数。
+
+        :param pre_cell: 突触前细胞名称，如 ``"ADAL"``
+        :param post_cell: 突触后细胞名称，如 ``"ADAR"``
+        :param specific_conn_template: 特定连接格式串，含三个 ``%s`` 占位符（pre, post, param）
+        :param default_conn_template: 默认连接格式串，含一个 ``%s`` 占位符（param）
+        :param param_name: 参数名后缀，如 ``"gbase"``、``"erev"``
+        :return: 参数值字符串；若均未找到则返回 ``None``
+
+    - name: c302ModelPrototype.get_syn
+      docstring: |
+        根据突触极性类型（``pol``）分发到对应的突触获取方法。
+
+        突触 ID 命名规则：``{pre_type}_to_{post_type}_{pol}_syn``，
+        如 ``"neuron_to_neuron_elec_syn"``、``"neuron_to_muscle_exc_syn"``。
+
+        :param pre_cell: 突触前细胞名
+        :param post_cell: 突触后细胞名
+        :param type: 连接类型字符串，如 ``"neuron_to_neuron"``
+        :param pol: 极性，取值 ``"elec"``（电突触）、``"exc"``（兴奋性）、``"inh"``（抑制性）
+        :return: 对应的突触对象（``GapJunction``、``ExpTwoSynapse`` 或 ``GradedSynapse``）
+
+    - name: c302ModelPrototype.create_n_connection_synapse
+      docstring: |
+        获取或注册突触原型对象，确保同一 ID 的突触只添加到文档一次（幂等）。
+
+        当多个细胞对共享相同突触参数时，通过 ``existing_synapses`` 字典缓存原型，
+        避免在 NeuroML 文档中重复注册相同 ID 的突触元素。
+
+        :param prototype_syn: 突触原型对象（``ExpTwoSynapse``、``GapJunction`` 或 ``GradedSynapse``）
+        :param n: 连接数（仅用于错误消息，不影响逻辑）
+        :param nml_doc: NeuroML 文档对象，用于注册新突触
+        :param existing_synapses: 已注册突触的 ID→对象 映射字典（可变，会被修改）
+        :return: 已注册或输入的突触原型对象
+        :raises Exception: 若突触类型不被识别
+
+    - name: c302ModelPrototype.is_nonneuroml_conn
+      docstring: |
+        判断突触是否为非 NeuroML 自定义类型（如 W2D 的 OutputSynapse）。
+
+        非 NeuroML 突触不会被写入 NeuroML 文档，由参数层级自定义处理。
+
+        :param syn: 突触对象
+        :return: ``True`` 若为 ``NonNeuroMLCustomType`` 实例
+
+    - name: c302ModelPrototype.is_analog_conn
+      docstring: |
+        判断突触是否为模拟（连续传递）型突触（GradedSynapse）。
+
+        模拟突触的传递量连续依赖于突触前膜电位，无需动作电位触发，
+        适合非放电神经元（Level C0、C1、BC1）。
+
+        :param syn: 突触对象
+        :return: ``True`` 若为 ``GradedSynapse`` 实例
+
+    - name: c302ModelPrototype.is_elec_conn
+      docstring: |
+        判断突触是否为电突触（缝隙连接，GapJunction）。
+
+        电突触在两细胞间双向传导电流，强度与膜电位差成正比，
+        是 Level B 及以上层级的真实缝隙连接实现。
+
+        :param syn: 突触对象
+        :return: ``True`` 若为 ``GapJunction`` 实例

@@ -1,0 +1,150 @@
+- file: project/c302/parameters_C0.py
+  functions:
+    - name: ParameterisedModel.__init__
+      docstring: |
+        初始化 Level C0 参数模型，使用简化的 Morris-Lecar 类导电模型和模拟突触。
+
+        C0 相对于标准 C 的关键差异：
+        - 无快钾通道（``k_fast``），用简化钙通道（``ca_simple``）替代 Boyle 钙通道
+        - 无钙通道失活门控
+        - 无 Ca²⁺ 浓度依赖
+        - 突触改为模拟型（``GradedSynapse``），传递量连续依赖膜电位，无需动作电位
+        - 适合模拟 C. elegans 中常见的非放电（graded-potential）神经元
+
+    - name: ParameterisedModel.create_models
+      docstring: |
+        按顺序创建所有网络组件模型。
+
+    - name: ParameterisedModel.create_generic_muscle_cell
+      docstring: |
+        创建 C0 层级的简化导电肌肉细胞，含慢钾通道和简化钙通道。
+
+    - name: ParameterisedModel.create_generic_neuron_cell
+      docstring: |
+        创建 C0 层级的简化导电神经元细胞，含慢钾通道和简化钙通道。
+
+    - name: ParameterisedModel.create_neuron_to_neuron_syn
+      docstring: |
+        创建神经元间模拟突触（``GradedSynapse``）和缝隙连接（``GapJunction``）。
+
+        GradedSynapse 的传递量由 Vth 和 delta 参数控制的 sigmoid 函数确定，
+        允许在无放电的条件下传递连续级别的信号。
+
+    - name: ParameterisedModel.create_neuron_to_muscle_syn
+      docstring: |
+        创建神经元到肌肉的模拟突触（``GradedSynapse``）和缝隙连接。
+
+    - name: ParameterisedModel.get_elec_syn
+      docstring: |
+        根据连接类型获取缝隙连接（``GapJunction``）对象。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串
+        :return: 配置好的 ``GapJunction`` 对象
+
+    - name: ParameterisedModel.get_exc_syn
+      docstring: |
+        根据连接类型获取兴奋性模拟突触（``GradedSynapse``）对象。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串
+        :return: 配置好的 ``GradedSynapse`` 兴奋性模拟突触对象
+
+    - name: ParameterisedModel.get_inh_syn
+      docstring: |
+        根据连接类型获取抑制性模拟突触（``GradedSynapse``）对象。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串
+        :return: 配置好的 ``GradedSynapse`` 抑制性模拟突触对象
+
+    - name: ParameterisedModel.create_n_connection_synapse
+      docstring: |
+        C0 层级重载此方法以支持 GradedSynapse2（自定义双模拟突触）的注册。
+
+        :param prototype_syn: 突触原型对象
+        :param n: 连接数（仅用于错误消息）
+        :param nml_doc: NeuroML 文档对象
+        :param existing_synapses: 已注册突触字典
+        :return: 已注册的突触原型对象
+
+    - name: ParameterisedModel.is_analog_conn
+      docstring: |
+        C0 层级重载此方法以同时识别 ``GradedSynapse2`` 为模拟连接。
+
+        :param syn: 突触对象
+        :return: ``True`` 若为 ``GradedSynapse`` 或 ``GradedSynapse2`` 实例
+
+    - name: GradedSynapse2.__init__
+      docstring: |
+        初始化自定义双模拟突触（GradedSynapse2），存储突触 ID。
+
+        ``GradedSynapse2`` 是 C0 层级特有的扩展突触类型，
+        定义于 ``custom_synapses.xml``，允许两个分量叠加。
+
+        :param id: 突触唯一标识符
+
+    - name: GradedSynapse2.export
+      docstring: |
+        将 GradedSynapse2 以 NeuroML XML 格式写入输出流。
+
+        :param outfile: 可写的输出流对象
+        :param level: 缩进层级
+        :param namespace: XML 命名空间（保留）
+        :param name_: XML 元素名（保留）
+        :param pretty_print: 是否美化输出
+
+- file: project/c302/parameters_C1.py
+  functions:
+    - name: ParameterisedModel.__init__
+      docstring: |
+        初始化 Level C1 参数模型，使用 HH 型导电细胞和模拟突触（GradedSynapse）。
+
+        C1 相对于 C 的关键差异：突触从事件驱动（``ExpTwoSynapse``）改为模拟型（``GradedSynapse``），
+        允许非放电神经元传递连续信号；细胞模型保留完整的 HH 通道（与 C 相同）。
+        这是 C0（简化细胞）和 C（事件突触）之间的混合方案。
+
+    - name: ParameterisedModel.set_default_bioparameters
+      docstring: |
+        设置 Level C1 的默认生物参数，从 C 继承细胞参数，替换突触参数为模拟型。
+
+        继承 C 的所有非突触参数，新增 ``GradedSynapse`` 参数组：
+        ``conductance``、``delta``、``Vth``、``erev``、``k``。
+
+    - name: ParameterisedModel.create_neuron_to_neuron_syn
+      docstring: |
+        创建神经元间模拟突触（``GradedSynapse``）和缝隙连接（``GapJunction``）。
+
+    - name: ParameterisedModel.create_neuron_to_muscle_syn
+      docstring: |
+        创建神经元到肌肉的模拟突触（``GradedSynapse``）和缝隙连接。
+
+    - name: ParameterisedModel.get_elec_syn
+      docstring: |
+        根据连接类型获取缝隙连接（``GapJunction``）对象。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串
+        :return: 配置好的 ``GapJunction`` 对象
+
+    - name: ParameterisedModel.get_exc_syn
+      docstring: |
+        根据连接类型获取兴奋性模拟突触（``GradedSynapse``）对象。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串
+        :return: 配置好的 ``GradedSynapse`` 兴奋性突触对象
+
+    - name: ParameterisedModel.get_inh_syn
+      docstring: |
+        根据连接类型获取抑制性模拟突触（``GradedSynapse``）对象。
+
+        :param pre_cell: 突触前细胞名称
+        :param post_cell: 突触后细胞名称
+        :param type: 连接类型字符串
+        :return: 配置好的 ``GradedSynapse`` 抑制性突触对象
