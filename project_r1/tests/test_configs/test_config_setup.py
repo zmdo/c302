@@ -4,7 +4,69 @@
 #   验证注册表机制、所有 16 个配置的注册状态和基本结构。
 #
 # 类与方法索引：
-#   (由 gen_index.py 生成)
+#   _make_mock_params                    (L125)  — 构造模拟的参数对象
+#   mock_params                          (L136)  — 统一 mock 所有配置模块中的 get_parameter_set
+#   TestRegisterConfig                   (L152)  — register_config 装饰器测试
+#     test_decorator_registers_function  (L155)  — 装饰器应将函数注册到全局注册表中
+#     test_decorator_returns_original_function (L167)  — 装饰器应返回原始函数（不包装）
+#     test_duplicate_registration_overwrites (L178)  — 重复注册同名配置应覆盖旧条目
+#   TestGetConfig                        (L193)  — get_config 查找测试
+#     test_get_existing_config           (L196)  — 应能获取已注册的配置函数
+#     test_get_nonexistent_raises_key_error (L206)  — 获取不存在的配置应抛出 KeyError
+#   TestListConfigs                      (L212)  — list_configs 列举测试
+#     test_list_returns_list             (L215)  — 应返回列表类型
+#     test_list_contains_registered_configs (L220)  — 列表应包含所有已注册的配置名称
+#   TestAllConfigsRegistered             (L250)  — 验证全部 16 个配置已注册
+#     test_config_registered             (L254)  — 配置 {name} 应已注册到注册表中
+#     test_total_config_count            (L259)  — 注册表中应恰好包含 16 个配置
+#     test_config_is_callable            (L267)  — 配置 setup 函数应是可调用的
+#   _make_mock_params                    (L275)  — 构造模拟的参数对象
+#   TestSetupReturnStructure             (L285)  — setup() 返回值基本结构测试（不生成文件）
+#     test_setup_returns_five_tuple      (L289)  — setup(generate_flag=False) 应返回 5 元素元组
+#     test_cells_is_list                 (L302)  — 返回的 cells 应是列表类型
+#     test_nml_doc_is_none_without_generate (L313)  — generate_flag=False 时 nml_doc 应为 None
+#   TestIClampConfig                     (L326)  — IClamp 配置特定测试
+#     test_cells_contain_adal            (L329)  — 应包含 ADAL 神经元
+#     test_muscles_include_mdr01         (L334)  — 应包含 MDR01 肌肉
+#     test_default_duration_based_on_stim (L339)  — 默认时长应基于刺激级数 (6*1000=6000ms)
+#   TestIClampMuscleConfig               (L345)  — IClampMuscle 配置特定测试
+#     test_cells_is_empty                (L348)  — 应无神经元（纯肌肉测试）
+#   TestFullConfig                       (L354)  — Full 配置特定测试
+#     test_returns_all_cell_names        (L357)  — 应返回数据读取器提供的全部细胞名称
+#   TestPharyngealConfig                 (L365)  — Pharyngeal 配置特定测试
+#     test_cells_count                   (L368)  — 应包含 20 个咽部神经元
+#   TestOscillatorConfig                 (L374)  — Oscillator 配置特定测试
+#     test_cells_count                   (L377)  — 应包含 14 个振荡器神经元
+#     test_no_muscles                    (L382)  — 不应包含肌肉
+#   TestSocialConfig                     (L388)  — Social 配置特定测试
+#     test_cells_count                   (L391)  — 应包含 7 个社交神经元
+#     test_rmgr_in_cells                 (L396)  — 应包含枢纽神经元 RMGR
+#   TestSynsConfig                       (L402)  — Syns 配置特定测试
+#     test_gap_cells_added_for_non_a     (L405)  — 非 A 层级应添加间隙连接测试细胞
+#   TestMuscleTestConfig                 (L412)  — MuscleTest 配置特定测试
+#     test_no_neurons                    (L415)  — 应无神经元细胞（纯肌肉测试）
+#     test_muscles_included              (L420)  — muscles_to_include 应为 True
+#   TestFWConfig                         (L426)  — FW 配置特定测试
+#     test_contains_avbl                 (L429)  — 应包含 AVBL 命令神经元
+#     test_muscles_included              (L434)  — 应包含所有肌肉
+#   TestTapWithdrawalConfig              (L440)  — TapWithdrawal 配置特定测试
+#     test_contains_touch_sensory        (L443)  — 应包含触觉感觉神经元 PLML
+#     test_no_muscles                    (L448)  — muscles_to_include 应为 False
+#   TestMultiSynsConfig                  (L454)  — MultiSyns 配置特定测试
+#     test_cells_count                   (L457)  — 应包含 6 个神经元
+#   TestTargetMuscleConfig               (L463)  — TargetMuscle 配置特定测试
+#     test_cells_contain_rmhr            (L466)  — 应包含 RMHR 神经元
+#     test_muscles_all_included          (L471)  — 应包含全部肌肉
+#   TestRIAConfig                        (L477)  — RIA 配置特定测试
+#     test_cells_contain_rial            (L480)  — 应包含 RIAL 神经元
+#   TestMusclesConfig                    (L486)  — Muscles 配置特定测试
+#     test_cells_contain_motor_neurons   (L489)  — 应包含运动神经元 DB1
+#     test_stimulate_avbl                (L494)  — 刺激目标应包含 AVBL
+#   TestMusclesSineConfig                (L500)  — MusclesSine 配置特定测试
+#     test_stimulate_avbl_avbr           (L503)  — 刺激目标应为 AVBL 和 AVBR
+#   TestOscillatorMConfig                (L510)  — OscillatorM 配置特定测试
+#     test_no_muscles                    (L513)  — 不应包含肌肉
+#     test_stimulate_vb1_vb2             (L518)  — 刺激目标应为 VB1 和 VB2
 #
 # 更新日志：
 #   2026-04-17  Copilot  计划3阶段五：新建

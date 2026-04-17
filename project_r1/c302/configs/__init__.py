@@ -4,10 +4,10 @@
 #   每个配置脚本使用 @register_config 装饰器注册自身的 setup() 函数。
 #
 # 类与方法索引：
-#   register_config                      (L23)   — 配置注册装饰器
-#   get_config                           (L37)   — 按名称获取配置 setup 函数
-#   list_configs                         (L54)   — 列出所有已注册的配置名称
-#   _auto_import                         (L63)   — 自动导入所有配置模块以触发注册
+#   register_config                      (L26)   — 配置注册装饰器
+#   get_config                           (L40)   — 按名称获取配置 setup 函数
+#   list_configs                         (L57)   — 列出所有已注册的配置名称
+#   _auto_import                         (L66)   — 自动导入所有配置模块以触发注册
 #
 # 更新日志：
 #   2026-04-17  Copilot  计划3阶段五：新建
