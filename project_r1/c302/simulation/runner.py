@@ -136,7 +136,6 @@ def run_c302(
                 directory=image_dir,
                 save=save,
                 show_plot_already=show_plot_already,
-                data_reader=data_reader,
                 plot_ca=plot_ca,
             )
         except ImportError:

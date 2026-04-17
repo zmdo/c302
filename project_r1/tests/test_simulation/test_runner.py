@@ -4,20 +4,20 @@
 #   配置加载、仿真调用和绘图流程（全部 mock，不执行真实仿真）。
 #
 # 类与方法索引：
-#   TestSimulators                       (L35)   — 仿真后端常量测试
-#     test_supported_simulators          (L38)   — 应包含两种仿真后端
-#     test_simulators_is_tuple           (L43)   — 应为不可变元组
-#   TestRunC302Validation                (L48)   — run_c302 参数校验测试
-#     test_invalid_simulator_raises      (L51)   — 传入不支持的仿真后端应抛出 ValueError
-#   TestRunC302Workflow                  (L63)   — run_c302 工作流程测试（全 mock）
-#     test_calls_setup_with_generate_flag (L68)   — 应以 generate_flag=True 调用配置 setup 函数
-#     test_calls_jneuroml_simulator      (L94)   — simulator='jNeuroML' 应调用 run_lems_with_jneuroml
-#     test_calls_neuron_simulator        (L117)  — simulator='jNeuroML_NEURON' 应调用 run_lems_with_jneuroml_neuron
-#     test_returns_four_tuple            (L140)  — 应返回 (cells, cells_to_stimulate, params, muscles) 四元组
-#     test_restores_cwd_on_success       (L168)  — 仿真成功后应恢复原始工作目录
-#     test_restores_cwd_on_failure       (L195)  — 仿真失败后也应恢复原始工作目录
-#     test_passes_param_overrides        (L224)  — param_overrides 应传递给 setup 函数
-#     test_creates_target_directory      (L249)  — 应自动创建输出目录
+#   TestSimulators                       (L38)   — 仿真后端常量测试
+#     test_supported_simulators          (L41)   — 应包含两种仿真后端
+#     test_simulators_is_tuple           (L46)   — 应为不可变元组
+#   TestRunC302Validation                (L51)   — run_c302 参数校验测试
+#     test_invalid_simulator_raises      (L54)   — 传入不支持的仿真后端应抛出 ValueError
+#   TestRunC302Workflow                  (L66)   — run_c302 工作流程测试（全 mock）
+#     test_calls_setup_with_generate_flag (L71)   — 应以 generate_flag=True 调用配置 setup 函数
+#     test_calls_jneuroml_simulator      (L97)   — simulator='jNeuroML' 应调用 run_lems_with_jneuroml
+#     test_calls_neuron_simulator        (L120)  — simulator='jNeuroML_NEURON' 应调用 run_lems_with_jneuroml_neuron
+#     test_returns_four_tuple            (L143)  — 应返回 (cells, cells_to_stimulate, params, muscles) 四元组
+#     test_restores_cwd_on_success       (L171)  — 仿真成功后应恢复原始工作目录
+#     test_restores_cwd_on_failure       (L198)  — 仿真失败后也应恢复原始工作目录
+#     test_passes_param_overrides        (L227)  — param_overrides 应传递给 setup 函数
+#     test_creates_target_directory      (L252)  — 应自动创建输出目录
 #
 # 更新日志：
 #   2026-04-17  Copilot  计划3阶段六：新建
@@ -30,6 +30,9 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from c302.simulation.runner import SIMULATORS, run_c302
+
+# 最小仿真结果，包含时间轴以通过 plot_c302_results 校验
+_MINIMAL_RESULTS = {"t": [0.0, 0.001]}
 
 
 class TestSimulators:
@@ -74,7 +77,7 @@ class TestRunC302Workflow:
             return_value=(["ADAL"], ["ADAL"], MagicMock(), [], None)
         )
         mock_get_config.return_value = mock_setup
-        mock_pynml.run_lems_with_jneuroml.return_value = {}
+        mock_pynml.run_lems_with_jneuroml.return_value = _MINIMAL_RESULTS
 
         run_c302(
             config="IClamp",
@@ -99,7 +102,7 @@ class TestRunC302Workflow:
             return_value=([], [], MagicMock(), [], None)
         )
         mock_get_config.return_value = mock_setup
-        mock_pynml.run_lems_with_jneuroml.return_value = {}
+        mock_pynml.run_lems_with_jneuroml.return_value = _MINIMAL_RESULTS
 
         run_c302(
             config="IClamp",
@@ -122,7 +125,7 @@ class TestRunC302Workflow:
             return_value=([], [], MagicMock(), [], None)
         )
         mock_get_config.return_value = mock_setup
-        mock_pynml.run_lems_with_jneuroml_neuron.return_value = {}
+        mock_pynml.run_lems_with_jneuroml_neuron.return_value = _MINIMAL_RESULTS
 
         run_c302(
             config="IClamp",
@@ -146,7 +149,7 @@ class TestRunC302Workflow:
             return_value=(["ADAL"], ["ADAL"], mock_params, True, None)
         )
         mock_get_config.return_value = mock_setup
-        mock_pynml.run_lems_with_jneuroml.return_value = {}
+        mock_pynml.run_lems_with_jneuroml.return_value = _MINIMAL_RESULTS
 
         result = run_c302(
             config="IClamp",
@@ -176,7 +179,7 @@ class TestRunC302Workflow:
             return_value=([], [], MagicMock(), [], None)
         )
         mock_get_config.return_value = mock_setup
-        mock_pynml.run_lems_with_jneuroml.return_value = {}
+        mock_pynml.run_lems_with_jneuroml.return_value = _MINIMAL_RESULTS
 
         run_c302(
             config="IClamp",
@@ -229,7 +232,7 @@ class TestRunC302Workflow:
             return_value=([], [], MagicMock(), [], None)
         )
         mock_get_config.return_value = mock_setup
-        mock_pynml.run_lems_with_jneuroml.return_value = {}
+        mock_pynml.run_lems_with_jneuroml.return_value = _MINIMAL_RESULTS
 
         overrides = {"cell_diameter": "10"}
         run_c302(
@@ -255,7 +258,7 @@ class TestRunC302Workflow:
             return_value=([], [], MagicMock(), [], None)
         )
         mock_get_config.return_value = mock_setup
-        mock_pynml.run_lems_with_jneuroml.return_value = {}
+        mock_pynml.run_lems_with_jneuroml.return_value = _MINIMAL_RESULTS
 
         run_c302(
             config="IClamp",
