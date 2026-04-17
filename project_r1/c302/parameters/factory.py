@@ -28,6 +28,11 @@
 #     create_neuron_to_neuron_syn        (L445)  — 创建神经元间突触（化学 ExpTwoSynapse + 电 GapJunction）
 #     create_neuron_to_muscle_syn        (L466)  — 创建神经元到肌肉突触（化学 ExpTwoSynapse + 电 GapJunction）
 #     get_elec_syn                       (L487)  — Level B 的电突触 — 返回 GapJunction
+#   _BC1Model                            (L494)  — Level BC1：IafActivityCell + GradedSynapse 化学突触
+#     create_neuron_to_neuron_syn        (L497)  — 创建神经元间突触（GradedSynapse + GapJunction）
+#     create_neuron_to_muscle_syn        (L520)  — 创建神经元到肌肉突触（GradedSynapse + GapJunction）
+#     get_exc_syn                        (L543)  — 兴奋性突触 — GradedSynapse
+#     get_inh_syn                        (L574)  — 抑制性突触 — GradedSynapse
 #   (create_hh_cell — 已迁移至 cell_builder.py)
 #   _HHModel                             (L608)  — Level C 族：单室 HH 导电模型
 #     create_models                      (L611)  — 创建肌肉/神经元细胞、偏置电流、浓度模型和突触
@@ -421,6 +426,135 @@ class _IafActivityModel(_IafModel):
         """Level B 的电突触 — 返回 GapJunction。"""
         gbase, conn_id = self._get_elec_syn_params(pre_cell, post_cell, type)
         return GapJunction(id=conn_id, conductance=gbase)
+
+
+# ---------------------------------------------------------------------------
+# Level BC1 — IafActivityCell + GradedSynapse（B 级细胞 + C1 级模拟突触）
+# ---------------------------------------------------------------------------
+
+
+class _BC1Model(_IafActivityModel):
+    """Level BC1：IafActivityCell 细胞 + 标准 GradedSynapse 化学突触。"""
+
+    def create_neuron_to_neuron_syn(self):
+        """创建神经元间突触（GradedSynapse + GapJunction）。"""
+        self.neuron_to_neuron_exc_syn = GradedSynapse(
+            id="neuron_to_neuron_exc_syn",
+            conductance=self.get_bioparameter(
+                "neuron_to_neuron_exc_syn_conductance"
+            ).value,
+            delta=self.get_bioparameter("exc_syn_delta").value,
+            Vth=self.get_bioparameter("exc_syn_vth").value,
+            erev=self.get_bioparameter("exc_syn_erev").value,
+            k=self.get_bioparameter("exc_syn_k").value,
+        )
+        self.neuron_to_neuron_inh_syn = GradedSynapse(
+            id="neuron_to_neuron_inh_syn",
+            conductance=self.get_bioparameter(
+                "neuron_to_neuron_inh_syn_conductance"
+            ).value,
+            delta=self.get_bioparameter("inh_syn_delta").value,
+            Vth=self.get_bioparameter("inh_syn_vth").value,
+            erev=self.get_bioparameter("inh_syn_erev").value,
+            k=self.get_bioparameter("inh_syn_k").value,
+        )
+        self.neuron_to_neuron_elec_syn = GapJunction(
+            id="neuron_to_neuron_elec_syn",
+            conductance=self.get_bioparameter("neuron_to_neuron_elec_syn_gbase").value,
+        )
+
+    def create_neuron_to_muscle_syn(self):
+        """创建神经元到肌肉突触（GradedSynapse + GapJunction）。"""
+        self.neuron_to_muscle_exc_syn = GradedSynapse(
+            id="neuron_to_muscle_exc_syn",
+            conductance=self.get_bioparameter(
+                "neuron_to_muscle_exc_syn_conductance"
+            ).value,
+            delta=self.get_bioparameter("exc_syn_delta").value,
+            Vth=self.get_bioparameter("exc_syn_vth").value,
+            erev=self.get_bioparameter("exc_syn_erev").value,
+            k=self.get_bioparameter("exc_syn_k").value,
+        )
+        self.neuron_to_muscle_inh_syn = GradedSynapse(
+            id="neuron_to_muscle_inh_syn",
+            conductance=self.get_bioparameter(
+                "neuron_to_muscle_inh_syn_conductance"
+            ).value,
+            delta=self.get_bioparameter("inh_syn_delta").value,
+            Vth=self.get_bioparameter("inh_syn_vth").value,
+            erev=self.get_bioparameter("inh_syn_erev").value,
+            k=self.get_bioparameter("inh_syn_k").value,
+        )
+        self.neuron_to_muscle_elec_syn = GapJunction(
+            id="neuron_to_muscle_elec_syn",
+            conductance=self.get_bioparameter("neuron_to_muscle_elec_syn_gbase").value,
+        )
+
+    def get_exc_syn(self, pre_cell, post_cell, type):
+        """兴奋性突触 — GradedSynapse。"""
+        self.found_specific_param = False
+        specific = "%s_to_%s_exc_syn_%s"
+        default = (
+            "neuron_to_neuron_exc_syn_%s"
+            if type == "neuron_to_neuron"
+            else "neuron_to_muscle_exc_syn_%s"
+        )
+        conductance = self.get_conn_param(
+            pre_cell, post_cell, specific, default, "conductance"
+        )
+        erev = self.get_conn_param(
+            pre_cell, post_cell, specific, "exc_syn_%s", "erev"
+        )
+        delta = self.get_conn_param(
+            pre_cell, post_cell, specific, "exc_syn_%s", "delta"
+        )
+        vth = self.get_conn_param(pre_cell, post_cell, specific, "exc_syn_%s", "vth")
+        k = self.get_conn_param(pre_cell, post_cell, specific, "exc_syn_%s", "k")
+
+        conn_id = (
+            "neuron_to_neuron_exc_syn"
+            if type == "neuron_to_neuron"
+            else "neuron_to_muscle_exc_syn"
+        )
+        if self.found_specific_param:
+            conn_id = "%s_to_%s_exc_syn" % (pre_cell, post_cell)
+
+        return GradedSynapse(
+            id=conn_id, conductance=conductance, delta=delta, Vth=vth, erev=erev, k=k
+        )
+
+    def get_inh_syn(self, pre_cell, post_cell, type):
+        """抑制性突触 — GradedSynapse。"""
+        self.found_specific_param = False
+        specific = "%s_to_%s_inh_syn_%s"
+        default = (
+            "neuron_to_neuron_inh_syn_%s"
+            if type == "neuron_to_neuron"
+            else "neuron_to_muscle_inh_syn_%s"
+        )
+        conductance = self.get_conn_param(
+            pre_cell, post_cell, specific, default, "conductance"
+        )
+        erev = self.get_conn_param(
+            pre_cell, post_cell, specific, "inh_syn_%s", "erev"
+        )
+        delta = self.get_conn_param(
+            pre_cell, post_cell, specific, "inh_syn_%s", "delta"
+        )
+        vth = self.get_conn_param(pre_cell, post_cell, specific, "inh_syn_%s", "vth")
+        k = self.get_conn_param(pre_cell, post_cell, specific, "inh_syn_%s", "k")
+
+        conn_id = (
+            "neuron_to_neuron_inh_syn"
+            if type == "neuron_to_neuron"
+            else "neuron_to_muscle_inh_syn"
+        )
+        if self.found_specific_param:
+            conn_id = "%s_to_%s_inh_syn" % (pre_cell, post_cell)
+
+        return GradedSynapse(
+            id=conn_id, conductance=conductance, delta=delta, Vth=vth, erev=erev, k=k
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -1131,6 +1265,7 @@ class _HHGradedModel(_HHMultiCompModel):
 _LEVEL_TO_CLASS: dict[str, type[_ModelBase]] = {
     "A": _IafModel,
     "B": _IafActivityModel,
+    "BC1": _BC1Model,
     "C": _HHModel,
     "C0": _HHC0Model,
     "C1": _HHC1Model,

@@ -191,8 +191,9 @@ class TestParameterSetRegistry:
     def test_list_parameter_sets(self):
         """列出所有已实现的层级。"""
         levels = list_parameter_sets()
-        assert len(levels) == 7
+        assert len(levels) == 8
         assert "A" in levels
+        assert "BC1" in levels
         assert "C0" in levels
         assert "D1" in levels
 

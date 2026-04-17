@@ -48,10 +48,12 @@ from c302.configs import get_config
 SUPPORTED_CASES = [
     ("IClamp", "A"),
     ("IClamp", "B"),
+    ("IClamp", "BC1"),
     ("IClamp", "C0"),
     ("IClamp", "D"),
     ("IClamp", "D1"),
     ("Syns", "A"),
+    ("Syns", "BC1"),
     ("Social", "C0"),
     ("Oscillator", "C1"),
     ("Muscles", "C"),
@@ -235,6 +237,13 @@ class TestSynapseModels:
         """Level B 有 GapJunction 电突触。"""
         nml_doc, _, _, _, _ = _generate("Syns", "B")
         assert len(nml_doc.gap_junctions) > 0
+
+    def test_level_bc1_has_graded_synapses(self):
+        """Level BC1 使用 GradedSynapse 化学突触 + GapJunction 电突触。"""
+        nml_doc, _, _, _, _ = _generate("Syns", "BC1")
+        assert len(nml_doc.graded_synapses) > 0
+        assert len(nml_doc.gap_junctions) > 0
+        assert len(nml_doc.exp_two_synapses) == 0
 
     def test_level_c0_has_gap_junctions(self):
         """Level C0 有 GapJunction 电突触。"""
