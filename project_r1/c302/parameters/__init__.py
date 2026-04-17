@@ -24,11 +24,11 @@ logger = logging.getLogger(__name__)
 
 # 所有已知层级（含 factory 尚未实现的）
 _LEVEL_REGISTRY: set[str] = {
-    "A", "B", "BC1", "C", "C0", "C1", "D", "D1", "W2D",
+    "A", "B", "BC1", "C", "C0", "C1", "C2", "D", "D1", "W2D",
 }
 
 # 尚未迁移的层级（YAML 存在但 factory 未实现）
-_PENDING_LEVELS: set[str] = {"C2"}
+_PENDING_LEVELS: set[str] = set()
 
 
 def get_parameter_set(level: str) -> c302ModelPrototype:

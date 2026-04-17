@@ -61,6 +61,7 @@ SUPPORTED_CASES = [
     ("Pharyngeal", "C"),
     ("Full", "A"),
     ("FW", "W2D"),
+    ("FW", "C2"),
 ]
 
 

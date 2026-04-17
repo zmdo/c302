@@ -95,3 +95,363 @@ class OutputSynapse(NonNeuroMLCustomType):
 
     def __init__(self, id):
         self.id = id
+
+
+# ---------------------------------------------------------------------------
+# C2 自定义组件
+# ---------------------------------------------------------------------------
+
+
+class DelayedGapJunction:
+    """延迟调制缝隙连接（C2，sigmoid 时间调制）。"""
+
+    def __init__(self, id, conductance, sigma, mu, weight=1):
+        self.id = id
+        self.weight = weight
+        self.conductance = conductance
+        self.sigma = sigma
+        self.mu = mu
+
+    def export(self, outfile, level, namespace, name_, pretty_print=True, **kwargs_):
+        outfile.write(
+            "    " * level
+            + '<delayedGapJunction id="%s" weight="%s" conductance="%s" sigma="%s" mu="%s" />\n'
+            % (self.id, self.weight, self.conductance, self.sigma, self.mu)
+        )
+
+
+class ProprioGapJunction:
+    """本体感觉调制缝隙连接（C2）。"""
+
+    def __init__(
+        self, id, conductance, p_conductance, mu, weight=1, sigma="0.3 per_mV"
+    ):
+        self.id = id
+        self.weight = weight
+        self.conductance = conductance
+        self.p_conductance = p_conductance
+        self.sigma = sigma
+        self.mu = mu
+
+    def export(self, outfile, level, namespace, name_, pretty_print=True, **kwargs_):
+        outfile.write(
+            "    " * level
+            + '<proprioGapJunction id="%s" weight="%s" conductance="%s" p_conductance="%s" sigma="%s" mu="%s" />\n'
+            % (
+                self.id,
+                self.weight,
+                self.conductance,
+                self.p_conductance,
+                self.sigma,
+                self.mu,
+            )
+        )
+
+
+class ProprioGapJunction2:
+    """增强型本体感觉缝隙连接（C2，支持门控参数）。"""
+
+    def __init__(
+        self,
+        id,
+        conductance,
+        p_conductance,
+        mu,
+        ar=None,
+        ad=None,
+        beta=None,
+        vth=None,
+        erev=None,
+        weight=1,
+        sigma="0.3 per_mV",
+    ):
+        self.id = id
+        self.weight = weight
+        self.conductance = conductance
+        self.p_conductance = p_conductance
+        self.sigma = sigma
+        self.mu = mu
+        self.ar = ar
+        self.ad = ad
+        self.beta = beta
+        self.vth = vth
+        self.erev = erev
+
+    def export(self, outfile, level, namespace, name_, pretty_print=True, **kwargs_):
+        outfile.write(
+            "    " * level
+            + '<proprioGapJunction2 id="%s" weight="%s" ar="%s" ad="%s" beta="%s" vth="%s" erev="%s" conductance="%s" p_conductance="%s" sigma="%s" mu="%s" />\n'
+            % (
+                self.id,
+                self.weight,
+                self.ar,
+                self.ad,
+                self.beta,
+                self.vth,
+                self.erev,
+                self.conductance,
+                self.p_conductance,
+                self.sigma,
+                self.mu,
+            )
+        )
+
+
+class NeuronMuscle:
+    """肌肉本体感觉反馈类突触（C2）。"""
+
+    def __init__(self, id, conductance, ar, ad, beta, cath, erev):
+        self.id = id
+        self.conductance = conductance
+        self.ar = ar
+        self.ad = ad
+        self.beta = beta
+        self.cath = cath
+        self.erev = erev
+
+    def export(self, outfile, level, namespace, name_, pretty_print=True, **kwargs_):
+        outfile.write(
+            "    " * level
+            + '<proprio id="%s" conductance="%s" ar="%s" ad="%s" beta="%s" cath="%s" erev="%s"/>\n'
+            % (
+                self.id,
+                self.conductance,
+                self.ar,
+                self.ad,
+                self.beta,
+                self.cath,
+                self.erev,
+            )
+        )
+
+
+class MuscleConcentrationModel2:
+    """扩展肌肉钙浓度模型（C2，含 sigmoid 浓度阈值调制）。"""
+
+    def __init__(
+        self,
+        id,
+        ion,
+        resting_conc,
+        decay_constant,
+        rho,
+        xRho,
+        xrest,
+        iCaSigmoidMid="",
+        iCaSigmoidSlope="",
+        xSigmoidMid="",
+        xSigmoidSlope="",
+        xDecay="",
+    ):
+        self.id = id
+        self.ion = ion
+        self.resting_conc = resting_conc
+        self.decay_constant = decay_constant
+        self.rho = rho
+        self.xRho = xRho
+        self.iCaSigmoidMid = iCaSigmoidMid
+        self.iCaSigmoidSlope = iCaSigmoidSlope
+        self.xSigmoidMid = xSigmoidMid
+        self.xSigmoidSlope = xSigmoidSlope
+        self.xDecay = xDecay
+        self.xrest = xrest
+
+    def export(self, outfile, level, namespace, name_, pretty_print=True, **kwargs_):
+        outfile.write(
+            "    " * level
+            + '<muscleConcentrationModel2 id="%s" ion="%s" restingConc="%s" decayConstant="%s" rho="%s" xRho="%s" iCaSigmoidMid="%s" iCaSigmoidSlope="%s" xSigmoidMid="%s" xSigmoidSlope="%s" xDecay="%s" xrest="%s" />\n'
+            % (
+                self.id,
+                self.ion,
+                self.resting_conc,
+                self.decay_constant,
+                self.rho,
+                self.xRho,
+                self.iCaSigmoidMid,
+                self.iCaSigmoidSlope,
+                self.xSigmoidMid,
+                self.xSigmoidSlope,
+                self.xDecay,
+                self.xrest,
+            )
+        )
+
+
+# ---------------------------------------------------------------------------
+# C2 自定义组件
+# ---------------------------------------------------------------------------
+
+
+class DelayedGapJunction:
+    """延迟调制缝隙连接（C2，sigmoid 时间调制）。"""
+
+    def __init__(self, id, conductance, sigma, mu, weight=1):
+        self.id = id
+        self.weight = weight
+        self.conductance = conductance
+        self.sigma = sigma
+        self.mu = mu
+
+    def export(self, outfile, level, namespace, name_, pretty_print=True, **kwargs_):
+        outfile.write(
+            "    " * level
+            + '<delayedGapJunction id="%s" weight="%s" conductance="%s" sigma="%s" mu="%s" />\n'
+            % (self.id, self.weight, self.conductance, self.sigma, self.mu)
+        )
+
+
+class ProprioGapJunction:
+    """本体感觉调制缝隙连接（C2）。"""
+
+    def __init__(
+        self, id, conductance, p_conductance, mu, weight=1, sigma="0.3 per_mV"
+    ):
+        self.id = id
+        self.weight = weight
+        self.conductance = conductance
+        self.p_conductance = p_conductance
+        self.sigma = sigma
+        self.mu = mu
+
+    def export(self, outfile, level, namespace, name_, pretty_print=True, **kwargs_):
+        outfile.write(
+            "    " * level
+            + '<proprioGapJunction id="%s" weight="%s" conductance="%s" p_conductance="%s" sigma="%s" mu="%s" />\n'
+            % (
+                self.id,
+                self.weight,
+                self.conductance,
+                self.p_conductance,
+                self.sigma,
+                self.mu,
+            )
+        )
+
+
+class ProprioGapJunction2:
+    """增强型本体感觉缝隙连接（C2，支持门控参数）。"""
+
+    def __init__(
+        self,
+        id,
+        conductance,
+        p_conductance,
+        mu,
+        ar=None,
+        ad=None,
+        beta=None,
+        vth=None,
+        erev=None,
+        weight=1,
+        sigma="0.3 per_mV",
+    ):
+        self.id = id
+        self.weight = weight
+        self.conductance = conductance
+        self.p_conductance = p_conductance
+        self.sigma = sigma
+        self.mu = mu
+        self.ar = ar
+        self.ad = ad
+        self.beta = beta
+        self.vth = vth
+        self.erev = erev
+
+    def export(self, outfile, level, namespace, name_, pretty_print=True, **kwargs_):
+        outfile.write(
+            "    " * level
+            + '<proprioGapJunction2 id="%s" weight="%s" ar="%s" ad="%s" beta="%s" vth="%s" erev="%s" conductance="%s" p_conductance="%s" sigma="%s" mu="%s" />\n'
+            % (
+                self.id,
+                self.weight,
+                self.ar,
+                self.ad,
+                self.beta,
+                self.vth,
+                self.erev,
+                self.conductance,
+                self.p_conductance,
+                self.sigma,
+                self.mu,
+            )
+        )
+
+
+class NeuronMuscle:
+    """肌肉本体感觉反馈类突触（C2）。"""
+
+    def __init__(self, id, conductance, ar, ad, beta, cath, erev):
+        self.id = id
+        self.conductance = conductance
+        self.ar = ar
+        self.ad = ad
+        self.beta = beta
+        self.cath = cath
+        self.erev = erev
+
+    def export(self, outfile, level, namespace, name_, pretty_print=True, **kwargs_):
+        outfile.write(
+            "    " * level
+            + '<proprio id="%s" conductance="%s" ar="%s" ad="%s" beta="%s" cath="%s" erev="%s"/>\n'
+            % (
+                self.id,
+                self.conductance,
+                self.ar,
+                self.ad,
+                self.beta,
+                self.cath,
+                self.erev,
+            )
+        )
+
+
+class MuscleConcentrationModel2:
+    """扩展肌肉钙浓度模型（C2，含 sigmoid 浓度阈值调制）。"""
+
+    def __init__(
+        self,
+        id,
+        ion,
+        resting_conc,
+        decay_constant,
+        rho,
+        xRho,
+        xrest,
+        iCaSigmoidMid="",
+        iCaSigmoidSlope="",
+        xSigmoidMid="",
+        xSigmoidSlope="",
+        xDecay="",
+    ):
+        self.id = id
+        self.ion = ion
+        self.resting_conc = resting_conc
+        self.decay_constant = decay_constant
+        self.rho = rho
+        self.xRho = xRho
+        self.iCaSigmoidMid = iCaSigmoidMid
+        self.iCaSigmoidSlope = iCaSigmoidSlope
+        self.xSigmoidMid = xSigmoidMid
+        self.xSigmoidSlope = xSigmoidSlope
+        self.xDecay = xDecay
+        self.xrest = xrest
+
+    def export(self, outfile, level, namespace, name_, pretty_print=True, **kwargs_):
+        outfile.write(
+            "    " * level
+            + '<muscleConcentrationModel2 id="%s" ion="%s" restingConc="%s" decayConstant="%s" rho="%s" xRho="%s" iCaSigmoidMid="%s" iCaSigmoidSlope="%s" xSigmoidMid="%s" xSigmoidSlope="%s" xDecay="%s" xrest="%s" />\n'
+            % (
+                self.id,
+                self.ion,
+                self.resting_conc,
+                self.decay_constant,
+                self.rho,
+                self.xRho,
+                self.iCaSigmoidMid,
+                self.iCaSigmoidSlope,
+                self.xSigmoidMid,
+                self.xSigmoidSlope,
+                self.xDecay,
+                self.xrest,
+            )
+        )
