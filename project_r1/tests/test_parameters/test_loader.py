@@ -27,11 +27,11 @@
 #     test_inheritance_overrides         (L171)  — B 继承 A 后覆盖 neuron_iaf_tau1
 #     test_inheritance_removals_wildcard (L177)  — B 继承 A，通配符移除 elec_syn_* 中 gbase 以外的参数
 #   TestParameterSetRegistry             (L188)  — 参数集注册表测试
-#     test_list_parameter_sets           (L191)  — 列出所有 10 个层级
-#     test_get_parameter_set             (L199)  — 按名称获取参数集
-#     test_get_parameter_set_case_insensitive (L205)  — 大小写不敏感
-#     test_get_parameter_set_unknown     (L210)  — 未知层级抛出 KeyError
-#     test_all_levels_loadable           (L215)  — 所有注册层级都可加载
+#     test_list_parameter_sets           (L191)  — 列出所有已实现的层级
+#     test_get_parameter_set             (L199)  — 按名称获取参数集，返回 c302ModelPrototype 实例
+#     test_get_parameter_set_case_insensitive (L207)  — 大小写不敏感
+#     test_get_parameter_set_unknown     (L212)  — 未知层级抛出 KeyError
+#     test_all_levels_loadable           (L217)  — 所有注册层级都可加载
 #
 # 更新日志：
 #   2026-04-17  Copilot  计划3阶段三：新建加载器单元测试
@@ -189,23 +189,25 @@ class TestParameterSetRegistry:
     """参数集注册表测试。"""
 
     def test_list_parameter_sets(self):
-        """列出所有 10 个层级。"""
+        """列出所有已实现的层级。"""
         levels = list_parameter_sets()
-        assert len(levels) == 10
+        assert len(levels) == 7
         assert "A" in levels
-        assert "C2" in levels
-        assert "W2D" in levels
+        assert "C0" in levels
+        assert "D1" in levels
 
     def test_get_parameter_set(self):
-        """按名称获取参数集。"""
+        """按名称获取参数集，返回 c302ModelPrototype 实例。"""
         params = get_parameter_set("A")
-        assert isinstance(params, list)
-        assert len(params) == 28
+        # 现在返回 c302ModelPrototype 实例
+        assert hasattr(params, "bioparameters")
+        assert len(params.bioparameters) == 28
+        assert params.level == "A"
 
     def test_get_parameter_set_case_insensitive(self):
         """大小写不敏感。"""
         params = get_parameter_set("a")
-        assert len(params) == 28
+        assert len(params.bioparameters) == 28
 
     def test_get_parameter_set_unknown(self):
         """未知层级抛出 KeyError。"""
@@ -216,4 +218,4 @@ class TestParameterSetRegistry:
         """所有注册层级都可加载。"""
         for level in list_parameter_sets():
             params = get_parameter_set(level)
-            assert len(params) > 0, f"Level {level} has no parameters"
+            assert len(params.bioparameters) > 0, f"Level {level} has no parameters"
