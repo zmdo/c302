@@ -3,10 +3,31 @@
 #   CsvDataReader / CsvDataReaderModified 的单元测试。
 #
 # 类与方法索引：
-#   TestCsvReadData                      (L23)   — CsvDataReader.read_data 测试
-#   TestCsvReadMuscleData                (L57)   — CsvDataReader.read_muscle_data 测试
-#   TestCsvModifiedReader                (L79)   — CsvDataReaderModified 测试
-#   TestHelperFunctions                  (L95)   — CSV 模块辅助函数测试
+#   TestCsvReadData                      (L51)   — CsvDataReader.read_data 测试
+#     test_returns_tuple                 (L54)   — 返回 (cells, conns) 元组
+#     test_cells_not_empty               (L60)   — 应返回非空的细胞列表
+#     test_all_neurons                   (L65)   — read_data 应只返回神经元（大写字母开头）
+#     test_include_nonconnected          (L71)   — 应包含 CANL/CANR
+#     test_conn_type                     (L77)   — 每个连接应为 ConnectionInfo 实例
+#   TestCsvReadMuscleData                (L83)   — CsvDataReader.read_muscle_data 测试
+#     test_returns_triple                (L86)   — 返回 (neurons, muscles, conns) 三元组
+#     test_muscles_standard_names        (L93)   — 肌肉名称应为标准格式（M** 开头）
+#     test_conns_not_empty               (L99)   — 应有神经肌肉连接
+#   TestCsvModifiedReader                (L105)  — CsvDataReaderModified 测试
+#     test_read_data                     (L108)  — 修正版 CSV 也能正常读取
+#     test_read_muscle_data              (L114)  — 修正版 CSV 肌肉数据
+#   TestHelperFunctions                  (L120)  — CSV 模块辅助函数测试
+#     test_is_neuron_csv_uppercase       (L123)  — test_is_neuron_csv_uppercase 函数
+#     test_is_neuron_csv_lowercase       (L126)  — test_is_neuron_csv_lowercase 函数
+#     test_get_syntype_electrical        (L129)  — test_get_syntype_electrical 函数
+#     test_get_syntype_chemical          (L132)  — test_get_syntype_chemical 函数
+#     test_get_syntype_unknown           (L135)  — test_get_syntype_unknown 函数
+#     test_get_synclass_gap              (L139)  — test_get_synclass_gap 函数
+#     test_get_synclass_gaba             (L142)  — test_get_synclass_gaba 函数
+#     test_get_synclass_ach              (L145)  — test_get_synclass_ach 函数
+#     test_get_old_muscle_name_vbwml     (L148)  — test_get_old_muscle_name_vbwml 函数
+#     test_get_old_muscle_name_dbwmr     (L151)  — test_get_old_muscle_name_dbwmr 函数
+#     test_get_old_muscle_name_padding   (L154)  — 小于 10 的索引应补零
 #
 # 更新日志：
 #   2026-04-17  yi  初始创建

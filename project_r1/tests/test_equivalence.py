@@ -5,30 +5,30 @@
 #   (配置, 参数集) 组合。
 #
 # 类与方法索引：
-#   _count_connections                   (L42)   — 统计 NeuroML 文档中的总连接数
-#   _count_stimuli                       (L66)   — 统计刺激输入数量
-#   _generate                            (L75)   — 使用新代码生成 NeuroML 网络文档
-#   TestGeneration                       (L90)   — 验证每个 (配置, 参数集) 组合能成功生成 NeuroML 文档
-#     test_generate_success              (L94)   — 生成不抛异常
-#     test_has_network                   (L100)  — 文档包含至少一个网络
-#     test_has_populations               (L106)  — 网络包含至少一个种群
-#   TestPopulations                      (L113)  — 验证种群数量
-#     test_population_count_matches_cells (L117)  — 种群数量 >= 返回的 cells 数（可能含额外肌肉种群）
-#   TestConnections                      (L125)  — 验证连接存在
-#     test_has_connections               (L132)  — 非 IClamp 配置应有连接
-#   TestStimuli                          (L139)  — 验证刺激参数
-#     test_has_stimuli                   (L143)  — 所有配置应有刺激输入
-#   TestBioParameters                    (L152)  — 验证参数完整性
-#     test_params_not_empty              (L156)  — 参数集非空
-#     test_level_matches                 (L162)  — 模型的 level 属性与请求一致
-#   TestCellModels                       (L168)  — 验证细胞模型正确创建
-#     test_level_a_iaf_cells             (L171)  — Level A 使用 IafCell
-#     test_level_c0_hh_cells             (L176)  — Level C0 使用导电模型 Cell
-#     test_level_c0_has_concentration_model (L181)  — Level C0 有钙浓度模型
-#   TestSynapseModels                    (L187)  — 验证突触模型正确创建
-#     test_level_a_all_exp_two           (L190)  — Level A 所有突触都是 ExpTwoSynapse
-#     test_level_b_has_gap_junctions     (L196)  — Level B 有 GapJunction 电突触
-#     test_level_c0_has_gap_junctions    (L201)  — Level C0 有 GapJunction 电突触
+#   _count_connections                   (L68)   — 统计 NeuroML 文档中的总连接数
+#   _count_stimuli                       (L92)   — 统计刺激输入数量
+#   _generate                            (L101)  — 使用新代码生成 NeuroML 网络文档
+#   TestGeneration                       (L116)  — 验证每个 (配置, 参数集) 组合能成功生成 NeuroML 文档
+#     test_generate_success              (L120)  — 生成不抛异常
+#     test_has_network                   (L126)  — 文档包含至少一个网络
+#     test_has_populations               (L132)  — 网络包含至少一个种群
+#   TestPopulations                      (L139)  — 验证种群数量
+#     test_population_count_matches_cells (L143)  — 种群数量 >= 返回的 cells 数（可能含额外肌肉种群）
+#   TestConnections                      (L151)  — 验证连接存在
+#     test_has_connections               (L158)  — 非 IClamp 配置应有连接
+#   TestStimuli                          (L165)  — 验证刺激参数
+#     test_has_stimuli                   (L169)  — 所有配置应有刺激输入
+#   TestBioParameters                    (L178)  — 验证参数完整性
+#     test_params_not_empty              (L182)  — 参数集非空
+#     test_level_matches                 (L188)  — 模型的 level 属性与请求一致
+#   TestCellModels                       (L194)  — 验证细胞模型正确创建
+#     test_level_a_iaf_cells             (L197)  — Level A 使用 IafCell
+#     test_level_c0_hh_cells             (L202)  — Level C0 使用导电模型 Cell
+#     test_level_c0_has_concentration_model (L207)  — Level C0 有钙浓度模型
+#   TestSynapseModels                    (L213)  — 验证突触模型正确创建
+#     test_level_a_all_exp_two           (L216)  — Level A 所有突触都是 ExpTwoSynapse
+#     test_level_b_has_gap_junctions     (L222)  — Level B 有 GapJunction 电突触
+#     test_level_c0_has_gap_junctions    (L227)  — Level C0 有 GapJunction 电突触
 #
 # 更新日志：
 #   2026-04-18  Copilot  计划3阶段八：新建等价性测试
@@ -53,6 +53,9 @@ SUPPORTED_CASES = [
     ("Social", "C0"),
     ("Oscillator", "C1"),
     ("Muscles", "C"),
+    ("FW", "A"),
+    ("Pharyngeal", "C"),
+    ("Full", "A"),
 ]
 
 # 注：("RIA", "D1") 依赖 D 族 create_neuron_cell，暂时排除

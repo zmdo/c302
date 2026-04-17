@@ -4,9 +4,16 @@
 #   这些测试依赖 cect 库安装，不可用时自动跳过。
 #
 # 类与方法索引：
-#   TestWhiteWholeReader                 (L26)   — White_whole 读取器测试
-#   TestWhiteAReader                     (L46)   — White_A 读取器测试
-#   TestWhiteL4Reader                    (L60)   — White_L4 读取器测试
+#   TestWhiteWholeReader                 (L34)   — White_whole 读取器测试
+#     test_read_data                     (L37)   — 返回非空的细胞和连接列表
+#     test_conn_type                     (L43)   — 连接类型应为本项目的 ConnectionInfo
+#     test_read_muscle_data              (L48)   — 返回神经元、肌肉和连接列表
+#   TestWhiteAReader                     (L55)   — White_A 读取器测试
+#     test_read_data                     (L58)   — test_read_data 函数
+#     test_read_muscle_data              (L62)   — test_read_muscle_data 函数
+#   TestWhiteL4Reader                    (L67)   — White_L4 读取器测试
+#     test_read_data                     (L70)   — test_read_data 函数
+#     test_read_muscle_data              (L74)   — test_read_muscle_data 函数
 #
 # 更新日志：
 #   2026-04-17  yi  初始创建

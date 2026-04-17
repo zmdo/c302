@@ -3,7 +3,11 @@
 #   读取器注册表的单元测试。
 #
 # 类与方法索引：
-#   TestReaderRegistry                   (L20)   — 注册表功能测试
+#   TestReaderRegistry                   (L24)   — 注册表功能测试
+#     test_spreadsheet_registered        (L27)   — SpreadsheetDataReader 应已注册
+#     test_csv_readers_registered        (L35)   — CSV 读取器应已注册
+#     test_unknown_reader_raises         (L42)   — 获取不存在的读取器应抛出 KeyError
+#     test_list_readers                  (L47)   — 列表应包含已注册的读取器
 #
 # 更新日志：
 #   2026-04-17  yi  初始创建

@@ -26,6 +26,10 @@
 #     test_no_calcium_for_param_a        (L186)  — 参数集 A 不应绘制钙离子图
 #     test_closes_plots_when_no_show     (L206)  — show_plot_already=False 应关闭所有图形
 #     test_empty_results_no_plot         (L222)  — 空结果不应绘制任何图
+#     test_calcium_plotted_for_c_series  (L239)  — C0 参数集 plot_ca=True 应绘制神经元 + 肌肉的 [Ca²⁺] 图
+#     test_save_creates_files            (L264)  — save=True 应调用 plt.savefig
+#     test_show_plot                     (L286)  — show_plot_already=True 应调用 plt.show
+#     test_activity_for_b_series         (L305)  — B 参数集 plot_ca=True 应绘制 activity（非 caConc）
 #
 # 更新日志：
 #   2026-04-17  Copilot  计划3阶段七：新建
@@ -232,3 +236,90 @@ class TestPlotC302Results:
 
         mock_heatmap.assert_not_called()
         mock_traces.assert_not_called()
+
+    @patch("c302.visualization.traces.plt")
+    @patch("c302.visualization.traces.plot_heatmap")
+    @patch("c302.visualization.traces.generate_traces_plot")
+    def test_calcium_plotted_for_c_series(
+        self, mock_traces, mock_heatmap, mock_plt
+    ) -> None:
+        """C0 参数集 plot_ca=True 应绘制神经元 + 肌肉的 [Ca²⁺] 图。"""
+        lems = {
+            "t": [0.0, 0.001, 0.002],
+            "ADAL/0/GenericNeuronCell/v": [0.0, -0.05, -0.04],
+            "ADAL/0/GenericNeuronCell/caConc": [0.0, 1e-6, 2e-6],
+            "MDL01/0/GenericMuscleCell/v": [0.0, -0.06, -0.05],
+            "MDL01/0/GenericMuscleCell/caConc": [0.0, 1e-7, 1e-7],
+        }
+
+        plot_c302_results(
+            lems, "IClamp", "C0",
+            show_plot_already=False, save=False, plot_ca=True,
+        )
+
+        # 热图：神经元电压 + 肌肉电压 + 神经元Ca + 肌肉Ca = 4次
+        assert mock_heatmap.call_count == 4
+        # 轨迹图：同样 4 次
+        assert mock_traces.call_count == 4
+
+    @patch("c302.visualization.traces.plt")
+    @patch("c302.visualization.traces.plot_heatmap")
+    @patch("c302.visualization.traces.generate_traces_plot")
+    def test_save_creates_files(
+        self, mock_traces, mock_heatmap, mock_plt
+    ) -> None:
+        """save=True 应调用 plt.savefig。"""
+        lems = {
+            "t": [0.0, 0.001, 0.002],
+            "ADAL/0/GenericNeuronCell/v": [0.0, -0.05, -0.04],
+            "MDL01/0/GenericMuscleCell/v": [0.0, -0.06, -0.05],
+        }
+
+        plot_c302_results(
+            lems, "IClamp", "C0",
+            directory="/tmp/test_traces",
+            show_plot_already=False, save=True, plot_ca=False,
+        )
+
+        # 保存 2 次（神经元 + 肌肉热图）
+        assert mock_plt.savefig.call_count == 2
+
+    @patch("c302.visualization.traces.plt")
+    @patch("c302.visualization.traces.plot_heatmap")
+    @patch("c302.visualization.traces.generate_traces_plot")
+    def test_show_plot(
+        self, mock_traces, mock_heatmap, mock_plt
+    ) -> None:
+        """show_plot_already=True 应调用 plt.show。"""
+        lems = {
+            "t": [0.0, 0.001],
+            "X/0/GenericNeuronCell/v": [0.0, -0.05],
+        }
+
+        plot_c302_results(
+            lems, "IClamp", "C0",
+            show_plot_already=True, save=False, plot_ca=False,
+        )
+
+        mock_plt.show.assert_called_once()
+
+    @patch("c302.visualization.traces.plt")
+    @patch("c302.visualization.traces.plot_heatmap")
+    @patch("c302.visualization.traces.generate_traces_plot")
+    def test_activity_for_b_series(
+        self, mock_traces, mock_heatmap, mock_plt
+    ) -> None:
+        """B 参数集 plot_ca=True 应绘制 activity（非 caConc）。"""
+        lems = {
+            "t": [0.0, 0.001, 0.002],
+            "ADAL/0/generic_neuron_iaf_cell/v": [0.0, -0.05, -0.04],
+            "ADAL/0/generic_neuron_iaf_cell/activity": [0.0, 1.0, 2.0],
+        }
+
+        plot_c302_results(
+            lems, "IClamp", "B",
+            show_plot_already=False, save=False, plot_ca=True,
+        )
+
+        # 热图：电压 + 活动 = 2 次
+        assert mock_heatmap.call_count == 2

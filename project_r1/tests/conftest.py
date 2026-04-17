@@ -3,9 +3,9 @@
 #   pytest 共享 fixtures，提供测试所需的公共资源和路径。
 #
 # 类与方法索引：
-#   project_root                     (L16)   — 项目根目录 fixture
-#   data_dir                         (L25)   — 数据目录 fixture
-#   morphology_dir                   (L34)   — 形态文件目录 fixture
+#   project_root                         (L21)   — 返回项目根目录路径
+#   data_dir                             (L27)   — 返回数据目录路径
+#   morphology_dir                       (L33)   — 返回形态文件目录路径
 #
 # 更新日志：
 #   2026-04-17  yi  初始创建

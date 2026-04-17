@@ -4,7 +4,21 @@
 #   脉冲和正弦波刺激创建。
 #
 # 类与方法索引：
-#   (由 gen_index.py 生成)
+#   _make_nml_doc                        (L40)   — 创建模拟的 NeuroML 文档对象
+#   _make_params                         (L56)   — 创建模拟的参数对象
+#   TestGetNextStimId                    (L65)   — get_next_stim_id 测试
+#     test_first_stim                    (L68)   — 无已有刺激时应返回 stim_CELL_1
+#     test_increments_correctly          (L74)   — 已有一个刺激时应返回 stim_CELL_2
+#     test_different_cells_independent   (L80)   — 不同细胞的刺激计数应独立
+#   TestAddNewInput                      (L87)   — add_new_input 测试
+#     test_creates_pulse_generator       (L90)   — 应创建 PulseGenerator 并添加到文档
+#     test_creates_input_list            (L101)  — 应创建 InputList 并追加到网络
+#     test_multiple_stims_increment_id   (L108)  — 多次添加应递增 ID
+#   TestAddNewSinusoidalInput            (L118)  — add_new_sinusoidal_input 测试
+#     test_creates_sine_generator_for_db (L121)  — DB 系列应正常创建 SineGenerator
+#     test_vb_inverts_amplitude          (L131)  — VB 系列幅度应取反
+#     test_vb_negative_amplitude_becomes_positive (L139)  — VB 系列的负幅度应变正
+#     test_phase_is_computed             (L147)  — 相位应基于 soma 位置计算
 #
 # 更新日志：
 #   2026-04-17  Copilot  计划3阶段四：新建

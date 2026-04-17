@@ -129,3 +129,4 @@ openworm/
 /project_r1/c302.egg-info/
 /project_r1/tests/reference_outputs/
 /project_r1/.pytest_cache/
+.coverage

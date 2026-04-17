@@ -5,10 +5,10 @@
 #   完整的 NeuroML2 网络文档。
 #
 # 类与方法索引：
-#   _load_data_reader                    (L46)   — 动态导入并返回指定名称的数据读取器
-#   get_cell_names_and_connection        (L61)   — 读取连接组数据，返回所有细胞名称和突触连接列表
-#   get_cell_muscle_names_and_connection (L76)   — 读取神经元-肌肉连接数据
-#   generate                             (L110)  — 生成 NeuroML 2 网络文档
+#   _load_data_reader                    (L49)   — 动态导入并返回指定名称的数据读取器
+#   get_cell_names_and_connection        (L64)   — 读取连接组数据，返回所有细胞名称和突触连接列表
+#   get_cell_muscle_names_and_connection (L79)   — 读取神经元-肌肉连接数据
+#   generate                             (L113)  — 生成 NeuroML 2 网络文档
 #
 # 更新日志：
 #   2026-04-17  Copilot  计划3阶段四：从 __init__.py 提取重写

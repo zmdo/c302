@@ -4,7 +4,16 @@
 #   的参数处理逻辑。
 #
 # 类与方法索引：
-#   (由 gen_index.py 生成)
+#   TestConstants                        (L31)   — 模块常量测试
+#     test_default_data_reader           (L34)   — 默认数据读取器应为 SpreadsheetDataReader
+#     test_fw_data_reader                (L38)   — 前向数据读取器应为 UpdatedSpreadsheetDataReader2
+#   TestGenerateParamProcessing          (L43)   — generate() 的参数处理逻辑测试
+#     _make_params                       (L46)   — 构造模拟的参数对象
+#     test_generate_level_a_defaults     (L77)   — A 级别应使用 IAF 细胞并设置正确的电压默认值
+#     test_generate_level_c_uses_cells   (L111)  — C 级别应使用 cells（非 iaf_cells）
+#     test_generate_with_muscles         (L141)  — 传入 muscles_to_include 时应调用肌肉种群和连接创建
+#     test_generate_no_muscles           (L179)  — muscles_to_include=[] 时不应创建肌肉种群
+#     test_generate_param_overrides_update_notes (L209)  — param_overrides 非空时应重新生成注释
 #
 # 更新日志：
 #   2026-04-17  Copilot  计划3阶段四：新建

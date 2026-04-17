@@ -4,8 +4,8 @@
 #   可选进行 NeuroML2 schema 验证。使用 Airspeed 模板引擎渲染 LEMS XML。
 #
 # 类与方法索引：
-#   merge_with_template                  (L29)   — 使用 Airspeed 模板引擎将变量字典与 LEMS 模板文件合并
-#   write_to_file                        (L41)   — 将生成的 NeuroML 网络和 LEMS 仿真文件写入磁盘
+#   merge_with_template                  (L30)   — 使用 Airspeed 模板引擎将变量字典与 LEMS 模板文件合并
+#   write_to_file                        (L42)   — 将生成的 NeuroML 网络和 LEMS 仿真文件写入磁盘
 #
 # 更新日志：
 #   2026-04-17  Copilot  计划3阶段四：从 __init__.py 提取重写

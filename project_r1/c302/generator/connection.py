@@ -5,16 +5,16 @@
 #   处理连接数量覆盖/缩放、极性覆盖和正则参数展开。
 #
 # 类与方法索引：
-#   get_projection_id                    (L43)   — 根据突触前/后细胞和突触分类生成标准 Projection ID
-#   set_param                            (L57)   — 设置或新增生物参数值
-#   mirror_param                         (L77)   — 为双向缝隙连接参数设置镜像值（A-B 和 B-A 使用相同参数）
-#   _apply_regex_param_overrides         (L101)  — 展开正则参数覆盖到具体连接
-#   _apply_number_processing             (L168)  — 处理连接数量：全局缩放 → 覆盖 → 缩放
-#   _create_projection                   (L217)  — 创建单条投射（化学/电/连续）
-#   _ensure_silent_synapse               (L310)  — 确保文档中有 SilentSynapse（模拟/非 NeuroML 连接需要）
-#   _process_single_connection           (L319)  — 处理单条连接并创建对应的投射
-#   create_neuron_connections            (L434)  — 创建神经元间连接
-#   create_muscle_connections            (L483)  — 创建神经元→肌肉和肌肉→肌肉连接
+#   get_projection_id                    (L52)   — 根据突触前/后细胞和突触分类生成标准 Projection ID
+#   set_param                            (L66)   — 设置或新增生物参数值
+#   mirror_param                         (L86)   — 为双向缝隙连接参数设置镜像值（A-B 和 B-A 使用相同参数）
+#   _apply_regex_param_overrides         (L110)  — 展开正则参数覆盖到具体连接
+#   _apply_number_processing             (L177)  — 处理连接数量：全局缩放 → 覆盖 → 缩放
+#   _create_projection                   (L226)  — 创建单条投射（化学/电/连续）
+#   _ensure_silent_synapse               (L319)  — 确保文档中有 SilentSynapse（模拟/非 NeuroML 连接需要）
+#   _process_single_connection           (L328)  — 处理单条连接并创建对应的投射
+#   create_neuron_connections            (L443)  — 创建神经元间连接
+#   create_muscle_connections            (L492)  — 创建神经元→肌肉和肌肉→肌肉连接
 #
 # 更新日志：
 #   2026-04-17  Copilot  计划3阶段四：从 __init__.py 提取重写

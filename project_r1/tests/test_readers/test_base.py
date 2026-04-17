@@ -4,16 +4,53 @@
 #   细胞类型判断函数、名称规范化函数。
 #
 # 类与方法索引：
-#   TestConnectionInfo                   (L26)   — ConnectionInfo 数据类测试
-#   TestConnectionInfoOrdering           (L76)   — ConnectionInfo 排序测试
-#   TestNeuronsConstant                  (L90)   — NEURONS 常量测试
-#   TestMusclesConstant                  (L104)  — MUSCLES 常量测试
-#   TestConvertToPreferredMuscleName     (L118)  — 肌肉名称转换测试
-#   TestIsMuscle                         (L139)  — is_muscle 判断测试
-#   TestIsBodyWallMuscle                 (L153)  — is_body_wall_muscle 判断测试
-#   TestIsNeuron                         (L167)  — is_neuron 判断测试
-#   TestRemoveLeadingIndexZero           (L181)  — 前导零去除测试
-#   TestCheckNeurons                     (L195)  — check_neurons 三路比对测试
+#   TestConnectionInfo                   (L78)   — ConnectionInfo 数据类测试
+#     test_create                        (L81)   — 创建连接记录
+#     test_str                           (L90)   — 格式化输出
+#     test_short                         (L98)   — 简短输出
+#     test_eq                            (L105)  — 相等比较
+#     test_neq                           (L111)  — 不等比较
+#     test_repr                          (L117)  — repr 输出
+#   TestConnectionInfoOrdering           (L123)  — ConnectionInfo 排序测试
+#     test_lt                            (L126)  — 小于比较
+#     test_sorting                       (L132)  — 列表排序
+#   TestNeuronsConstant                  (L140)  — NEURONS 常量测试
+#     test_count                         (L143)  — 应有 302 个神经元
+#     test_known_neurons                 (L147)  — 包含已知关键神经元
+#     test_no_duplicates                 (L153)  — 无重复名称
+#   TestMusclesConstant                  (L158)  — MUSCLES 常量测试
+#     test_count                         (L161)  — 应有 97 个肌肉名称
+#     test_known_muscles                 (L165)  — 包含已知肌肉
+#     test_no_duplicates                 (L171)  — 无重复名称
+#   TestConvertToPreferredMuscleName     (L176)  — 肌肉名称转换测试
+#     test_bwm_vl                        (L179)  — test_bwm_vl 函数
+#     test_bwm_vr                        (L182)  — test_bwm_vr 函数
+#     test_bwm_dl                        (L185)  — test_bwm_dl 函数
+#     test_bwm_dr                        (L188)  — test_bwm_dr 函数
+#     test_legacy                        (L191)  — test_legacy 函数
+#     test_unknown                       (L194)  — test_unknown 函数
+#   TestIsMuscle                         (L199)  — is_muscle 判断测试
+#     test_body_wall_muscle              (L202)  — test_body_wall_muscle 函数
+#     test_pharyngeal_muscle             (L205)  — test_pharyngeal_muscle 函数
+#     test_neuron                        (L208)  — test_neuron 函数
+#     test_vbwm_prefix                   (L211)  — test_vbwm_prefix 函数
+#   TestIsBodyWallMuscle                 (L215)  — is_body_wall_muscle 判断测试
+#     test_bwm_d                         (L218)  — test_bwm_d 函数
+#     test_pharyngeal_not_body_wall      (L221)  — test_pharyngeal_not_body_wall 函数
+#     test_neuron                        (L224)  — test_neuron 函数
+#   TestIsNeuron                         (L228)  — is_neuron 判断测试
+#     test_neuron                        (L231)  — test_neuron 函数
+#     test_body_wall_muscle              (L234)  — test_body_wall_muscle 函数
+#     test_pharyngeal_is_neuron          (L237)  — 咽部肌肉不是体壁肌肉，所以 is_neuron 返回 True
+#   TestRemoveLeadingIndexZero           (L242)  — 前导零去除测试
+#     test_with_leading_zero             (L245)  — test_with_leading_zero 函数
+#     test_without_leading_zero          (L248)  — test_without_leading_zero 函数
+#     test_two_digit_no_zero             (L251)  — test_two_digit_no_zero 函数
+#     test_muscle_unchanged              (L254)  — 体壁肌肉不受影响
+#   TestCheckNeurons                     (L259)  — check_neurons 三路比对测试
+#     test_all_preferred                 (L262)  — 全部是标准神经元
+#     test_with_non_neuron               (L271)  — 包含非神经元
+#     test_missing_preferred             (L277)  — 少数标准神经元缺失
 #
 # 更新日志：
 #   2026-04-17  yi  初始创建

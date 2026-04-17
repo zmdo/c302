@@ -4,7 +4,24 @@
 #   以及种群创建的核心逻辑。
 #
 # 类与方法索引：
-#   (由 gen_index.py 生成)
+#   _FakeParams                          (L39)   — 用于测试的模拟参数对象
+#     __init__                           (L42)   — __init__ 函数
+#     is_level_D                         (L49)   — is_level_D 函数
+#     is_level_C                         (L52)   — is_level_C 函数
+#     is_level_A                         (L55)   — is_level_A 函数
+#     is_level_B                         (L58)   — is_level_B 函数
+#   TestGetCellIdString                  (L62)   — get_cell_id_string 测试
+#     test_neuron_non_d_level            (L65)   — 非 D 级神经元应使用 generic_neuron_cell.id
+#     test_muscle_non_d_level            (L71)   — 非 D 级肌肉应使用 generic_muscle_cell.id
+#     test_neuron_d_level                (L77)   — D 级神经元应使用细胞名本身
+#     test_muscle_d_level                (L83)   — D 级肌肉仍使用 generic_muscle_cell.id
+#     test_auto_detect_muscle            (L89)   — 体壁肌肉名称应自动检测为肌肉
+#   TestIsCondBasedCell                  (L97)   — is_cond_based_cell 测试
+#     test_level_a_not_cond_based        (L100)  — A 级不是导电模型
+#     test_level_b_not_cond_based        (L104)  — B 级不是导电模型
+#     test_level_c_is_cond_based         (L108)  — C 级是导电模型
+#     test_level_d_is_cond_based         (L112)  — D 级是导电模型
+#     test_level_c0_is_cond_based        (L116)  — C0 级是导电模型
 #
 # 更新日志：
 #   2026-04-17  Copilot  计划3阶段四：新建

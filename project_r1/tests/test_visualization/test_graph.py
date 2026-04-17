@@ -26,6 +26,10 @@
 #   TestFindNmlFiles                     (L192)  — NML 文件搜索测试
 #     test_finds_nml_files               (L195)  — 应找到 .nml 文件
 #     test_recursive_search              (L203)  — 递归搜索应找到子目录中的文件
+#   TestExecuteGraphGenerator            (L212)  — execute_graph_generator 测试
+#     test_calls_neato_and_dot           (L215)  — 应调用 neato 和 dot 命令
+#   TestGenerateGraph                    (L235)  — generate_graph 端到端测试（mock 外部命令）
+#     test_generates_both_layouts        (L238)  — 应生成 dot 和 neato 两种布局
 #
 # 更新日志：
 #   2026-04-17  Copilot  计划3阶段七：新建
@@ -207,3 +211,49 @@ class TestFindNmlFiles:
         (subdir / "nested.nml").write_text("<nml/>")
         files = find_nml_files(str(tmp_path), recursive=True)
         assert len(files) == 1
+
+
+class TestExecuteGraphGenerator:
+    """execute_graph_generator 测试。"""
+
+    def test_calls_neato_and_dot(self, tmp_path) -> None:
+        """应调用 neato 和 dot 命令。"""
+        from unittest.mock import patch, call
+        from c302.visualization.graph import execute_graph_generator
+
+        gv = str(tmp_path / "test.gv")
+        fig = str(tmp_path / "test.png")
+        # 创建虚拟 gv 文件
+        Path(gv).write_text("digraph {}")
+
+        with patch("c302.visualization.graph.subprocess.call") as mock_call, \
+             patch("c302.visualization.graph.os.system") as mock_system:
+            mock_call.return_value = 0
+            execute_graph_generator(gv, fig)
+            # neato 调用
+            assert mock_call.call_count == 1
+            # dot | neato 管线
+            assert mock_system.call_count == 1
+
+
+class TestGenerateGraph:
+    """generate_graph 端到端测试（mock 外部命令）。"""
+
+    def test_generates_both_layouts(self, tmp_path, nml_root) -> None:
+        """应生成 dot 和 neato 两种布局。"""
+        from unittest.mock import patch
+        from c302.visualization.graph import generate_graph
+
+        # 写出 NML 文件
+        nml_file = str(tmp_path / "test.net.nml")
+        tree = ET.ElementTree(nml_root)
+        tree.write(nml_file)
+
+        with patch("c302.visualization.graph.subprocess.call") as mock_call, \
+             patch("c302.visualization.graph.os.system"):
+            mock_call.return_value = 0
+            generate_graph(nml_file)
+
+        # 应生成 2 个 gv 文件
+        gv_files = list(tmp_path.glob("*.gv"))
+        assert len(gv_files) == 2

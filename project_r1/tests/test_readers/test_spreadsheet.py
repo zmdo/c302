@@ -3,8 +3,19 @@
 #   SpreadsheetDataReader 的单元测试：XLS 解析正确性、连接数据完整性。
 #
 # 类与方法索引：
-#   TestSpreadsheetReadData              (L23)   — read_data 测试
-#   TestSpreadsheetReadMuscleData        (L55)   — read_muscle_data 测试
+#   TestSpreadsheetReadData              (L32)   — read_data 测试（CElegansNeuronTables.xls）
+#     test_returns_tuple                 (L35)   — 返回值为 (cells, conns) 元组
+#     test_cells_not_empty               (L41)   — 应返回非空的细胞列表
+#     test_conns_not_empty               (L46)   — 应返回非空的连接列表
+#     test_conn_type                     (L51)   — 每个连接应为 ConnectionInfo 实例
+#     test_include_nonconnected_cells    (L56)   — include_nonconnected_cells=True 应包含 CANL/CANR/VC6
+#     test_neuron_connect_mode           (L63)   — neuron_connect=True 使用 NeuronConnectFormatted.xlsx
+#   TestSpreadsheetReadMuscleData        (L73)   — read_muscle_data 测试
+#     test_returns_triple                (L76)   — 返回值为 (neurons, muscles, conns) 三元组
+#     test_neurons_not_empty             (L83)   — 运动神经元列表不为空
+#     test_muscles_not_empty             (L88)   — 肌肉列表不为空
+#     test_conns_all_send                (L93)   — 肌肉连接的突触类型均为 Send
+#     test_synclass_no_comma             (L98)   — synclass 字段不含逗号
 #
 # 更新日志：
 #   2026-04-17  yi  初始创建

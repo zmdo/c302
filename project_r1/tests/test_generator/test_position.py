@@ -4,7 +4,30 @@
 #   肌肉名称判断和名称列表生成。
 #
 # 类与方法索引：
-#   (由 gen_index.py 生成)
+#   TestGetCellPosition                  (L50)   — get_cell_position 测试
+#     test_returns_tuple_of_three_floats (L53)   — 应返回三元组 (x, y, z)
+#     test_different_cells_have_different_positions (L60)   — 不同细胞的 soma 位置应不同
+#     test_nonexistent_cell_raises       (L67)   — 不存在的细胞文件应抛出异常
+#   TestGetMusclePosition                (L73)   — get_muscle_position 测试
+#     test_standard_muscle_mdl01         (L76)   — MDL01 应返回 (80, -270, 80)
+#     test_standard_muscle_mvr12         (L83)   — MVR12 应返回 (-80, 60, -80)
+#     test_special_muscle_manal          (L90)   — MANAL 返回原点
+#     test_special_muscle_mvulva         (L94)   — MVULVA 返回原点
+#     test_alternate_format_vl10         (L98)   — 无 M 前缀格式 VL10 也应正常解析
+#     test_unrecognized_raises           (L105)  — 无法识别的肌肉名称应抛出 ValueError
+#   TestIsBodyWallMuscle                 (L111)  — is_body_wall_muscle 测试
+#     test_standard_muscles              (L114)  — 标准体壁肌肉名称应返回 True
+#     test_neurons_are_not_muscles       (L119)  — 神经元名称应返回 False
+#     test_special_muscles_not_matching_pattern (L124)  — MANAL/MVULVA 不匹配体壁肌肉正则
+#   TestGetMuscleNames                   (L130)  — get_muscle_names 测试
+#     test_returns_96_names              (L133)  — 应返回 96 个肌肉名称
+#     test_quadrant_distribution         (L138)  — 每个象限应有 24 个肌肉
+#     test_padding                       (L145)  — 1-9 应补零，10-24 不补零
+#     test_no_duplicates                 (L153)  — 不应有重复名称
+#   TestSomaPositionDicts                (L159)  — VB/DB soma 位置字典测试
+#     test_vb_has_11_entries             (L162)  — VB_SOMA_POS 应有 11 个条目
+#     test_db_has_7_entries              (L166)  — DB_SOMA_POS 应有 7 个条目
+#     test_values_are_floats_in_range    (L170)  — 所有位置值应在 [0, 1] 范围内
 #
 # 更新日志：
 #   2026-04-17  Copilot  计划3阶段四：新建

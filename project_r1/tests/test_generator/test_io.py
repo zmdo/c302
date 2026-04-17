@@ -3,7 +3,12 @@
 #   文件写出模块的单元测试。覆盖 LEMS 模板合并和文件输出路径。
 #
 # 类与方法索引：
-#   (由 gen_index.py 生成)
+#   TestMergeWithTemplate                (L28)   — merge_with_template 测试
+#     test_template_file_constant        (L31)   — 模板文件常量应为 LEMS_c302_TEMPLATE.xml
+#     test_basic_merge                   (L35)   — 应正确替换模板变量
+#     test_missing_template_raises       (L60)   — 模板文件不存在时应抛出异常
+#   TestWriteToFile                      (L70)   — write_to_file 测试（集成方面仅验证路径逻辑）
+#     test_creates_output_directory      (L73)   — 应能创建输出目录
 #
 # 更新日志：
 #   2026-04-17  Copilot  计划3阶段四：新建

@@ -4,10 +4,10 @@
 #   的创建，以及将刺激绑定到 NeuroML 网络 InputList 的功能。
 #
 # 类与方法索引：
-#   get_next_stim_id                     (L29)   — 为指定细胞生成下一个不重复的刺激 ID
-#   append_input_to_nml_input_list       (L46)   — 将刺激输入追加到 NeuroML 网络的 InputList 中
-#   add_new_input                        (L68)   — 为指定细胞创建脉冲刺激输入
-#   add_new_sinusoidal_input             (L88)   — 为指定细胞创建正弦波刺激输入
+#   get_next_stim_id                     (L32)   — 为指定细胞生成下一个不重复的刺激 ID
+#   append_input_to_nml_input_list       (L49)   — 将刺激输入追加到 NeuroML 网络的 InputList 中
+#   add_new_input                        (L71)   — 为指定细胞创建脉冲刺激输入
+#   add_new_sinusoidal_input             (L91)   — 为指定细胞创建正弦波刺激输入
 #
 # 更新日志：
 #   2026-04-17  Copilot  计划3阶段四：从 __init__.py 提取重写

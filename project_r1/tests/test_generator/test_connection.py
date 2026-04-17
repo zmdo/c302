@@ -4,7 +4,31 @@
 #   连接数量处理和投射创建逻辑。
 #
 # 类与方法索引：
-#   (由 gen_index.py 生成)
+#   _FakeConn                            (L53)   — 模拟连接对象
+#     __init__                           (L56)   — __init__ 函数
+#   _FakeParams                          (L64)   — 模拟参数模型对象
+#     __init__                           (L67)   — __init__ 函数
+#     get_bioparameter                   (L70)   — get_bioparameter 函数
+#     set_bioparameter                   (L76)   — set_bioparameter 函数
+#     add_bioparameter                   (L83)   — add_bioparameter 函数
+#   TestGetProjectionId                  (L87)   — get_projection_id 测试
+#     test_standard_format               (L90)   — 应返回 NC_pre_post_synclass 格式
+#     test_gap_junction                  (L95)   — 电突触也使用相同格式
+#   TestSetParam                         (L101)  — set_param 测试
+#     test_add_new_param                 (L104)  — 不存在的参数应被添加
+#     test_update_existing_param         (L110)  — 已存在的参数应被更新
+#     test_same_value_no_update          (L117)  — 相同值不应触发更新
+#   TestMirrorParam                      (L126)  — mirror_param 测试
+#     test_creates_both_directions       (L129)  — 应同时创建正向和反向参数
+#   TestApplyNumberProcessing            (L142)  — _apply_number_processing 测试
+#     test_no_modifications              (L145)  — 无覆盖/缩放时应返回原始数量
+#     test_number_override               (L152)  — 连接数量覆盖应替换原始值
+#     test_number_scaling                (L161)  — 连接数量缩放应使用原始 conn.number
+#     test_global_power_scaling          (L170)  — 全局幂缩放应正确计算
+#     test_regex_override                (L180)  — 正则模式覆盖应匹配
+#   TestEnsureSilentSynapse              (L190)  — _ensure_silent_synapse 测试
+#     test_adds_silent_synapse_when_empty (L193)  — 空文档应添加 SilentSynapse
+#     test_no_duplicate_when_exists      (L201)  — 已有 SilentSynapse 时不应重复添加
 #
 # 更新日志：
 #   2026-04-17  Copilot  计划3阶段四：新建
