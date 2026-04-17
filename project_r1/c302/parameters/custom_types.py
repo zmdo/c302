@@ -4,14 +4,46 @@
 #   从 factory.py 提取，供多个层级模型复用。
 #
 # 类与方法索引：
-#   IafActivityCell                      (L26)  — IafCell 变体，增加 tau1 时间常数（对应 cell_B.xml 中的 iafActivityCell）
-#     __init__                           (L29)  — __init__ 函数
-#     export                             (L38)  — 将 iafActivityCell 写入 NeuroML XML
-#   GradedSynapse2                       (L56)  — 自定义 GradedSynapse2（对应 custom_synapses.xml 中的 gradedSynapse2）
-#     __init__                           (L59)  — __init__ 函数
-#     export                             (L68)  — 将 gradedSynapse2 写入 NeuroML XML
-#   CellW2D                              (L84)  — W2D 偏置-增益细胞（对应 cell_W2D.xml 中的 cellW2D）
-#   OutputSynapse                        (L92)  — W2D 输出突触（对应 custom_synapses.xml 中的 outputSynapse）
+#   IafActivityCell                      (L26)   — IafCell 变体，增加 tau1 时间常数（对应 cell_B.xml 中的 iafActivityCell）
+#     __init__                           (L29)   — __init__ 函数
+#     export                             (L38)   — 将 iafActivityCell 写入 NeuroML XML
+#   GradedSynapse2                       (L56)   — 自定义 GradedSynapse2（对应 custom_synapses.xml 中的 gradedSynapse2）
+#     __init__                           (L59)   — __init__ 函数
+#     export                             (L68)   — 将 gradedSynapse2 写入 NeuroML XML
+#   CellW2D                              (L86)   — W2D 偏置-增益细胞（对应 cell_W2D.xml 中的 cellW2D）
+#     __init__                           (L89)   — __init__ 函数
+#   OutputSynapse                        (L93)   — W2D 输出突触（对应 custom_synapses.xml 中的 outputSynapse）
+#     __init__                           (L96)   — __init__ 函数
+#   DelayedGapJunction                   (L105)  — 延迟调制缝隙连接（C2，sigmoid 时间调制）
+#     __init__                           (L108)  — __init__ 函数
+#     export                             (L115)  — export 函数
+#   ProprioGapJunction                   (L123)  — 本体感觉调制缝隙连接（C2）
+#     __init__                           (L126)  — __init__ 函数
+#     export                             (L136)  — export 函数
+#   ProprioGapJunction2                  (L151)  — 增强型本体感觉缝隙连接（C2，支持门控参数）
+#     __init__                           (L154)  — __init__ 函数
+#     export                             (L180)  — export 函数
+#   NeuronMuscle                         (L200)  — 肌肉本体感觉反馈类突触（C2）
+#     __init__                           (L203)  — __init__ 函数
+#     export                             (L212)  — export 函数
+#   MuscleConcentrationModel2            (L228)  — 扩展肌肉钙浓度模型（C2，含 sigmoid 浓度阈值调制）
+#     __init__                           (L231)  — __init__ 函数
+#     export                             (L259)  — export 函数
+#   DelayedGapJunction                   (L285)  — 延迟调制缝隙连接（C2，sigmoid 时间调制）
+#     __init__                           (L288)  — __init__ 函数
+#     export                             (L295)  — export 函数
+#   ProprioGapJunction                   (L303)  — 本体感觉调制缝隙连接（C2）
+#     __init__                           (L306)  — __init__ 函数
+#     export                             (L316)  — export 函数
+#   ProprioGapJunction2                  (L331)  — 增强型本体感觉缝隙连接（C2，支持门控参数）
+#     __init__                           (L334)  — __init__ 函数
+#     export                             (L360)  — export 函数
+#   NeuronMuscle                         (L380)  — 肌肉本体感觉反馈类突触（C2）
+#     __init__                           (L383)  — __init__ 函数
+#     export                             (L392)  — export 函数
+#   MuscleConcentrationModel2            (L408)  — 扩展肌肉钙浓度模型（C2，含 sigmoid 浓度阈值调制）
+#     __init__                           (L411)  — __init__ 函数
+#     export                             (L439)  — export 函数
 #
 # 更新日志：
 #   2026-04-18  Copilot  计划4阶段二：从 factory.py 提取自定义组件类型

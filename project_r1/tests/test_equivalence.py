@@ -5,18 +5,37 @@
 #   细胞模型、突触模型等计数和值。
 #
 # 类与方法索引：
-#   _discover_baselines                  — 自动发现可用基线文件
-#   _load_baseline                       — 从 JSON 文件加载基线数据
-#   _count_connections                   — 统计 NeuroML 文档中的连接数（分类型）
-#   _count_stimuli                       — 统计刺激输入数量
-#   _generate                            — 使用新代码生成 NeuroML 网络文档
-#   TestGeneration                       — 验证能成功生成 NeuroML 文档
-#   TestPopulations                      — 种群数量精确比对
-#   TestConnections                      — 连接总数精确比对
-#   TestStimuli                          — 刺激数量精确比对
-#   TestBioParameters                    — 参数数量和逐值比对
-#   TestCellModels                       — 细胞模型计数精确比对
-#   TestSynapseModels                    — 突触模型类型计数精确比对
+#   _discover_baselines                  (L42)   — 自动发现所有可用基线文件，返回 (config, level) 列表
+#   _load_baseline                       (L56)   — 加载基线 JSON 文件
+#   _count_connections                   (L101)  — 统计 NeuroML 文档中的连接数，分化学/电/连续三类
+#   _count_stimuli                       (L124)  — 统计刺激输入数量
+#   _generate                            (L132)  — 使用新代码生成 NeuroML 网络文档
+#   TestGeneration                       (L147)  — 验证每个支持的组合能成功生成 NeuroML 文档
+#     test_generate_success              (L151)  — 生成不抛异常
+#     test_has_network                   (L157)  — 文档包含至少一个网络
+#     test_has_populations               (L163)  — 网络包含至少一个种群
+#   _mark_known_diffs                    (L173)  — 对已知配置差异的组合添加 xfail 标记
+#   TestPopulations                      (L194)  — 种群数量精确比对
+#     test_count_exact                   (L198)  — 种群数量与基线一致
+#   TestConnections                      (L206)  — 连接数精确比对
+#     test_total_exact                   (L210)  — 连接总数与基线一致
+#   TestStimuli                          (L224)  — 刺激数量精确比对
+#     test_count_exact                   (L228)  — 刺激输入数量与基线一致
+#   TestBioParameters                    (L236)  — 参数数量和逐值比对
+#     test_count_exact                   (L240)  — 参数数量与基线一致
+#     test_values_match                  (L247)  — 逐参数值比对
+#     test_level_matches                 (L265)  — 模型的 level 属性与请求一致
+#   TestCellModels                       (L271)  — 细胞模型计数精确比对
+#     test_iaf_count                     (L275)  — IAF 细胞数量与基线一致
+#     test_hh_count                      (L282)  — HH 导电细胞数量与基线一致
+#     test_level_d_has_muscle_cell_only  (L288)  — Level D 仅注册通用肌肉 Cell（神经元为 per-cell 文件）
+#     test_level_d1_has_muscle_cell_only (L294)  — Level D1 仅注册通用肌肉 Cell
+#   TestSynapseModels                    (L301)  — 突触模型类型计数精确比对
+#     test_exp_two_count                 (L305)  — ExpTwoSynapse 数量与基线一致
+#     test_gap_junction_count            (L312)  — GapJunction 数量与基线一致
+#     test_graded_synapse_count          (L319)  — GradedSynapse 数量与基线一致
+#     test_graded_synapse2_count         (L326)  — GradedSynapse2 数量与基线一致
+#     test_level_bc1_has_graded_synapses (L341)  — Level BC1 使用 GradedSynapse 化学突触 + GapJunction 电突触
 #
 # 更新日志：
 #   2026-04-18  Copilot  计划3阶段八：新建等价性测试
@@ -68,11 +87,23 @@ SUPPORTED_CASES = [
     ("IClamp", "A"),
     ("IClamp", "B"),
     ("IClamp", "BC1"),
+    ("IClamp", "C"),
     ("IClamp", "C0"),
+    ("IClamp", "C1"),
+    ("IClamp", "C2"),
     ("IClamp", "D"),
     ("IClamp", "D1"),
+    ("IClamp", "W2D"),
     ("Syns", "A"),
+    ("Syns", "B"),
     ("Syns", "BC1"),
+    ("Syns", "C"),
+    ("Syns", "C0"),
+    ("Syns", "C1"),
+    ("Syns", "C2"),
+    ("Syns", "D"),
+    ("Syns", "D1"),
+    ("Syns", "W2D"),
     ("Social", "C0"),
     ("Oscillator", "C1"),
     ("Muscles", "C"),

@@ -28,10 +28,10 @@
 #     test_inheritance_removals_wildcard (L177)  — B 继承 A，通配符移除 elec_syn_* 中 gbase 以外的参数
 #   TestParameterSetRegistry             (L188)  — 参数集注册表测试
 #     test_list_parameter_sets           (L191)  — 列出所有已实现的层级
-#     test_get_parameter_set             (L199)  — 按名称获取参数集，返回 c302ModelPrototype 实例
-#     test_get_parameter_set_case_insensitive (L207)  — 大小写不敏感
-#     test_get_parameter_set_unknown     (L212)  — 未知层级抛出 KeyError
-#     test_all_levels_loadable           (L217)  — 所有注册层级都可加载
+#     test_get_parameter_set             (L202)  — 按名称获取参数集，返回 c302ModelPrototype 实例
+#     test_get_parameter_set_case_insensitive (L210)  — 大小写不敏感
+#     test_get_parameter_set_unknown     (L215)  — 未知层级抛出 KeyError
+#     test_all_levels_loadable           (L220)  — 所有注册层级都可加载
 #
 # 更新日志：
 #   2026-04-17  Copilot  计划3阶段三：新建加载器单元测试

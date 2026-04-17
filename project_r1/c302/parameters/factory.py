@@ -5,72 +5,89 @@
 #   支持层级：A, B, C, C0, C1, D, D1（可扩展 BC1, C2, W2D）。
 #
 # 类与方法索引：
-#   (IafActivityCell — 已迁移至 custom_types.py)
-#   (GradedSynapse2 — 已迁移至 custom_types.py)
-#   (create_hh_cell — 已迁移至 cell_builder.py)
-#   (create_c0_cell — 已迁移至 cell_builder.py)
-#   _ModelBase                           (L178)  — 所有层级模型的基类，从 YAML 加载生物参数
-#     __init__                           (L181)  — __init__ 函数
-#     get_exc_syn                        (L198)  — 创建兴奋性化学突触（ExpTwoSynapse）
-#     get_inh_syn                        (L233)  — 创建抑制性化学突触（ExpTwoSynapse）
-#     _get_elec_syn_params               (L268)  — 提取电突触连接参数（gbase + 可选 erev/decay/rise）
-#   _IafModel                            (L304)  — Level A：积分放电模型 + 事件突触
-#     create_models                      (L307)  — 创建所有细胞和突触模型
-#     create_generic_muscle_cell         (L315)  — 创建通用肌肉 IafCell
-#     create_generic_neuron_cell         (L326)  — 创建通用神经元 IafCell
-#     create_offset                      (L337)  — 创建偏置电流生成器
-#     create_neuron_to_neuron_syn        (L346)  — 创建神经元间突触（全部 ExpTwoSynapse）
-#     create_neuron_to_muscle_syn        (L371)  — 创建神经元到肌肉突触（全部 ExpTwoSynapse）
-#     get_elec_syn                       (L395)  — Level A 的电突触 — 返回 ExpTwoSynapse（假电突触）
-#   _IafActivityModel                    (L418)  — Level B：IafActivityCell + 真实 GapJunction 电突触
-#     create_generic_muscle_cell         (L421)  — 创建通用肌肉 IafActivityCell
-#     create_generic_neuron_cell         (L433)  — 创建通用神经元 IafActivityCell
-#     create_neuron_to_neuron_syn        (L445)  — 创建神经元间突触（化学 ExpTwoSynapse + 电 GapJunction）
-#     create_neuron_to_muscle_syn        (L466)  — 创建神经元到肌肉突触（化学 ExpTwoSynapse + 电 GapJunction）
-#     get_elec_syn                       (L487)  — Level B 的电突触 — 返回 GapJunction
-#   _BC1Model                            (L494)  — Level BC1：IafActivityCell + GradedSynapse 化学突触
-#     create_neuron_to_neuron_syn        (L497)  — 创建神经元间突触（GradedSynapse + GapJunction）
-#     create_neuron_to_muscle_syn        (L520)  — 创建神经元到肌肉突触（GradedSynapse + GapJunction）
-#     get_exc_syn                        (L543)  — 兴奋性突触 — GradedSynapse
-#     get_inh_syn                        (L574)  — 抑制性突触 — GradedSynapse
-#   (create_hh_cell — 已迁移至 cell_builder.py)
-#   _HHModel                             (L608)  — Level C 族：单室 HH 导电模型
-#     create_models                      (L611)  — 创建肌肉/神经元细胞、偏置电流、浓度模型和突触
-#     create_generic_muscle_cell         (L619)  — 创建通用肌肉 HH 细胞
-#     create_generic_neuron_cell         (L625)  — 创建通用神经元 HH 细胞
-#     create_offsetcurrent_concentrationmodel (L631)  — 创建偏置电流和钙浓度模型
-#     create_neuron_to_neuron_syn        (L647)  — 创建神经元间突触（ExpTwoSynapse + GapJunction）
-#     create_neuron_to_muscle_syn        (L668)  — 创建神经元到肌肉突触（ExpTwoSynapse + GapJunction）
-#     get_elec_syn                       (L689)  — Level C 的电突触 — 返回 GapJunction
-#   (create_c0_cell — 已迁移至 cell_builder.py)
-#   _HHC0Model                           (L787)  — Level C0：HH 导电模型 + ca_simple 通道 + GradedSynapse2 突触
-#     create_models                      (L790)  — 创建所有细胞和突触模型
-#     create_generic_muscle_cell         (L798)  — 创建通用肌肉 HH 细胞（ca_simple 通道）
-#     create_generic_neuron_cell         (L804)  — 创建通用神经元 HH 细胞（ca_simple 通道）
-#     create_offsetcurrent_concentrationmodel (L810)  — 创建偏置电流和钙浓度模型
-#     create_neuron_to_neuron_syn        (L826)  — 创建神经元间突触（GradedSynapse2 + GapJunction）
-#     create_neuron_to_muscle_syn        (L855)  — 创建神经元到肌肉突触（GradedSynapse2 + GapJunction）
-#     get_elec_syn                       (L884)  — 电突触 — GapJunction
-#     get_exc_syn                        (L889)  — 兴奋性突触 — GradedSynapse2
-#     get_inh_syn                        (L929)  — 抑制性突触 — GradedSynapse2
-#     create_n_connection_synapse        (L969)  — 注册突触原型（含 GradedSynapse2 支持）
-#     is_analog_conn                     (L981)  — 判断是否为模拟连接
-#   _HHC1Model                           (L991)  — Level C1：HH 导电模型 + 标准 GradedSynapse 化学突触
-#     create_neuron_to_neuron_syn        (L994)  — 创建神经元间突触（GradedSynapse + GapJunction）
-#     create_neuron_to_muscle_syn        (L1021) — 创建神经元到肌肉突触（GradedSynapse + GapJunction）
-#     get_exc_syn                        (L1048) — 兴奋性突触 — GradedSynapse
-#     get_inh_syn                        (L1081) — 抑制性突触 — GradedSynapse
-#   _HHMultiCompModel                    (L1120) — Level D：导电模型，无通用神经元细胞（按名称从 NML 创建）
-#     create_models                      (L1123) — 创建肌肉细胞、偏置电流、浓度模型和突触（不创建通用神经元）
-#     create_neuron_cell                 (L1131) — 创建单个神经元 Cell（D 族特有的逐个构建方式）
-#   _HHGradedModel                       (L1224) — Level D1：导电模型 + GradedSynapse2 化学突触
-#     create_neuron_to_neuron_syn        (L1227) — 创建神经元间突触（GradedSynapse2 + GapJunction）
-#     create_neuron_to_muscle_syn        (L1256) — 创建神经元到肌肉突触（GradedSynapse2 + GapJunction）
-#     get_exc_syn                        (L1285) — Level D1 的兴奋性突触 — 返回 GradedSynapse2
-#     get_inh_syn                        (L1328) — Level D1 的抑制性突触 — 返回 GradedSynapse2
-#     create_n_connection_synapse        (L1371) — 注册突触原型（含 GradedSynapse2 支持）
-#     is_analog_conn                     (L1385) — 判断是否为模拟连接（含 GradedSynapse2）
-#   create_model                         (L1406) — 根据层级名称创建参数化模型实例
+#   _ModelBase                           (L129)  — 所有层级模型的基类，从 YAML 加载生物参数
+#     __init__                           (L132)  — __init__ 函数
+#     get_exc_syn                        (L149)  — 创建兴奋性化学突触（ExpTwoSynapse）
+#     get_inh_syn                        (L184)  — 创建抑制性化学突触（ExpTwoSynapse）
+#     _get_elec_syn_params               (L219)  — 提取电突触连接参数（gbase + 可选 erev/decay/rise）
+#   _IafModel                            (L255)  — Level A：积分放电模型 + 事件突触
+#     create_models                      (L258)  — 创建所有细胞和突触模型
+#     create_generic_muscle_cell         (L266)  — 创建通用肌肉 IafCell
+#     create_generic_neuron_cell         (L277)  — 创建通用神经元 IafCell
+#     create_offset                      (L288)  — 创建偏置电流生成器
+#     create_neuron_to_neuron_syn        (L297)  — 创建神经元间突触（全部 ExpTwoSynapse）
+#     create_neuron_to_muscle_syn        (L322)  — 创建神经元到肌肉突触（全部 ExpTwoSynapse）
+#     get_elec_syn                       (L346)  — Level A 的电突触 — 返回 ExpTwoSynapse（假电突触）
+#   _IafActivityModel                    (L369)  — Level B：IafActivityCell + 真实 GapJunction 电突触
+#     create_generic_muscle_cell         (L372)  — 创建通用肌肉 IafActivityCell
+#     create_generic_neuron_cell         (L384)  — 创建通用神经元 IafActivityCell
+#     create_neuron_to_neuron_syn        (L396)  — 创建神经元间突触（化学 ExpTwoSynapse + 电 GapJunction）
+#     create_neuron_to_muscle_syn        (L417)  — 创建神经元到肌肉突触（化学 ExpTwoSynapse + 电 GapJunction）
+#     get_elec_syn                       (L438)  — Level B 的电突触 — 返回 GapJunction
+#   _BC1Model                            (L449)  — Level BC1：IafActivityCell 细胞 + 标准 GradedSynapse 化学突触
+#     create_neuron_to_neuron_syn        (L452)  — 创建神经元间突触（GradedSynapse + GapJunction）
+#     create_neuron_to_muscle_syn        (L479)  — 创建神经元到肌肉突触（GradedSynapse + GapJunction）
+#     get_exc_syn                        (L506)  — 兴奋性突触 — GradedSynapse
+#     get_inh_syn                        (L539)  — 抑制性突触 — GradedSynapse
+#   _HHModel                             (L578)  — Level C 族：单室 HH 导电模型
+#     create_models                      (L581)  — 创建肌肉/神经元细胞、偏置电流、浓度模型和突触
+#     create_generic_muscle_cell         (L589)  — 创建通用肌肉 HH 细胞
+#     create_generic_neuron_cell         (L595)  — 创建通用神经元 HH 细胞
+#     create_offsetcurrent_concentrationmodel (L601)  — 创建偏置电流和钙浓度模型
+#     create_neuron_to_neuron_syn        (L617)  — 创建神经元间突触（ExpTwoSynapse + GapJunction）
+#     create_neuron_to_muscle_syn        (L638)  — 创建神经元到肌肉突触（ExpTwoSynapse + GapJunction）
+#     get_elec_syn                       (L659)  — Level C 的电突触 — 返回 GapJunction
+#   _HHC0Model                           (L670)  — Level C0：HH 导电模型 + ca_simple 通道 + GradedSynapse2 突触
+#     create_models                      (L673)  — 创建所有细胞和突触模型
+#     create_generic_muscle_cell         (L681)  — 创建通用肌肉 HH 细胞（ca_simple 通道）
+#     create_generic_neuron_cell         (L687)  — 创建通用神经元 HH 细胞（ca_simple 通道）
+#     create_offsetcurrent_concentrationmodel (L693)  — 创建偏置电流和钙浓度模型
+#     create_neuron_to_neuron_syn        (L709)  — 创建神经元间突触（GradedSynapse2 + GapJunction）
+#     create_neuron_to_muscle_syn        (L738)  — 创建神经元到肌肉突触（GradedSynapse2 + GapJunction）
+#     get_elec_syn                       (L767)  — 电突触 — GapJunction
+#     get_exc_syn                        (L772)  — 兴奋性突触 — GradedSynapse2
+#     get_inh_syn                        (L812)  — 抑制性突触 — GradedSynapse2
+#     create_n_connection_synapse        (L852)  — 注册突触原型（含 GradedSynapse2 支持）
+#     is_analog_conn                     (L864)  — 判断是否为模拟连接
+#   _HHC1Model                           (L874)  — Level C1：HH 导电模型 + 标准 GradedSynapse 化学突触
+#     create_neuron_to_neuron_syn        (L877)  — 创建神经元间突触（GradedSynapse + GapJunction）
+#     create_neuron_to_muscle_syn        (L904)  — 创建神经元到肌肉突触（GradedSynapse + GapJunction）
+#     get_exc_syn                        (L931)  — 兴奋性突触 — GradedSynapse
+#     get_inh_syn                        (L964)  — 抑制性突触 — GradedSynapse
+#   _HHMultiCompModel                    (L1003) — Level D：导电模型，无通用神经元细胞（按名称从 NML 创建）
+#     create_models                      (L1006) — 创建肌肉细胞、偏置电流、浓度模型和突触（不创建通用神经元）
+#     create_neuron_cell                 (L1014) — 创建单个神经元 Cell（D 族特有的逐个构建方式）
+#   _HHGradedModel                       (L1107) — Level D1：导电模型 + GradedSynapse2 化学突触
+#     create_neuron_to_neuron_syn        (L1110) — 创建神经元间突触（GradedSynapse2 + GapJunction）
+#     create_neuron_to_muscle_syn        (L1139) — 创建神经元到肌肉突触（GradedSynapse2 + GapJunction）
+#     get_exc_syn                        (L1168) — Level D1 的兴奋性突触 — 返回 GradedSynapse2
+#     get_inh_syn                        (L1211) — Level D1 的抑制性突触 — 返回 GradedSynapse2
+#     create_n_connection_synapse        (L1254) — 注册突触原型（含 GradedSynapse2 支持）
+#     is_analog_conn                     (L1268) — 判断是否为模拟连接（含 GradedSynapse2）
+#   _C2Model                             (L1278) — Level C2：HH 导电模型 + GradedSynapse + 多种自定义缝隙连接
+#     create_models                      (L1281) — 创建所有组件：浓度模型、肌肉/神经元、突触
+#     create_generic_muscle_cell         (L1290) — 创建 C2 肌肉细胞（独立膜参数和通道变体）
+#     create_offsetcurrent_concentrationmodel (L1380) — 创建偏置电流和独立的神经元/肌肉钙浓度模型
+#     create_neuron_to_neuron_syn        (L1432) — 创建神经元间突触（GradedSynapse + GapJunction + DelayedGapJunction）
+#     create_neuron_to_muscle_syn        (L1470) — 创建神经元到肌肉突触（GradedSynapse + GapJunction）
+#     create_muscle_to_muscle_syn        (L1497) — 创建肌肉间缝隙连接
+#     get_elec_syn                       (L1504) — 电突触 — 支持 DelayedGapJunction / ProprioGapJunction(2) / GapJunction
+#     get_exc_syn                        (L1586) — 兴奋性突触 — 支持 NeuronMuscle / GradedSynapse2 / GradedSynapse
+#     get_inh_syn                        (L1678) — 抑制性突触 — GradedSynapse
+#     create_n_connection_synapse        (L1718) — 注册突触原型（含 C2 自定义类型）
+#     is_elec_conn                       (L1741) — 判断是否为电突触（含延迟/本体感觉变体）
+#     is_analog_conn                     (L1747) — 判断是否为模拟连接（含 NeuronMuscle / GradedSynapse2）
+#   _W2DModel                            (L1759) — Level W2D：CellW2D 偏置-增益细胞 + OutputSynapse 连续突触
+#     create_models                      (L1762) — 创建肌肉/神经元细胞、偏置电流和突触
+#     create_generic_muscle_cell         (L1770) — 创建 W2D 通用肌肉细胞
+#     create_generic_neuron_cell         (L1774) — 创建 W2D 通用神经元细胞
+#     create_offset                      (L1778) — 创建偏置电流生成器
+#     create_neuron_to_neuron_syn        (L1787) — 创建神经元间突触（OutputSynapse + GapJunction）
+#     create_neuron_to_muscle_syn        (L1796) — 创建神经元到肌肉突触（OutputSynapse + GapJunction）
+#     get_elec_syn                       (L1804) — 根据连接类型返回 GapJunction
+#     get_exc_syn                        (L1819) — 兴奋性突触 — 返回 OutputSynapse
+#     get_inh_syn                        (L1823) — 抑制性突触 — 返回 OutputSynapse
+#   create_model                         (L1847) — 根据层级名称创建参数化模型实例
 #
 # 更新日志：
 #   2026-04-18  Copilot  计划4阶段二：拆分 custom_types.py + cell_builder.py
