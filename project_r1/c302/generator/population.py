@@ -16,6 +16,7 @@
 # =============================================================================
 """种群创建模块。"""
 import logging
+import os
 
 import neuroml.loaders as loaders
 import neuroml.writers as writers
@@ -142,6 +143,8 @@ def create_neuron_populations(
             nml_cell_doc.cells.append(new_cell)
             new_cell_file = "cells/%s_D.cell.nml" % cell
             nml_file = target_directory + "/" + new_cell_file
+            # 确保 cells/ 子目录存在
+            os.makedirs(os.path.dirname(nml_file), exist_ok=True)
             logger.info("Writing new cell to: %s", nml_file)
             writers.NeuroMLWriter.write(nml_cell_doc, nml_file)
 

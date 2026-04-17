@@ -49,6 +49,8 @@ SUPPORTED_CASES = [
     ("IClamp", "A"),
     ("IClamp", "B"),
     ("IClamp", "C0"),
+    ("IClamp", "D"),
+    ("IClamp", "D1"),
     ("Syns", "A"),
     ("Social", "C0"),
     ("Oscillator", "C1"),
@@ -57,9 +59,6 @@ SUPPORTED_CASES = [
     ("Pharyngeal", "C"),
     ("Full", "A"),
 ]
-
-# 注：("RIA", "D1") 依赖 D 族 create_neuron_cell，暂时排除
-# 直到 generator 对 D 族的 per-neuron cell 创建完全对接
 
 
 # -- 辅助函数 --
@@ -208,6 +207,19 @@ class TestCellModels:
         """Level C0 有钙浓度模型。"""
         nml_doc, _, _, _, _ = _generate("IClamp", "C0")
         assert len(nml_doc.fixed_factor_concentration_models) > 0
+
+    def test_level_d_has_muscle_cell_only(self):
+        """Level D 仅注册通用肌肉 Cell（神经元为 per-cell 文件）。"""
+        nml_doc, _, _, _, _ = _generate("IClamp", "D")
+        # D 级 nml_doc.cells 只有 GenericMuscleCell
+        assert len(nml_doc.cells) == 1
+        assert nml_doc.cells[0].id == "GenericMuscleCell"
+
+    def test_level_d1_has_muscle_cell_only(self):
+        """Level D1 仅注册通用肌肉 Cell。"""
+        nml_doc, _, _, _, _ = _generate("IClamp", "D1")
+        assert len(nml_doc.cells) == 1
+        assert nml_doc.cells[0].id == "GenericMuscleCell"
 
 
 class TestSynapseModels:
