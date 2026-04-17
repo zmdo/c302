@@ -10,6 +10,8 @@
 #   GradedSynapse2                       (L56)  — 自定义 GradedSynapse2（对应 custom_synapses.xml 中的 gradedSynapse2）
 #     __init__                           (L59)  — __init__ 函数
 #     export                             (L68)  — 将 gradedSynapse2 写入 NeuroML XML
+#   CellW2D                              (L84)  — W2D 偏置-增益细胞（对应 cell_W2D.xml 中的 cellW2D）
+#   OutputSynapse                        (L92)  — W2D 输出突触（对应 custom_synapses.xml 中的 outputSynapse）
 #
 # 更新日志：
 #   2026-04-18  Copilot  计划4阶段二：从 factory.py 提取自定义组件类型
@@ -17,6 +19,8 @@
 # 当前维护者：Copilot
 # =============================================================================
 """自定义 NeuroML 组件类型。"""
+
+from c302.parameters.model import NonNeuroMLCustomType
 
 
 class IafActivityCell:
@@ -77,3 +81,17 @@ class GradedSynapse2:
                 self.erev,
             )
         )
+
+
+class CellW2D(NonNeuroMLCustomType):
+    """W2D 偏置-增益细胞（对应 cell_W2D.xml 中的 cellW2D）。"""
+
+    def __init__(self, id):
+        self.id = id
+
+
+class OutputSynapse(NonNeuroMLCustomType):
+    """W2D 输出突触（对应 custom_synapses.xml 中的 outputSynapse）。"""
+
+    def __init__(self, id):
+        self.id = id

@@ -101,7 +101,7 @@ from neuroml import (
 )
 
 from c302.parameters.cell_builder import create_c0_cell, create_hh_cell
-from c302.parameters.custom_types import GradedSynapse2, IafActivityCell
+from c302.parameters.custom_types import CellW2D, GradedSynapse2, IafActivityCell, OutputSynapse
 from c302.parameters.loader import ParameterLoader
 from c302.parameters.model import c302ModelPrototype
 
@@ -1258,6 +1258,80 @@ class _HHGradedModel(_HHMultiCompModel):
 
 
 # ---------------------------------------------------------------------------
+# Level W2D — Worm2D 偏置-增益模型 + OutputSynapse + GapJunction
+# ---------------------------------------------------------------------------
+
+
+class _W2DModel(_ModelBase):
+    """Level W2D：CellW2D 偏置-增益细胞 + OutputSynapse 连续突触。"""
+
+    def create_models(self):
+        """创建肌肉/神经元细胞、偏置电流和突触。"""
+        self.create_generic_muscle_cell()
+        self.create_generic_neuron_cell()
+        self.create_offset()
+        self.create_neuron_to_neuron_syn()
+        self.create_neuron_to_muscle_syn()
+
+    def create_generic_muscle_cell(self):
+        """创建 W2D 通用肌肉细胞。"""
+        self.generic_muscle_cell = CellW2D(id="GenericMuscleCell")
+
+    def create_generic_neuron_cell(self):
+        """创建 W2D 通用神经元细胞。"""
+        self.generic_neuron_cell = CellW2D(id="GenericNeuronCell")
+
+    def create_offset(self):
+        """创建偏置电流生成器。"""
+        self.offset_current = PulseGenerator(
+            id="offset_current",
+            delay=self.get_bioparameter("unphysiological_offset_current_del").value,
+            duration=self.get_bioparameter("unphysiological_offset_current_dur").value,
+            amplitude=self.get_bioparameter("unphysiological_offset_current").value,
+        )
+
+    def create_neuron_to_neuron_syn(self):
+        """创建神经元间突触（OutputSynapse + GapJunction）。"""
+        self.neuron_to_neuron_exc_syn = OutputSynapse(id="neuron_to_neuron_exc_w2d")
+        self.neuron_to_neuron_inh_syn = OutputSynapse(id="neuron_to_neuron_inh_w2d")
+        self.neuron_to_neuron_elec_syn = GapJunction(
+            id="neuron_to_neuron_elec_syn",
+            conductance=self.get_bioparameter("neuron_to_neuron_elec_syn_gbase").value,
+        )
+
+    def create_neuron_to_muscle_syn(self):
+        """创建神经元到肌肉突触（OutputSynapse + GapJunction）。"""
+        self.neuron_to_muscle_exc_syn = OutputSynapse(id="neuron_to_muscle_w2d")
+        self.neuron_to_muscle_elec_syn = GapJunction(
+            id="neuron_to_muscle_elec_syn",
+            conductance=self.get_bioparameter("neuron_to_muscle_elec_syn_gbase").value,
+        )
+
+    def get_elec_syn(self, pre_cell, post_cell, type):
+        """根据连接类型返回 GapJunction。"""
+        if type == "neuron_to_neuron":
+            gbase = self.get_bioparameter("neuron_to_neuron_elec_syn_gbase").value
+            conn_id = "neuron_to_neuron_elec_syn"
+        elif type == "neuron_to_muscle":
+            gbase = self.get_bioparameter("neuron_to_muscle_elec_syn_gbase").value
+            conn_id = "neuron_to_muscle_elec_syn"
+        elif type == "muscle_to_muscle":
+            gbase = self.get_bioparameter("muscle_to_muscle_elec_syn_gbase").value
+            conn_id = "muscle_to_muscle_elec_syn"
+        else:
+            raise ValueError("Unknown electrical connection type: %s" % type)
+        return GapJunction(id=conn_id, conductance=gbase)
+
+    def get_exc_syn(self, pre_cell, post_cell, type):
+        """兴奋性突触 — 返回 OutputSynapse。"""
+        return self.neuron_to_neuron_exc_syn
+
+    def get_inh_syn(self, pre_cell, post_cell, type):
+        """抑制性突触 — 返回 OutputSynapse。"""
+        return self.neuron_to_neuron_inh_syn
+
+
+# ---------------------------------------------------------------------------
 # 层级 → 模型类映射
 # ---------------------------------------------------------------------------
 
@@ -1271,6 +1345,7 @@ _LEVEL_TO_CLASS: dict[str, type[_ModelBase]] = {
     "C1": _HHC1Model,
     "D": _HHMultiCompModel,
     "D1": _HHGradedModel,
+    "W2D": _W2DModel,
 }
 
 

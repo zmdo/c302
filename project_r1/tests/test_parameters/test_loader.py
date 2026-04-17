@@ -191,11 +191,12 @@ class TestParameterSetRegistry:
     def test_list_parameter_sets(self):
         """列出所有已实现的层级。"""
         levels = list_parameter_sets()
-        assert len(levels) == 8
+        assert len(levels) == 9
         assert "A" in levels
         assert "BC1" in levels
         assert "C0" in levels
         assert "D1" in levels
+        assert "W2D" in levels
 
     def test_get_parameter_set(self):
         """按名称获取参数集，返回 c302ModelPrototype 实例。"""
