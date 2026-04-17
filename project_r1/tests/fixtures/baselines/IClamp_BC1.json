@@ -1,0 +1,67 @@
+{
+  "config": "IClamp",
+  "level": "BC1",
+  "generated_by": "original",
+  "populations": {
+    "count": 3,
+    "names": [
+      "ADAL",
+      "MDR01",
+      "PVCL"
+    ]
+  },
+  "connections": {
+    "chemical": 0,
+    "electrical": 0,
+    "continuous": 0,
+    "total": 0
+  },
+  "stimuli": {
+    "input_lists": 18,
+    "total_inputs": 18
+  },
+  "bioparameters": {
+    "count": 29,
+    "values": {
+      "muscle_iaf_leak_reversal": "-50mV",
+      "muscle_iaf_reset": "-50mV",
+      "muscle_iaf_thresh": "-30mV",
+      "muscle_iaf_C": "3pF",
+      "muscle_iaf_conductance": "0.1nS",
+      "muscle_iaf_tau1": "50ms",
+      "neuron_iaf_leak_reversal": "-50mV",
+      "neuron_iaf_reset": "-50mV",
+      "neuron_iaf_thresh": "-30mV",
+      "neuron_iaf_C": "3pF",
+      "neuron_iaf_conductance": "0.1nS",
+      "neuron_iaf_tau1": "50ms",
+      "neuron_to_neuron_exc_syn_conductance": "8 nS",
+      "neuron_to_muscle_exc_syn_conductance": "8 nS",
+      "exc_syn_delta": "5 mV",
+      "exc_syn_vth": "0 mV",
+      "exc_syn_erev": "0 mV",
+      "exc_syn_k": "0.025per_ms",
+      "neuron_to_neuron_inh_syn_conductance": "8 nS",
+      "neuron_to_muscle_inh_syn_conductance": "8 nS",
+      "inh_syn_delta": "5 mV",
+      "inh_syn_vth": "0 mV",
+      "inh_syn_erev": "-70 mV",
+      "inh_syn_k": "0.025per_ms",
+      "neuron_to_neuron_elec_syn_gbase": "0.3 nS",
+      "neuron_to_muscle_elec_syn_gbase": "0.3 nS",
+      "unphysiological_offset_current": "0 nA",
+      "unphysiological_offset_current_del": "0 ms",
+      "unphysiological_offset_current_dur": "2000 ms"
+    }
+  },
+  "cell_models": {
+    "iaf_cells": 2,
+    "hh_cells": 0
+  },
+  "synapse_models": {
+    "exp_two_synapses": 0,
+    "gap_junctions": 0,
+    "graded_synapses": 0,
+    "graded_synapses2": 0
+  }
+}

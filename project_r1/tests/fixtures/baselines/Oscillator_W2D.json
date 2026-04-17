@@ -1,0 +1,56 @@
+{
+  "config": "Oscillator",
+  "level": "W2D",
+  "generated_by": "original",
+  "populations": {
+    "count": 14,
+    "names": [
+      "AVBL",
+      "AVBR",
+      "DA2",
+      "DA3",
+      "DB2",
+      "DB3",
+      "DD2",
+      "DD3",
+      "VA2",
+      "VA3",
+      "VB2",
+      "VB3",
+      "VD2",
+      "VD3"
+    ]
+  },
+  "connections": {
+    "chemical": 0,
+    "electrical": 24,
+    "continuous": 31,
+    "total": 55
+  },
+  "stimuli": {
+    "input_lists": 2,
+    "total_inputs": 2
+  },
+  "bioparameters": {
+    "count": 7,
+    "values": {
+      "initial_memb_pot": "-45 mV",
+      "neuron_to_neuron_elec_syn_gbase": "1 nS",
+      "neuron_to_muscle_elec_syn_gbase": "1 nS",
+      "muscle_to_muscle_elec_syn_gbase": "1 nS",
+      "unphysiological_offset_current": "4pA",
+      "unphysiological_offset_current_del": "100 ms",
+      "unphysiological_offset_current_dur": "800 ms"
+    }
+  },
+  "cell_models": {
+    "iaf_cells": 0,
+    "hh_cells": 0
+  },
+  "synapse_models": {
+    "exp_two_synapses": 0,
+    "gap_junctions": 1,
+    "graded_synapses": 0,
+    "graded_synapses2": 0
+  }
+}

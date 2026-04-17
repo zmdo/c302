@@ -1,0 +1,408 @@
+{
+  "total": 80,
+  "success": 66,
+  "skipped": 0,
+  "failed": 14,
+  "details": [
+    {
+      "combo": "IClamp_A",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Syns_A",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Social_A",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Pharyngeal_A",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Full_A",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Muscles_A",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Oscillator_A",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "FW_A",
+      "status": "FAILED",
+      "reason": "object of type 'NoneType' has no len()"
+    },
+    {
+      "combo": "IClamp_B",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Syns_B",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Social_B",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Pharyngeal_B",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Full_B",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Muscles_B",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Oscillator_B",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "FW_B",
+      "status": "FAILED",
+      "reason": "object of type 'NoneType' has no len()"
+    },
+    {
+      "combo": "IClamp_BC1",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Syns_BC1",
+      "status": "FAILED",
+      "reason": "'ParameterisedModel' object has no attribute 'get_elec_syn'"
+    },
+    {
+      "combo": "Social_BC1",
+      "status": "FAILED",
+      "reason": "'ParameterisedModel' object has no attribute 'get_elec_syn'"
+    },
+    {
+      "combo": "Pharyngeal_BC1",
+      "status": "FAILED",
+      "reason": "'ParameterisedModel' object has no attribute 'get_elec_syn'"
+    },
+    {
+      "combo": "Full_BC1",
+      "status": "FAILED",
+      "reason": "'ParameterisedModel' object has no attribute 'get_elec_syn'"
+    },
+    {
+      "combo": "Muscles_BC1",
+      "status": "FAILED",
+      "reason": "'ParameterisedModel' object has no attribute 'get_elec_syn'"
+    },
+    {
+      "combo": "Oscillator_BC1",
+      "status": "FAILED",
+      "reason": "'ParameterisedModel' object has no attribute 'get_exc_syn'"
+    },
+    {
+      "combo": "FW_BC1",
+      "status": "FAILED",
+      "reason": "'ParameterisedModel' object has no attribute 'get_exc_syn'"
+    },
+    {
+      "combo": "IClamp_C",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Syns_C",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Social_C",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Pharyngeal_C",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Full_C",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Muscles_C",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Oscillator_C",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "FW_C",
+      "status": "FAILED",
+      "reason": "cannot access local variable 'conn_id' where it is not associated with a value"
+    },
+    {
+      "combo": "IClamp_C0",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Syns_C0",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Social_C0",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Pharyngeal_C0",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Full_C0",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Muscles_C0",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Oscillator_C0",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "FW_C0",
+      "status": "FAILED",
+      "reason": "cannot access local variable 'conn_id' where it is not associated with a value"
+    },
+    {
+      "combo": "IClamp_C1",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Syns_C1",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Social_C1",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Pharyngeal_C1",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Full_C1",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Muscles_C1",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Oscillator_C1",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "FW_C1",
+      "status": "FAILED",
+      "reason": "cannot access local variable 'conn_id' where it is not associated with a value"
+    },
+    {
+      "combo": "IClamp_C2",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Syns_C2",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Social_C2",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Pharyngeal_C2",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Full_C2",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Muscles_C2",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Oscillator_C2",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "FW_C2",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "IClamp_D",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Syns_D",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Social_D",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Pharyngeal_D",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Full_D",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Muscles_D",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Oscillator_D",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "FW_D",
+      "status": "FAILED",
+      "reason": "cannot access local variable 'conn_id' where it is not associated with a value"
+    },
+    {
+      "combo": "IClamp_D1",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Syns_D1",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Social_D1",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Pharyngeal_D1",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Full_D1",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Muscles_D1",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Oscillator_D1",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "FW_D1",
+      "status": "FAILED",
+      "reason": "cannot access local variable 'conn_id' where it is not associated with a value"
+    },
+    {
+      "combo": "IClamp_W2D",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Syns_W2D",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Social_W2D",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Pharyngeal_W2D",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Full_W2D",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Muscles_W2D",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "Oscillator_W2D",
+      "status": "OK",
+      "reason": ""
+    },
+    {
+      "combo": "FW_W2D",
+      "status": "OK",
+      "reason": ""
+    }
+  ]
+}
