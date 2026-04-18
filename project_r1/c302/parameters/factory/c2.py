@@ -5,19 +5,19 @@
 #   从 special.py 拆分而来（计划6阶段一）。
 #
 # 类与方法索引：
-#   _C2Model                             (L46)
-#     create_models                      (L49)
-#     create_generic_muscle_cell         (L58)
-#     create_offsetcurrent_concentrationmodel (L150)
-#     create_neuron_to_neuron_syn        (L205)
-#     create_neuron_to_muscle_syn        (L244)
-#     create_muscle_to_muscle_syn        (L271)
-#     get_elec_syn                       (L278)
-#     get_exc_syn                        (L362)
-#     get_inh_syn                        (L455)
-#     create_n_connection_synapse        (L495)
-#     is_elec_conn                       (L521)
-#     is_analog_conn                     (L527)
+#   _C2Model                             (L60)   — Level C2：HH 导电模型 + GradedSynapse + 多种自定义缝隙连接
+#     create_models                      (L63)   — 创建所有组件：浓度模型、肌肉/神经元、突触
+#     create_generic_muscle_cell         (L72)   — 创建 C2 肌肉细胞（独立膜参数和通道变体）
+#     create_offsetcurrent_concentrationmodel (L164)  — 创建偏置电流和独立的神经元/肌肉钙浓度模型
+#     create_neuron_to_neuron_syn        (L219)  — 创建神经元间突触（GradedSynapse + GapJunction + DelayedGapJunction）
+#     create_neuron_to_muscle_syn        (L258)  — 创建神经元到肌肉突触（GradedSynapse + GapJunction）
+#     create_muscle_to_muscle_syn        (L285)  — 创建肌肉间缝隙连接
+#     get_elec_syn                       (L292)  — 电突触 — 支持 DelayedGapJunction / ProprioGapJunction(2) / GapJunction
+#     get_exc_syn                        (L376)  — 兴奋性突触 — 支持 NeuronMuscle / GradedSynapse2 / GradedSynapse
+#     get_inh_syn                        (L469)  — 抑制性突触 — GradedSynapse
+#     create_n_connection_synapse        (L509)  — 注册突触原型（含 C2 自定义类型）
+#     is_elec_conn                       (L535)  — 判断是否为电突触（含延迟/本体感觉变体）
+#     is_analog_conn                     (L541)  — 判断是否为模拟连接（含 NeuronMuscle / GradedSynapse2）
 #
 # 更新日志：
 #   2026-04-19  Copilot  计划5阶段六：从 factory.py 迁移特殊模型

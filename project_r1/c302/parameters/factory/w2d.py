@@ -4,16 +4,16 @@
 #   从 special.py 拆分而来（计划6阶段一）。
 #
 # 类与方法索引：
-#   _W2DModel                            (L28)
-#     create_models                      (L31)
-#     create_generic_muscle_cell         (L39)
-#     create_generic_neuron_cell         (L43)
-#     create_offset                      (L47)
-#     create_neuron_to_neuron_syn        (L56)
-#     create_neuron_to_muscle_syn        (L65)
-#     get_elec_syn                       (L73)
-#     get_exc_syn                        (L88)
-#     get_inh_syn                        (L92)
+#   _W2DModel                            (L31)   — Level W2D：CellW2D 偏置-增益细胞 + OutputSynapse 连续突触
+#     create_models                      (L34)   — 创建肌肉/神经元细胞、偏置电流和突触
+#     create_generic_muscle_cell         (L42)   — 创建 W2D 通用肌肉细胞
+#     create_generic_neuron_cell         (L46)   — 创建 W2D 通用神经元细胞
+#     create_offset                      (L50)   — 创建偏置电流生成器
+#     create_neuron_to_neuron_syn        (L59)   — 创建神经元间突触（OutputSynapse + GapJunction）
+#     create_neuron_to_muscle_syn        (L68)   — 创建神经元到肌肉突触（OutputSynapse + GapJunction）
+#     get_elec_syn                       (L76)   — 根据连接类型返回 GapJunction
+#     get_exc_syn                        (L91)   — 兴奋性突触 — 返回 OutputSynapse
+#     get_inh_syn                        (L95)   — 抑制性突触 — 返回 OutputSynapse
 #
 # 更新日志：
 #   2026-04-19  Copilot  计划5阶段六：从 factory.py 迁移特殊模型

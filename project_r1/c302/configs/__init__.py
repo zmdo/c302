@@ -7,7 +7,7 @@
 #   register_config                      (L27)   — 配置注册装饰器
 #   get_config                           (L41)   — 按名称获取配置 setup 函数
 #   list_configs                         (L58)   — 列出所有已注册的配置名称
-#   _auto_import                         (L67)   — 自动导入所有配置模块以触发注册
+#   _auto_import                         (L70)   — 自动导入所有配置模块以触发注册
 #
 # 更新日志：
 #   2026-04-17  Copilot  计划3阶段五：新建
