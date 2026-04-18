@@ -264,21 +264,21 @@ class c302ModelPrototype(ParameterisedModelPrototype):
             return None
         return def_param.value
 
-    def get_syn(self, pre_cell: str, post_cell: str, type: str, pol: str):
+    def get_syn(self, pre_cell: str, post_cell: str, conn_type: str, pol: str):
         """按极性分发到对应的突触获取方法。
 
         :param pre_cell: 突触前细胞名
         :param post_cell: 突触后细胞名
-        :param type: 连接类型字符串
+        :param conn_type: 连接类型字符串
         :param pol: 极性："elec" / "exc" / "inh"
         :return: 突触对象
         """
         if pol == "elec":
-            return self.get_elec_syn(pre_cell, post_cell, type)
+            return self.get_elec_syn(pre_cell, post_cell, conn_type)
         elif pol == "exc":
-            return self.get_exc_syn(pre_cell, post_cell, type)
+            return self.get_exc_syn(pre_cell, post_cell, conn_type)
         elif pol == "inh":
-            return self.get_inh_syn(pre_cell, post_cell, type)
+            return self.get_inh_syn(pre_cell, post_cell, conn_type)
 
     def create_n_connection_synapse(self, prototype_syn, n, nml_doc, existing_synapses):
         """幂等注册突触原型到 NeuroML 文档。

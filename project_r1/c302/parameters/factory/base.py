@@ -198,7 +198,7 @@ class _ModelBase(c302ModelPrototype):
 
     # -- 模板方法：get_exc_syn / get_inh_syn / get_elec_syn --
 
-    def get_exc_syn(self, pre_cell, post_cell, type):
+    def get_exc_syn(self, pre_cell, post_cell, conn_type):
         """获取兴奋性化学突触（模板方法）。
 
         子类通过 ``_exc_syn_cls`` / ``_exc_param_fields`` /
@@ -209,9 +209,9 @@ class _ModelBase(c302ModelPrototype):
         specific = f"%s_to_%s_{chem}exc_syn_%s"
 
         # 按连接类型确定默认模板
-        if type == "neuron_to_neuron":
+        if conn_type == "neuron_to_neuron":
             default = f"neuron_to_neuron_{chem}exc_syn_%s"
-        elif type == "neuron_to_muscle":
+        elif conn_type == "neuron_to_muscle":
             default = f"neuron_to_muscle_{chem}exc_syn_%s"
         else:
             default = f"neuron_to_neuron_{chem}exc_syn_%s"
@@ -233,7 +233,7 @@ class _ModelBase(c302ModelPrototype):
         # 构造 conn_id
         conn_id = (
             "neuron_to_neuron_exc_syn"
-            if type == "neuron_to_neuron"
+            if conn_type == "neuron_to_neuron"
             else "neuron_to_muscle_exc_syn"
         )
         if self.found_specific_param:
@@ -241,7 +241,7 @@ class _ModelBase(c302ModelPrototype):
 
         return self._exc_syn_cls(id=conn_id, **kwargs)
 
-    def get_inh_syn(self, pre_cell, post_cell, type):
+    def get_inh_syn(self, pre_cell, post_cell, conn_type):
         """获取抑制性化学突触（模板方法）。
 
         子类通过 ``_inh_syn_cls`` / ``_inh_param_fields`` /
@@ -252,9 +252,9 @@ class _ModelBase(c302ModelPrototype):
         specific = f"%s_to_%s_{chem}inh_syn_%s"
 
         # 按连接类型确定默认模板
-        if type == "neuron_to_neuron":
+        if conn_type == "neuron_to_neuron":
             default = f"neuron_to_neuron_{chem}inh_syn_%s"
-        elif type == "neuron_to_muscle":
+        elif conn_type == "neuron_to_muscle":
             default = f"neuron_to_muscle_{chem}inh_syn_%s"
         else:
             default = f"neuron_to_neuron_{chem}inh_syn_%s"
@@ -275,7 +275,7 @@ class _ModelBase(c302ModelPrototype):
         # 构造 conn_id
         conn_id = (
             "neuron_to_neuron_inh_syn"
-            if type == "neuron_to_neuron"
+            if conn_type == "neuron_to_neuron"
             else "neuron_to_muscle_inh_syn"
         )
         if self.found_specific_param:
@@ -283,13 +283,13 @@ class _ModelBase(c302ModelPrototype):
 
         return self._inh_syn_cls(id=conn_id, **kwargs)
 
-    def get_elec_syn(self, pre_cell, post_cell, type):
+    def get_elec_syn(self, pre_cell, post_cell, conn_type):
         """获取电突触（模板方法）。
 
         Level A（_elec_syn_cls = ExpTwoSynapse）返回假电突触，
         其余层级（_elec_syn_cls = GapJunction）返回 GapJunction。
         """
-        gbase, conn_id = self._get_elec_syn_params(pre_cell, post_cell, type)
+        gbase, conn_id = self._get_elec_syn_params(pre_cell, post_cell, conn_type)
         if self._elec_syn_cls is GapJunction:
             return GapJunction(id=conn_id, conductance=gbase)
         # ExpTwoSynapse（Level A）— 需要额外参数
@@ -306,23 +306,23 @@ class _ModelBase(c302ModelPrototype):
             id=conn_id, gbase=gbase, erev=erev, tau_decay=decay, tau_rise=rise
         )
 
-    def _get_elec_syn_params(self, pre_cell, post_cell, type):
+    def _get_elec_syn_params(self, pre_cell, post_cell, conn_type):
         """提取电突触连接参数（gbase + conn_id）。
 
         :param pre_cell: 突触前细胞
         :param post_cell: 突触后细胞
-        :param type: 连接类型
+        :param conn_type: 连接类型
         :return: (gbase, conn_id) 元组
         """
         self.found_specific_param = False
         specific = "%s_to_%s_elec_syn_%s"
 
         # 按连接类型确定默认模板
-        if type == "neuron_to_neuron":
+        if conn_type == "neuron_to_neuron":
             default_gbase = "neuron_to_neuron_elec_syn_%s"
-        elif type == "neuron_to_muscle":
+        elif conn_type == "neuron_to_muscle":
             default_gbase = "neuron_to_muscle_elec_syn_%s"
-        elif type == "muscle_to_muscle":
+        elif conn_type == "muscle_to_muscle":
             default_gbase = "muscle_to_muscle_elec_syn_%s"
         else:
             default_gbase = "neuron_to_neuron_elec_syn_%s"
@@ -337,7 +337,7 @@ class _ModelBase(c302ModelPrototype):
             "neuron_to_muscle": "neuron_to_muscle_elec_syn",
             "muscle_to_muscle": "muscle_to_muscle_elec_syn",
         }
-        conn_id = id_map.get(type, "neuron_to_neuron_elec_syn")
+        conn_id = id_map.get(conn_type, "neuron_to_neuron_elec_syn")
         if self.found_specific_param:
             conn_id = "%s_to_%s_elec_syn" % (pre_cell, post_cell)
 

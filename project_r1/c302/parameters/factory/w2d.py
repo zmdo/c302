@@ -73,25 +73,25 @@ class _W2DModel(_ModelBase):
             conductance=self.get_bioparameter("neuron_to_muscle_elec_syn_gbase").value,
         )
 
-    def get_elec_syn(self, pre_cell, post_cell, type):
+    def get_elec_syn(self, pre_cell, post_cell, conn_type):
         """根据连接类型返回 GapJunction。"""
-        if type == "neuron_to_neuron":
+        if conn_type == "neuron_to_neuron":
             gbase = self.get_bioparameter("neuron_to_neuron_elec_syn_gbase").value
             conn_id = "neuron_to_neuron_elec_syn"
-        elif type == "neuron_to_muscle":
+        elif conn_type == "neuron_to_muscle":
             gbase = self.get_bioparameter("neuron_to_muscle_elec_syn_gbase").value
             conn_id = "neuron_to_muscle_elec_syn"
-        elif type == "muscle_to_muscle":
+        elif conn_type == "muscle_to_muscle":
             gbase = self.get_bioparameter("muscle_to_muscle_elec_syn_gbase").value
             conn_id = "muscle_to_muscle_elec_syn"
         else:
-            raise ValueError("Unknown electrical connection type: %s" % type)
+            raise ValueError("Unknown electrical connection type: %s" % conn_type)
         return GapJunction(id=conn_id, conductance=gbase)
 
-    def get_exc_syn(self, pre_cell, post_cell, type):
+    def get_exc_syn(self, pre_cell, post_cell, conn_type):
         """兴奋性突触 — 返回 OutputSynapse。"""
         return self.neuron_to_neuron_exc_syn
 
-    def get_inh_syn(self, pre_cell, post_cell, type):
+    def get_inh_syn(self, pre_cell, post_cell, conn_type):
         """抑制性突触 — 返回 OutputSynapse。"""
         return self.neuron_to_neuron_inh_syn

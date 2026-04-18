@@ -289,12 +289,12 @@ class _C2Model(_HHModel):
             conductance=self.get_bioparameter("muscle_to_muscle_elec_syn_gbase").value,
         )
 
-    def get_elec_syn(self, pre_cell, post_cell, type):
+    def get_elec_syn(self, pre_cell, post_cell, conn_type):
         """电突触 — 支持 DelayedGapJunction / ProprioGapJunction(2) / GapJunction。"""
         self.found_specific_param = False
         sigma = mu = p_gbase = ar = ad = beta = gbase = vth = erev = conn_id = None
 
-        if type == "neuron_to_neuron":
+        if conn_type == "neuron_to_neuron":
             gbase = self.get_conn_param(
                 pre_cell, post_cell, "%s_to_%s_elec_syn_%s",
                 "neuron_to_neuron_elec_syn_%s", "gbase",
@@ -335,14 +335,14 @@ class _C2Model(_HHModel):
                 self.found_specific_param = True
             conn_id = "neuron_to_neuron_elec_syn"
 
-        elif type == "neuron_to_muscle":
+        elif conn_type == "neuron_to_muscle":
             gbase = self.get_conn_param(
                 pre_cell, post_cell, "%s_to_%s_elec_syn_%s",
                 "neuron_to_muscle_elec_syn_%s", "gbase",
             )
             conn_id = "neuron_to_muscle_elec_syn"
 
-        elif type == "muscle_to_muscle":
+        elif conn_type == "muscle_to_muscle":
             gbase = self.get_conn_param(
                 pre_cell, post_cell, "%s_to_%s_elec_syn_%s",
                 "muscle_to_muscle_elec_syn_%s", "gbase",
@@ -373,13 +373,13 @@ class _C2Model(_HHModel):
             )
         return GapJunction(id=conn_id, conductance=gbase)
 
-    def get_exc_syn(self, pre_cell, post_cell, type):
+    def get_exc_syn(self, pre_cell, post_cell, conn_type):
         """兴奋性突触 — 支持 NeuronMuscle / GradedSynapse2 / GradedSynapse。"""
         self.found_specific_param = False
         specific = "%s_to_%s_exc_syn_%s"
         cath = ar = ad = beta = vth = erev = delta = k = None
 
-        if type == "neuron_to_neuron":
+        if conn_type == "neuron_to_neuron":
             default = "neuron_to_neuron_exc_syn_%s"
             conductance = self.get_conn_param(
                 pre_cell, post_cell, specific, default, "conductance"
@@ -407,7 +407,7 @@ class _C2Model(_HHModel):
             )
             conn_id = "neuron_to_neuron_exc_syn"
 
-        elif type == "neuron_to_muscle":
+        elif conn_type == "neuron_to_muscle":
             default = "neuron_to_muscle_exc_syn_%s"
             conductance = self.get_conn_param(
                 pre_cell, post_cell, specific, default, "conductance"
@@ -426,7 +426,7 @@ class _C2Model(_HHModel):
             )
             conn_id = "neuron_to_muscle_exc_syn"
 
-        elif type == "muscle_to_neuron":
+        elif conn_type == "muscle_to_neuron":
             default = "muscle_to_neuron_exc_syn_%s"
             conductance = self.get_conn_param(
                 pre_cell, post_cell, specific, default, "conductance"
@@ -466,14 +466,14 @@ class _C2Model(_HHModel):
             id=conn_id, conductance=conductance, delta=delta, Vth=vth, erev=erev, k=k
         )
 
-    def get_inh_syn(self, pre_cell, post_cell, type):
+    def get_inh_syn(self, pre_cell, post_cell, conn_type):
         """抑制性突触 — GradedSynapse。"""
         self.found_specific_param = False
         specific = "%s_to_%s_inh_syn_%s"
 
-        if type == "neuron_to_neuron":
+        if conn_type == "neuron_to_neuron":
             default = "neuron_to_neuron_inh_syn_%s"
-        elif type == "neuron_to_muscle":
+        elif conn_type == "neuron_to_muscle":
             default = "neuron_to_muscle_inh_syn_%s"
         else:
             default = "neuron_to_neuron_inh_syn_%s"
@@ -496,7 +496,7 @@ class _C2Model(_HHModel):
 
         conn_id = (
             "neuron_to_neuron_inh_syn"
-            if type == "neuron_to_neuron"
+            if conn_type == "neuron_to_neuron"
             else "neuron_to_muscle_inh_syn"
         )
         if self.found_specific_param:
