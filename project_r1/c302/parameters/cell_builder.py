@@ -4,8 +4,8 @@
 #   供 C/C0/D 族模型共用。
 #
 # 类与方法索引：
-#   create_hh_cell                       (L25)  — 创建单室 HH 导电细胞（ca_boyle 通道）
-#   create_c0_cell                       (L117) — 创建 C0 级 HH 导电细胞（ca_simple 通道）
+#   create_hh_cell                       (L33)   — 创建单室 HH 导电细胞（供 C/D 族共用）
+#   create_c0_cell                       (L143)  — 创建 C0 级 HH 导电细胞（使用 ca_simple 通道和分离比膜电容）
 #
 # 更新日志：
 #   2026-04-18  Copilot  计划4阶段二：从 factory.py 提取细胞构建器

@@ -4,10 +4,10 @@
 #   加载形态文件并分配 3D 位置坐标，以及添加偏置电流输入。
 #
 # 类与方法索引：
-#   get_cell_id_string                   (L39)   — 构建 NeuroML 中引用细胞实例的路径字符串
-#   is_cond_based_cell                   (L68)   — 判断参数层级是否为导电模型（Level C 或 D 系列）
-#   create_neuron_populations            (L77)   — 在网络中创建神经元种群
-#   create_muscle_populations            (L231)  — 在网络中创建肌肉种群
+#   get_cell_id_string                   (L40)   — 构建 NeuroML 中引用细胞实例的路径字符串
+#   is_cond_based_cell                   (L69)   — 判断参数层级是否为导电模型（Level C 或 D 系列）
+#   create_neuron_populations            (L78)   — 在网络中创建神经元种群
+#   create_muscle_populations            (L234)  — 在网络中创建肌肉种群
 #
 # 更新日志：
 #   2026-04-17  Copilot  计划3阶段四：从 __init__.py 提取重写

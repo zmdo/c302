@@ -4,10 +4,10 @@
 #   Level D1（HH 多室 + GradedSynapse2）。
 #
 # 类与方法索引：
-#   _HHMultiCompModel                    (L41)   — Level D：多隔室 HH 模型
-#     create_models                      (L44)   — 创建肌肉/偏置/浓度/突触
-#     create_neuron_cell                 (L52)   — 逐个创建神经元 Cell
-#   _HHGradedModel                       (L119)  — Level D1：多隔室 + GradedSynapse2
+#   _HHMultiCompModel                    (L37)   — Level D：导电模型，无通用神经元细胞（按名称从 NML 创建）
+#     create_models                      (L40)   — 创建肌肉细胞、偏置电流、浓度模型和突触（不创建通用神经元）
+#     create_neuron_cell                 (L48)   — 创建单个神经元 Cell（D 族特有的逐个构建方式）
+#   _HHGradedModel                       (L138)  — Level D1：HH 多隔室 + GradedSynapse2 化学突触
 #
 # 更新日志：
 #   2026-04-19  Copilot  计划5阶段五：从 factory.py 迁移 HH 多隔室族

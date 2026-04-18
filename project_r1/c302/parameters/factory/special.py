@@ -5,29 +5,29 @@
 #   C2 原样迁移（12 个方法），W2D 使用部分模板方法。
 #
 # 类与方法索引：
-#   _C2Model                             (L51)   — Level C2
-#     create_models                      (L54)   — 创建所有组件
-#     create_generic_muscle_cell         (L63)   — C2 肌肉细胞
-#     create_offsetcurrent_concentrationmodel (L153) — 偏置 + 双浓度模型
-#     create_neuron_to_neuron_syn        (L205)  — 含 DelayedGapJunction
-#     create_neuron_to_muscle_syn        (L243)  — GradedSynapse + GapJunction
-#     create_muscle_to_muscle_syn        (L270)  — 肌肉间缝隙连接
-#     get_elec_syn                       (L277)  — 多态电突触
-#     get_exc_syn                        (L359)  — 多态兴奋性突触
-#     get_inh_syn                        (L451)  — GradedSynapse
-#     create_n_connection_synapse        (L491)  — 含 C2 自定义类型
-#     is_elec_conn                       (L514)  — 含延迟/本体感觉
-#     is_analog_conn                     (L520)  — 含 NeuronMuscle / GradedSynapse2
-#   _W2DModel                            (L528)  — Level W2D
-#     create_models                      (L535)  — 创建细胞和突触
-#     create_generic_muscle_cell         (L543)  — CellW2D 肌肉
-#     create_generic_neuron_cell         (L547)  — CellW2D 神经元
-#     create_offset                      (L551)  — 偏置电流
-#     create_neuron_to_neuron_syn        (L560)  — OutputSynapse + GapJunction
-#     create_neuron_to_muscle_syn        (L569)  — OutputSynapse + GapJunction
-#     get_elec_syn                       (L577)  — GapJunction
-#     get_exc_syn                        (L592)  — OutputSynapse
-#     get_inh_syn                        (L596)  — OutputSynapse
+#   _C2Model                             (L77)   — Level C2：HH 导电模型 + GradedSynapse + 多种自定义缝隙连接
+#     create_models                      (L80)   — 创建所有组件：浓度模型、肌肉/神经元、突触
+#     create_generic_muscle_cell         (L89)   — 创建 C2 肌肉细胞（独立膜参数和通道变体）
+#     create_offsetcurrent_concentrationmodel (L181)  — 创建偏置电流和独立的神经元/肌肉钙浓度模型
+#     create_neuron_to_neuron_syn        (L236)  — 创建神经元间突触（GradedSynapse + GapJunction + DelayedGapJunction）
+#     create_neuron_to_muscle_syn        (L275)  — 创建神经元到肌肉突触（GradedSynapse + GapJunction）
+#     create_muscle_to_muscle_syn        (L302)  — 创建肌肉间缝隙连接
+#     get_elec_syn                       (L309)  — 电突触 — 支持 DelayedGapJunction / ProprioGapJunction(2) / GapJunction
+#     get_exc_syn                        (L393)  — 兴奋性突触 — 支持 NeuronMuscle / GradedSynapse2 / GradedSynapse
+#     get_inh_syn                        (L486)  — 抑制性突触 — GradedSynapse
+#     create_n_connection_synapse        (L526)  — 注册突触原型（含 C2 自定义类型）
+#     is_elec_conn                       (L552)  — 判断是否为电突触（含延迟/本体感觉变体）
+#     is_analog_conn                     (L558)  — 判断是否为模拟连接（含 NeuronMuscle / GradedSynapse2）
+#   _W2DModel                            (L570)  — Level W2D：CellW2D 偏置-增益细胞 + OutputSynapse 连续突触
+#     create_models                      (L573)  — 创建肌肉/神经元细胞、偏置电流和突触
+#     create_generic_muscle_cell         (L581)  — 创建 W2D 通用肌肉细胞
+#     create_generic_neuron_cell         (L585)  — 创建 W2D 通用神经元细胞
+#     create_offset                      (L589)  — 创建偏置电流生成器
+#     create_neuron_to_neuron_syn        (L598)  — 创建神经元间突触（OutputSynapse + GapJunction）
+#     create_neuron_to_muscle_syn        (L607)  — 创建神经元到肌肉突触（OutputSynapse + GapJunction）
+#     get_elec_syn                       (L615)  — 根据连接类型返回 GapJunction
+#     get_exc_syn                        (L630)  — 兴奋性突触 — 返回 OutputSynapse
+#     get_inh_syn                        (L634)  — 抑制性突触 — 返回 OutputSynapse
 #
 # 更新日志：
 #   2026-04-19  Copilot  计划5阶段六：从 factory.py 迁移特殊模型

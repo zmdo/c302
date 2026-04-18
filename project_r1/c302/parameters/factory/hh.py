@@ -4,15 +4,15 @@
 #   Level C1（HH + GradedSynapse）。
 #
 # 类与方法索引：
-#   _HHModel                             (L37)   — Level C：单室 HH 导电模型
-#     create_models                      (L40)   — 创建细胞、偏置、浓度和突触
-#     create_generic_muscle_cell         (L48)   — create_hh_cell (muscle)
-#     create_generic_neuron_cell         (L54)   — create_hh_cell (neuron)
-#     create_offsetcurrent_concentrationmodel (L60) — 偏置电流 + CaPool
-#   _HHC0Model                           (L79)   — Level C0：修正继承 _HHModel
-#     create_generic_muscle_cell         (L93)   — create_c0_cell (muscle)
-#     create_generic_neuron_cell         (L99)   — create_c0_cell (neuron)
-#   _HHC1Model                           (L105)  — Level C1：GradedSynapse 化学突触
+#   _HHModel                             (L35)   — Level C 族：单室 HH 导电模型 + ExpTwoSynapse + GapJunction
+#     create_models                      (L40)   — 创建肌肉/神经元细胞、偏置电流、浓度模型和突触
+#     create_generic_muscle_cell         (L48)   — 创建通用肌肉 HH 细胞
+#     create_generic_neuron_cell         (L54)   — 创建通用神经元 HH 细胞
+#     create_offsetcurrent_concentrationmodel (L60)   — 创建偏置电流和钙浓度模型
+#   _HHC0Model                           (L77)   — Level C0：HH 导电模型 + ca_simple 通道 + GradedSynapse2 突触
+#     create_generic_muscle_cell         (L93)   — 创建通用肌肉 HH 细胞（ca_simple 通道变体）
+#     create_generic_neuron_cell         (L99)   — 创建通用神经元 HH 细胞（ca_simple 通道变体）
+#   _HHC1Model                           (L106)  — Level C1：HH 导电模型 + 标准 GradedSynapse 化学突触
 #
 # 更新日志：
 #   2026-04-19  Copilot  计划5阶段四：从 factory.py 迁移 HH 族

@@ -4,20 +4,15 @@
 #   Level BC1（IafActivityCell + GradedSynapse）。
 #
 # 类与方法索引：
-#   _IafModel                            (L35)   — Level A：积分放电模型
-#     _elec_syn_cls = ExpTwoSynapse
-#     create_models                      (L42)   — 创建所有细胞和突触
-#     create_generic_muscle_cell         (L50)   — 创建通用肌肉 IafCell
-#     create_generic_neuron_cell         (L61)   — 创建通用神经元 IafCell
-#     create_offset                      (L72)   — 创建偏置电流生成器
-#   _IafActivityModel                    (L84)   — Level B：IafActivityCell
-#     _elec_syn_cls = GapJunction
-#     create_generic_muscle_cell         (L91)   — 创建通用肌肉 IafActivityCell
-#     create_generic_neuron_cell         (L104)  — 创建通用神经元 IafActivityCell
-#   _BC1Model                            (L118)  — Level BC1：GradedSynapse 化学突触
-#     _exc_syn_cls = GradedSynapse
-#     _inh_syn_cls = GradedSynapse
-#     _chem_prefix = ""
+#   _IafModel                            (L29)   — Level A：积分放电模型 + 事件突触
+#     create_models                      (L37)   — 创建所有细胞和突触模型
+#     create_generic_muscle_cell         (L45)   — 创建通用肌肉 IafCell
+#     create_generic_neuron_cell         (L56)   — 创建通用神经元 IafCell
+#     create_offset                      (L67)   — 创建偏置电流生成器
+#   _IafActivityModel                    (L77)   — Level B：IafActivityCell + 真实 GapJunction 电突触
+#     create_generic_muscle_cell         (L83)   — 创建通用肌肉 IafActivityCell（含 tau1 参数）
+#     create_generic_neuron_cell         (L95)   — 创建通用神经元 IafActivityCell（含 tau1 参数）
+#   _BC1Model                            (L108)  — Level BC1：IafActivityCell 细胞 + 标准 GradedSynapse 化学突触
 #
 # 更新日志：
 #   2026-04-19  Copilot  计划5阶段三：从 factory.py 迁移 IAF 族

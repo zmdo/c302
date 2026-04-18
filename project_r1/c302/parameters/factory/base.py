@@ -9,19 +9,19 @@
 #   create_n_connection_synapse 和 is_analog_conn 共享方法。
 #
 # 类与方法索引：
-#   _ModelBase                           (L44)   — 所有层级模型的基类
-#     __init__                           (L69)   — 加载 YAML 参数
-#     _build_syn_from_params             (L85)   — 根据参数字段构造突触对象
-#     _build_elec_syn_from_params        (L117)  — 构造电突触对象
-#     create_neuron_to_neuron_syn        (L138)  — 模板：创建神经元间突触
-#     create_neuron_to_muscle_syn        (L159)  — 模板：创建神经元到肌肉突触
-#     get_exc_syn                        (L180)  — 模板：获取兴奋性化学突触
-#     get_inh_syn                        (L218)  — 模板：获取抑制性化学突触
-#     get_elec_syn                       (L256)  — 模板：获取电突触
-#     _get_elec_syn_params               (L276)  — 提取电突触参数（gbase + conn_id）
-#   _GradedSynapse2Mixin                 (L306)  — GradedSynapse2 共享方法
-#     create_n_connection_synapse        (L309)  — 注册突触原型（含 GradedSynapse2）
-#     is_analog_conn                     (L325)  — 判断是否为模拟连接
+#   _ModelBase                           (L43)   — 所有层级模型的基类，从 YAML 加载生物参数
+#     __init__                           (L71)   — 加载 YAML 参数并初始化基类
+#     _build_syn_from_params             (L92)   — 根据参数字段从 BioParameter 查找值并构造突触对象
+#     _build_elec_syn_from_params        (L124)  — 构造电突触对象
+#     create_neuron_to_neuron_syn        (L147)  — 创建神经元间突触（模板方法）
+#     create_neuron_to_muscle_syn        (L175)  — 创建神经元到肌肉突触（模板方法）
+#     get_exc_syn                        (L201)  — 获取兴奋性化学突触（模板方法）
+#     get_inh_syn                        (L244)  — 获取抑制性化学突触（模板方法）
+#     get_elec_syn                       (L286)  — 获取电突触（模板方法）
+#     _get_elec_syn_params               (L309)  — 提取电突触连接参数（gbase + conn_id）
+#   _GradedSynapse2Mixin                 (L352)  — 为使用 GradedSynapse2 的层级（C0, D1）提供共享方法
+#     create_n_connection_synapse        (L358)  — 注册突触原型（含 GradedSynapse2 支持）
+#     is_analog_conn                     (L381)  — 判断是否为模拟连接（含 GradedSynapse2）
 #
 # 更新日志：
 #   2026-04-19  Copilot  计划5阶段二：从 factory.py 提取基类
