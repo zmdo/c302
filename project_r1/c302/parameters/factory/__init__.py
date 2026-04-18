@@ -43,6 +43,19 @@ from c302.parameters.factory.w2d import _W2DModel  # noqa: F401
 
 logger = logging.getLogger(__name__)
 
+_LEVEL_TO_CLASS: dict[str, type] = {
+    "A": _IafModel,
+    "B": _IafActivityModel,
+    "BC1": _BC1Model,
+    "C": _HHModel,
+    "C0": _HHC0Model,
+    "C1": _HHC1Model,
+    "C2": _C2Model,
+    "D": _HHMultiCompModel,
+    "D1": _HHGradedModel,
+    "W2D": _W2DModel,
+}
+
 
 def create_model(level: str) -> c302ModelPrototype:
     """根据层级名称创建参数化模型实例。
@@ -51,19 +64,6 @@ def create_model(level: str) -> c302ModelPrototype:
     :return: 已加载参数的 c302ModelPrototype 实例
     :raises KeyError: 未知的层级名称
     """
-    _LEVEL_TO_CLASS: dict[str, type] = {
-        "A": _IafModel,
-        "B": _IafActivityModel,
-        "BC1": _BC1Model,
-        "C": _HHModel,
-        "C0": _HHC0Model,
-        "C1": _HHC1Model,
-        "C2": _C2Model,
-        "D": _HHMultiCompModel,
-        "D1": _HHGradedModel,
-        "W2D": _W2DModel,
-    }
-
     level_upper = level.upper()
     cls = _LEVEL_TO_CLASS.get(level_upper)
     if cls is None:

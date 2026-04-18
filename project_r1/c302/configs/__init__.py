@@ -64,12 +64,20 @@ def list_configs() -> list[str]:
     return list(_CONFIG_REGISTRY.keys())
 
 
+_imported = False
+
+
 def _auto_import() -> None:
     """自动导入所有配置模块以触发注册。
 
     使用 pkgutil.iter_modules 扫描本包下所有子模块，
-    避免硬编码模块列表。
+    避免硬编码模块列表。添加幂等哨兵防止重复扫描。
     """
+    global _imported
+    if _imported:
+        return
+    _imported = True
+
     import importlib
     import pkgutil
 
@@ -78,4 +86,4 @@ def _auto_import() -> None:
         try:
             importlib.import_module(name)
         except ImportError:
-            pass
+            logger.debug("配置模块 %s 导入失败", name, exc_info=True)
