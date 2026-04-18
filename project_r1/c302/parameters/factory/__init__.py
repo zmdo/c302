@@ -38,7 +38,8 @@ from c302.parameters.factory.hh_multi import (  # noqa: F401
     _HHGradedModel,
     _HHMultiCompModel,
 )
-from c302.parameters.factory.special import _C2Model, _W2DModel  # noqa: F401
+from c302.parameters.factory.c2 import _C2Model  # noqa: F401
+from c302.parameters.factory.w2d import _W2DModel  # noqa: F401
 
 logger = logging.getLogger(__name__)
 

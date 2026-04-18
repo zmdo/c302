@@ -1,40 +1,31 @@
 # =============================================================================
 # 功能描述：
-#   特殊模型：Level C2（HH + GradedSynapse + 多种自定义缝隙连接）、
-#   Level W2D（CellW2D 偏置-增益模型 + OutputSynapse）。
-#   C2 原样迁移（12 个方法），W2D 使用部分模板方法。
+#   Level C2 参数化模型：HH 导电模型 + GradedSynapse + 多种自定义缝隙连接
+#   （DelayedGapJunction / ProprioGapJunction / ProprioGapJunction2）。
+#   从 special.py 拆分而来（计划6阶段一）。
 #
 # 类与方法索引：
-#   _C2Model                             (L77)   — Level C2：HH 导电模型 + GradedSynapse + 多种自定义缝隙连接
-#     create_models                      (L80)   — 创建所有组件：浓度模型、肌肉/神经元、突触
-#     create_generic_muscle_cell         (L89)   — 创建 C2 肌肉细胞（独立膜参数和通道变体）
-#     create_offsetcurrent_concentrationmodel (L181)  — 创建偏置电流和独立的神经元/肌肉钙浓度模型
-#     create_neuron_to_neuron_syn        (L236)  — 创建神经元间突触（GradedSynapse + GapJunction + DelayedGapJunction）
-#     create_neuron_to_muscle_syn        (L275)  — 创建神经元到肌肉突触（GradedSynapse + GapJunction）
-#     create_muscle_to_muscle_syn        (L302)  — 创建肌肉间缝隙连接
-#     get_elec_syn                       (L309)  — 电突触 — 支持 DelayedGapJunction / ProprioGapJunction(2) / GapJunction
-#     get_exc_syn                        (L393)  — 兴奋性突触 — 支持 NeuronMuscle / GradedSynapse2 / GradedSynapse
-#     get_inh_syn                        (L486)  — 抑制性突触 — GradedSynapse
-#     create_n_connection_synapse        (L526)  — 注册突触原型（含 C2 自定义类型）
-#     is_elec_conn                       (L552)  — 判断是否为电突触（含延迟/本体感觉变体）
-#     is_analog_conn                     (L558)  — 判断是否为模拟连接（含 NeuronMuscle / GradedSynapse2）
-#   _W2DModel                            (L570)  — Level W2D：CellW2D 偏置-增益细胞 + OutputSynapse 连续突触
-#     create_models                      (L573)  — 创建肌肉/神经元细胞、偏置电流和突触
-#     create_generic_muscle_cell         (L581)  — 创建 W2D 通用肌肉细胞
-#     create_generic_neuron_cell         (L585)  — 创建 W2D 通用神经元细胞
-#     create_offset                      (L589)  — 创建偏置电流生成器
-#     create_neuron_to_neuron_syn        (L598)  — 创建神经元间突触（OutputSynapse + GapJunction）
-#     create_neuron_to_muscle_syn        (L607)  — 创建神经元到肌肉突触（OutputSynapse + GapJunction）
-#     get_elec_syn                       (L615)  — 根据连接类型返回 GapJunction
-#     get_exc_syn                        (L630)  — 兴奋性突触 — 返回 OutputSynapse
-#     get_inh_syn                        (L634)  — 抑制性突触 — 返回 OutputSynapse
+#   _C2Model                             (L46)
+#     create_models                      (L49)
+#     create_generic_muscle_cell         (L58)
+#     create_offsetcurrent_concentrationmodel (L150)
+#     create_neuron_to_neuron_syn        (L205)
+#     create_neuron_to_muscle_syn        (L244)
+#     create_muscle_to_muscle_syn        (L271)
+#     get_elec_syn                       (L278)
+#     get_exc_syn                        (L362)
+#     get_inh_syn                        (L455)
+#     create_n_connection_synapse        (L495)
+#     is_elec_conn                       (L521)
+#     is_analog_conn                     (L527)
 #
 # 更新日志：
 #   2026-04-19  Copilot  计划5阶段六：从 factory.py 迁移特殊模型
+#   2026-04-19  Copilot  计划6阶段一：从 special.py 拆分为独立文件
 #
 # 当前维护者：Copilot
 # =============================================================================
-"""特殊模型工厂（C2/W2D）。"""
+"""C2 层级参数化模型。"""
 from neuroml import (
     BiophysicalProperties,
     Cell,
@@ -56,22 +47,14 @@ from neuroml import (
 )
 
 from c302.parameters.custom_types import (
-    CellW2D,
     DelayedGapJunction,
     GradedSynapse2,
     MuscleConcentrationModel2,
     NeuronMuscle,
-    OutputSynapse,
     ProprioGapJunction,
     ProprioGapJunction2,
 )
-from c302.parameters.factory.base import _ModelBase
 from c302.parameters.factory.hh import _HHModel
-
-
-# ---------------------------------------------------------------------------
-# Level C2 — HH 导电模型 + GradedSynapse + 延迟/本体感觉缝隙连接
-# ---------------------------------------------------------------------------
 
 
 class _C2Model(_HHModel):
@@ -560,77 +543,3 @@ class _C2Model(_HHModel):
         return super().is_analog_conn(syn) or isinstance(
             syn, (NeuronMuscle, GradedSynapse2)
         )
-
-
-# ---------------------------------------------------------------------------
-# Level W2D — Worm2D 偏置-增益模型 + OutputSynapse + GapJunction
-# ---------------------------------------------------------------------------
-
-
-class _W2DModel(_ModelBase):
-    """Level W2D：CellW2D 偏置-增益细胞 + OutputSynapse 连续突触。"""
-
-    def create_models(self):
-        """创建肌肉/神经元细胞、偏置电流和突触。"""
-        self.create_generic_muscle_cell()
-        self.create_generic_neuron_cell()
-        self.create_offset()
-        self.create_neuron_to_neuron_syn()
-        self.create_neuron_to_muscle_syn()
-
-    def create_generic_muscle_cell(self):
-        """创建 W2D 通用肌肉细胞。"""
-        self.generic_muscle_cell = CellW2D(id="GenericMuscleCell")
-
-    def create_generic_neuron_cell(self):
-        """创建 W2D 通用神经元细胞。"""
-        self.generic_neuron_cell = CellW2D(id="GenericNeuronCell")
-
-    def create_offset(self):
-        """创建偏置电流生成器。"""
-        self.offset_current = PulseGenerator(
-            id="offset_current",
-            delay=self.get_bioparameter("unphysiological_offset_current_del").value,
-            duration=self.get_bioparameter("unphysiological_offset_current_dur").value,
-            amplitude=self.get_bioparameter("unphysiological_offset_current").value,
-        )
-
-    def create_neuron_to_neuron_syn(self):
-        """创建神经元间突触（OutputSynapse + GapJunction）。"""
-        self.neuron_to_neuron_exc_syn = OutputSynapse(id="neuron_to_neuron_exc_w2d")
-        self.neuron_to_neuron_inh_syn = OutputSynapse(id="neuron_to_neuron_inh_w2d")
-        self.neuron_to_neuron_elec_syn = GapJunction(
-            id="neuron_to_neuron_elec_syn",
-            conductance=self.get_bioparameter("neuron_to_neuron_elec_syn_gbase").value,
-        )
-
-    def create_neuron_to_muscle_syn(self):
-        """创建神经元到肌肉突触（OutputSynapse + GapJunction）。"""
-        self.neuron_to_muscle_exc_syn = OutputSynapse(id="neuron_to_muscle_w2d")
-        self.neuron_to_muscle_elec_syn = GapJunction(
-            id="neuron_to_muscle_elec_syn",
-            conductance=self.get_bioparameter("neuron_to_muscle_elec_syn_gbase").value,
-        )
-
-    def get_elec_syn(self, pre_cell, post_cell, type):
-        """根据连接类型返回 GapJunction。"""
-        if type == "neuron_to_neuron":
-            gbase = self.get_bioparameter("neuron_to_neuron_elec_syn_gbase").value
-            conn_id = "neuron_to_neuron_elec_syn"
-        elif type == "neuron_to_muscle":
-            gbase = self.get_bioparameter("neuron_to_muscle_elec_syn_gbase").value
-            conn_id = "neuron_to_muscle_elec_syn"
-        elif type == "muscle_to_muscle":
-            gbase = self.get_bioparameter("muscle_to_muscle_elec_syn_gbase").value
-            conn_id = "muscle_to_muscle_elec_syn"
-        else:
-            raise ValueError("Unknown electrical connection type: %s" % type)
-        return GapJunction(id=conn_id, conductance=gbase)
-
-    def get_exc_syn(self, pre_cell, post_cell, type):
-        """兴奋性突触 — 返回 OutputSynapse。"""
-        return self.neuron_to_neuron_exc_syn
-
-    def get_inh_syn(self, pre_cell, post_cell, type):
-        """抑制性突触 — 返回 OutputSynapse。"""
-        return self.neuron_to_neuron_inh_syn
