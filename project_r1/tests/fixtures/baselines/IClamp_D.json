@@ -1,0 +1,74 @@
+{
+  "config": "IClamp",
+  "level": "D",
+  "generated_by": "original",
+  "populations": {
+    "count": 3,
+    "names": [
+      "ADAL",
+      "MDR01",
+      "PVCL"
+    ]
+  },
+  "connections": {
+    "chemical": 0,
+    "electrical": 0,
+    "continuous": 0,
+    "total": 0
+  },
+  "stimuli": {
+    "input_lists": 18,
+    "total_inputs": 18
+  },
+  "bioparameters": {
+    "count": 36,
+    "values": {
+      "cell_diameter": "5",
+      "muscle_length": "20",
+      "initial_memb_pot": "-45 mV",
+      "specific_capacitance": "1 uF_per_cm2",
+      "resistivity": "12 kohm_cm",
+      "muscle_spike_thresh": "-26 mV",
+      "neuron_spike_thresh": "-26 mV",
+      "muscle_leak_cond_density": "0.005 mS_per_cm2",
+      "neuron_leak_cond_density": "0.02 mS_per_cm2",
+      "leak_erev": "-50 mV",
+      "muscle_k_slow_cond_density": "4 mS_per_cm2",
+      "neuron_k_slow_cond_density": "2 mS_per_cm2",
+      "k_slow_erev": "-60 mV",
+      "muscle_k_fast_cond_density": "0.2 mS_per_cm2",
+      "neuron_k_fast_cond_density": "0.2 mS_per_cm2",
+      "k_fast_erev": "-60 mV",
+      "muscle_ca_boyle_cond_density": "2 mS_per_cm2",
+      "neuron_ca_boyle_cond_density": "2 mS_per_cm2",
+      "ca_boyle_erev": "40 mV",
+      "ca_conc_decay_time": "11.5943 ms",
+      "ca_conc_rho": "0.000238919 mol_per_m_per_A_per_s",
+      "neuron_to_neuron_chem_exc_syn_gbase": ".01 nS",
+      "neuron_to_muscle_chem_exc_syn_gbase": ".01 nS",
+      "chem_exc_syn_erev": "0 mV",
+      "chem_exc_syn_rise": "1 ms",
+      "chem_exc_syn_decay": "5 ms",
+      "neuron_to_neuron_chem_inh_syn_gbase": "3 nS",
+      "neuron_to_muscle_chem_inh_syn_gbase": "3 nS",
+      "chem_inh_syn_erev": "-60 mV",
+      "chem_inh_syn_rise": "2 ms",
+      "chem_inh_syn_decay": "40 ms",
+      "neuron_to_neuron_elec_syn_gbase": "0.0005 nS",
+      "neuron_to_muscle_elec_syn_gbase": "0.0005 nS",
+      "unphysiological_offset_current": "0 pA",
+      "unphysiological_offset_current_del": "0 ms",
+      "unphysiological_offset_current_dur": "2000 ms"
+    }
+  },
+  "cell_models": {
+    "iaf_cells": 0,
+    "hh_cells": 1
+  },
+  "synapse_models": {
+    "exp_two_synapses": 0,
+    "gap_junctions": 0,
+    "graded_synapses": 0,
+    "graded_synapses2": 0
+  }
+}

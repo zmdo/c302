@@ -1,0 +1,84 @@
+# Level C1 参数集 — C 的 HH 细胞 + GradedSynapse + GapJunction
+# 继承 C 的所有非突触参数，替换突触为 GradedSynapse 型
+
+level: C1
+custom_component_types_definitions: "cell_C.xml"
+
+inherits: level_c
+
+parameter_removals:
+  # 丢弃 C 的所有化学突触参数（含 "syn" 的参数）
+  # elec_syn_gbase 不在此处删除，由 overrides 直接覆盖新值
+  - "neuron_to_neuron_chem_exc_syn_gbase"
+  - "neuron_to_muscle_chem_exc_syn_gbase"
+  - "chem_exc_syn_erev"
+  - "chem_exc_syn_rise"
+  - "chem_exc_syn_decay"
+  - "neuron_to_neuron_chem_inh_syn_gbase"
+  - "neuron_to_muscle_chem_inh_syn_gbase"
+  - "chem_inh_syn_erev"
+  - "chem_inh_syn_rise"
+  - "chem_inh_syn_decay"
+
+parameter_overrides:
+  # GradedSynapse 兴奋性突触
+  - name: "neuron_to_neuron_exc_syn_conductance"
+    value: "0.09 nS"
+    source: "BlindGuess"
+    certainty: "0.1"
+  - name: "neuron_to_muscle_exc_syn_conductance"
+    value: "0.09 nS"
+    source: "BlindGuess"
+    certainty: "0.1"
+  - name: "exc_syn_delta"
+    value: "5 mV"
+    source: "BlindGuess"
+    certainty: "0.1"
+  - name: "exc_syn_vth"
+    value: "0 mV"
+    source: "BlindGuess"
+    certainty: "0.1"
+  - name: "exc_syn_erev"
+    value: "0 mV"
+    source: "BlindGuess"
+    certainty: "0.1"
+  - name: "exc_syn_k"
+    value: "0.025per_ms"
+    source: "BlindGuess"
+    certainty: "0.1"
+
+  # GradedSynapse 抑制性突触
+  - name: "neuron_to_neuron_inh_syn_conductance"
+    value: "0.09 nS"
+    source: "BlindGuess"
+    certainty: "0.1"
+  - name: "neuron_to_muscle_inh_syn_conductance"
+    value: "0.09 nS"
+    source: "BlindGuess"
+    certainty: "0.1"
+  - name: "inh_syn_delta"
+    value: "5 mV"
+    source: "BlindGuess"
+    certainty: "0.1"
+  - name: "inh_syn_vth"
+    value: "0 mV"
+    source: "BlindGuess"
+    certainty: "0.1"
+  - name: "inh_syn_erev"
+    value: "-70 mV"
+    source: "BlindGuess"
+    certainty: "0.1"
+  - name: "inh_syn_k"
+    value: "0.025per_ms"
+    source: "BlindGuess"
+    certainty: "0.1"
+
+  # 缝隙连接
+  - name: "neuron_to_neuron_elec_syn_gbase"
+    value: "0.00052 nS"
+    source: "BlindGuess"
+    certainty: "0.1"
+  - name: "neuron_to_muscle_elec_syn_gbase"
+    value: "0.00052 nS"
+    source: "BlindGuess"
+    certainty: "0.1"

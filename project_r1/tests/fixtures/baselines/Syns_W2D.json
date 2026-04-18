@@ -1,0 +1,50 @@
+{
+  "config": "Syns",
+  "level": "W2D",
+  "generated_by": "original",
+  "populations": {
+    "count": 8,
+    "names": [
+      "AIZL",
+      "AS2",
+      "ASHL",
+      "MDL07",
+      "SMDDR",
+      "URYDL",
+      "VB11",
+      "VD12"
+    ]
+  },
+  "connections": {
+    "chemical": 0,
+    "electrical": 2,
+    "continuous": 3,
+    "total": 5
+  },
+  "stimuli": {
+    "input_lists": 8,
+    "total_inputs": 8
+  },
+  "bioparameters": {
+    "count": 7,
+    "values": {
+      "initial_memb_pot": "-45 mV",
+      "neuron_to_neuron_elec_syn_gbase": "1 nS",
+      "neuron_to_muscle_elec_syn_gbase": "1 nS",
+      "muscle_to_muscle_elec_syn_gbase": "1 nS",
+      "unphysiological_offset_current": "0 pA",
+      "unphysiological_offset_current_del": "50 ms",
+      "unphysiological_offset_current_dur": "2000 ms"
+    }
+  },
+  "cell_models": {
+    "iaf_cells": 0,
+    "hh_cells": 0
+  },
+  "synapse_models": {
+    "exp_two_synapses": 0,
+    "gap_junctions": 1,
+    "graded_synapses": 0,
+    "graded_synapses2": 0
+  }
+}

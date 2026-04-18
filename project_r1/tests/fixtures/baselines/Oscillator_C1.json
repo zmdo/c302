@@ -1,0 +1,86 @@
+{
+  "config": "Oscillator",
+  "level": "C1",
+  "generated_by": "original",
+  "populations": {
+    "count": 14,
+    "names": [
+      "AVBL",
+      "AVBR",
+      "DA2",
+      "DA3",
+      "DB2",
+      "DB3",
+      "DD2",
+      "DD3",
+      "VA2",
+      "VA3",
+      "VB2",
+      "VB3",
+      "VD2",
+      "VD3"
+    ]
+  },
+  "connections": {
+    "chemical": 0,
+    "electrical": 24,
+    "continuous": 31,
+    "total": 55
+  },
+  "stimuli": {
+    "input_lists": 2,
+    "total_inputs": 2
+  },
+  "bioparameters": {
+    "count": 37,
+    "values": {
+      "neuron_to_neuron_exc_syn_conductance": "0.09 nS",
+      "neuron_to_muscle_exc_syn_conductance": "0.09 nS",
+      "exc_syn_delta": "5 mV",
+      "exc_syn_vth": "0 mV",
+      "exc_syn_erev": "0 mV",
+      "exc_syn_k": "0.025per_ms",
+      "neuron_to_neuron_inh_syn_conductance": "0.09 nS",
+      "neuron_to_muscle_inh_syn_conductance": "0.09 nS",
+      "inh_syn_delta": "5 mV",
+      "inh_syn_vth": "0 mV",
+      "inh_syn_erev": "-90 mV",
+      "inh_syn_k": "0.025per_ms",
+      "neuron_to_neuron_elec_syn_gbase": "0.00052 nS",
+      "neuron_to_muscle_elec_syn_gbase": "0.00052 nS",
+      "cell_diameter": "5",
+      "muscle_length": "20",
+      "initial_memb_pot": "-45 mV",
+      "specific_capacitance": "1 uF_per_cm2",
+      "muscle_spike_thresh": "-20 mV",
+      "neuron_spike_thresh": "-20 mV",
+      "muscle_leak_cond_density": "5e-7 S_per_cm2",
+      "neuron_leak_cond_density": "0.005 mS_per_cm2",
+      "leak_erev": "-50 mV",
+      "muscle_k_slow_cond_density": "0.0006 S_per_cm2",
+      "neuron_k_slow_cond_density": "3 mS_per_cm2",
+      "k_slow_erev": "-60 mV",
+      "muscle_k_fast_cond_density": "0.0001 S_per_cm2",
+      "neuron_k_fast_cond_density": "0.0711643917483308 mS_per_cm2",
+      "k_fast_erev": "-60 mV",
+      "muscle_ca_boyle_cond_density": "0.0007 S_per_cm2",
+      "neuron_ca_boyle_cond_density": "3 mS_per_cm2",
+      "ca_boyle_erev": "40 mV",
+      "ca_conc_decay_time": "11.5943 ms",
+      "ca_conc_rho": "0.000238919 mol_per_m_per_A_per_s",
+      "unphysiological_offset_current": "4pA",
+      "unphysiological_offset_current_del": "100 ms",
+      "unphysiological_offset_current_dur": "800 ms"
+    }
+  },
+  "cell_models": {
+    "iaf_cells": 0,
+    "hh_cells": 2
+  },
+  "synapse_models": {
+    "exp_two_synapses": 0,
+    "gap_junctions": 1,
+    "graded_synapses": 2,
+    "graded_synapses2": 0
+  }
+}
