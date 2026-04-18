@@ -34,6 +34,7 @@ from pathlib import Path
 import pytest
 
 from c302.configs import get_config
+from c302.parameters.custom_types import GradedSynapse2
 
 # -- 基线发现 --
 
@@ -321,16 +322,12 @@ class TestSynapseModels:
         """GradedSynapse2 数量与基线一致。"""
         baseline = _load_baseline(config, level)
         nml_doc, _, _, _, _ = _generate(config, level)
-        # graded_synapses2 存储在 graded_synapses 列表中（自定义类型），需按类型计数
-        # 但基线中记录的是整体 graded_synapses 属性长度
-        # 这里直接使用基线值
         expected = baseline["synapse_models"]["graded_synapses2"]
-        if expected == 0:
-            # 无需额外检查
-            pass
-        # graded_synapses2 和 graded_synapses 共享同一列表时的兼容逻辑
-        # 仅当基线 > 0 时验证
-        assert expected >= 0  # 基线值合法性
+        # GradedSynapse2 与 GradedSynapse 共享 graded_synapses 列表，需按类型计数
+        actual = sum(
+            1 for s in nml_doc.graded_synapses if isinstance(s, GradedSynapse2)
+        )
+        assert actual == expected
 
     def test_level_bc1_has_graded_synapses(self):
         """Level BC1 使用 GradedSynapse 化学突触 + GapJunction 电突触。"""

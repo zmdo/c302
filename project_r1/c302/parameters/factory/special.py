@@ -394,7 +394,7 @@ class _C2Model(_HHModel):
         """兴奋性突触 — 支持 NeuronMuscle / GradedSynapse2 / GradedSynapse。"""
         self.found_specific_param = False
         specific = "%s_to_%s_exc_syn_%s"
-        cath = ar = ad = beta = vth = erev = None
+        cath = ar = ad = beta = vth = erev = delta = k = None
 
         if type == "neuron_to_neuron":
             default = "neuron_to_neuron_exc_syn_%s"

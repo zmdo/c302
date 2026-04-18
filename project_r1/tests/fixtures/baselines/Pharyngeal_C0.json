@@ -88,6 +88,6 @@
     "exp_two_synapses": 0,
     "gap_junctions": 1,
     "graded_synapses": 1,
-    "graded_synapses2": 0
+    "graded_synapses2": 1
   }
 }
