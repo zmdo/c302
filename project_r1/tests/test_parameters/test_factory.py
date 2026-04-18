@@ -1,18 +1,29 @@
 # =============================================================================
 # 功能描述：
-#   针对 parameters/factory.py 中 D/D1 族模型类的单元测试。
+#   针对 parameters/factory/ 子包中工厂类的单元测试。
 #   直接实例化模型并验证 create_models、create_neuron_cell、
 #   get_exc_syn/get_inh_syn、create_n_connection_synapse 等方法。
 #
 # 类与方法索引：
-#   (placeholder)
+#   TestCreateModel                      — create_model 工厂函数
+#   TestDModel / TestD1Model             — D/D1 族模型
+#   TestCustomTypes                      — IafActivityCell / GradedSynapse2 自定义类型
+#   TestModelBaseElecSynParams           — _ModelBase 电突触参数多路径
+#   TestC0ModelSynapse / TestC1ModelSynapse — C0/C1 突触覆盖
+#   TestIafModel                         — A 级 _IafModel
+#   TestIafActivityModel                 — B 级 _IafActivityModel
+#   TestBC1Model                         — BC1 级 _BC1Model
+#   TestHHModel                          — C 级 _HHModel
+#   TestC2Model                          — C2 级 _C2Model
+#   TestW2DModel                         — W2D 级 _W2DModel
 #
 # 更新日志：
 #   2026-04-18  Copilot  计划3阶段九：补充 D/D1 族覆盖率
+#   2026-04-19  Copilot  计划5阶段十：补全 6 个工厂类直接测试
 #
 # 当前维护者：Copilot
 # =============================================================================
-"""D/D1 族模型工厂单元测试。"""
+"""工厂类单元测试。"""
 import pytest
 from neuroml import GapJunction, Morphology, NeuroMLDocument, Segment
 from neuroml.nml.nml import Point3DWithDiam
@@ -35,7 +46,7 @@ from c302.parameters.factory import (
 class TestCreateModel:
     """验证 create_model 工厂函数。"""
 
-    @pytest.mark.parametrize("level", ["A", "B", "C", "C0", "C1", "D", "D1"])
+    @pytest.mark.parametrize("level", ["A", "B", "BC1", "C", "C0", "C1", "C2", "D", "D1", "W2D"])
     def test_create_all_levels(self, level):
         """每个级别都能成功创建模型。"""
         model = create_model(level)
@@ -323,3 +334,176 @@ class TestC1ModelSynapse:
         from neuroml import GradedSynapse
         syn = model.get_inh_syn("ADAL", "MDL01", "neuron_to_muscle")
         assert isinstance(syn, GradedSynapse)
+
+
+# -- 计划5阶段十：补全工厂类单元测试 --
+
+
+class TestIafModel:
+    """A 级 _IafModel 测试。"""
+
+    @pytest.fixture()
+    def model(self):
+        m = create_model("A")
+        m.create_models()
+        return m
+
+    def test_create_models(self, model):
+        """create_models 后有 generic_neuron_cell。"""
+        assert model.generic_neuron_cell is not None
+
+    def test_generic_neuron_is_iaf(self, model):
+        """generic_neuron_cell 是 IafCell。"""
+        from neuroml import IafCell
+        assert isinstance(model.generic_neuron_cell, IafCell)
+
+    def test_create_neuron_to_neuron_syn(self, model):
+        """A 级 neuron_to_neuron 化学突触为 ExpTwoSynapse。"""
+        from neuroml import ExpTwoSynapse
+        syn = model.get_exc_syn("ADAL", "ADAR", "neuron_to_neuron")
+        assert isinstance(syn, ExpTwoSynapse)
+
+    def test_elec_syn_is_exp_two(self, model):
+        """A 级电突触为 ExpTwoSynapse（非 GapJunction）。"""
+        from neuroml import ExpTwoSynapse
+        syn = model.get_elec_syn("ADAL", "ADAR", "neuron_to_neuron")
+        assert isinstance(syn, ExpTwoSynapse)
+
+
+class TestIafActivityModel:
+    """B 级 _IafActivityModel 测试。"""
+
+    @pytest.fixture()
+    def model(self):
+        m = create_model("B")
+        m.create_models()
+        return m
+
+    def test_generic_neuron_is_iaf_activity(self, model):
+        """generic_neuron_cell 是 IafActivityCell。"""
+        assert isinstance(model.generic_neuron_cell, IafActivityCell)
+
+    def test_elec_syn_is_gap_junction(self, model):
+        """B 级电突触为 GapJunction。"""
+        syn = model.get_elec_syn("ADAL", "ADAR", "neuron_to_neuron")
+        assert isinstance(syn, GapJunction)
+
+
+class TestBC1Model:
+    """BC1 级 _BC1Model 测试。"""
+
+    @pytest.fixture()
+    def model(self):
+        m = create_model("BC1")
+        m.create_models()
+        return m
+
+    def test_exc_syn_is_graded(self, model):
+        """BC1 兴奋性突触为 GradedSynapse。"""
+        from neuroml import GradedSynapse
+        syn = model.get_exc_syn("ADAL", "ADAR", "neuron_to_neuron")
+        assert isinstance(syn, GradedSynapse)
+
+    def test_inh_syn_is_graded(self, model):
+        """BC1 抑制性突触为 GradedSynapse。"""
+        from neuroml import GradedSynapse
+        syn = model.get_inh_syn("ADAL", "ADAR", "neuron_to_neuron")
+        assert isinstance(syn, GradedSynapse)
+
+    def test_neuron_to_muscle_syn(self, model):
+        """BC1 neuron_to_muscle 突触为 GradedSynapse。"""
+        from neuroml import GradedSynapse
+        syn = model.get_exc_syn("ADAL", "MDL01", "neuron_to_muscle")
+        assert isinstance(syn, GradedSynapse)
+
+
+class TestHHModel:
+    """C 级 _HHModel 测试。"""
+
+    @pytest.fixture()
+    def model(self):
+        m = create_model("C")
+        m.create_models()
+        return m
+
+    def test_create_models(self, model):
+        """create_models 后有 generic_neuron_cell。"""
+        assert model.generic_neuron_cell is not None
+
+    def test_generic_neuron_is_hh(self, model):
+        """generic_neuron_cell 是 Cell（HH 导电细胞）。"""
+        from neuroml import Cell
+        assert isinstance(model.generic_neuron_cell, Cell)
+
+    def test_concentration_model(self, model):
+        """C 级有钙浓度模型。"""
+        assert model.concentration_model is not None
+
+    def test_offset_current(self, model):
+        """C 级有偏置电流。"""
+        assert model.offset_current is not None
+
+
+class TestC2Model:
+    """C2 级 _C2Model 测试。"""
+
+    @pytest.fixture()
+    def model(self):
+        m = create_model("C2")
+        m.create_models()
+        return m
+
+    def test_create_models(self, model):
+        """create_models 成功。"""
+        assert model.generic_muscle_cell is not None
+
+    def test_exc_syn_nn(self, model):
+        """C2 neuron_to_neuron 兴奋性突触。"""
+        syn = model.get_exc_syn("ADAL", "ADAR", "neuron_to_neuron")
+        assert syn is not None
+
+    def test_inh_syn_nn(self, model):
+        """C2 neuron_to_neuron 抑制性突触。"""
+        syn = model.get_inh_syn("ADAL", "ADAR", "neuron_to_neuron")
+        assert syn is not None
+
+    def test_is_analog_conn(self, model):
+        """C2 GradedSynapse2 判定为模拟连接。"""
+        syn = model.get_exc_syn("ADAL", "ADAR", "neuron_to_neuron")
+        assert model.is_analog_conn(syn) is True
+
+    def test_is_elec_conn(self, model):
+        """C2 GapJunction 判定为电连接。"""
+        syn = model.get_elec_syn("ADAL", "ADAR", "neuron_to_neuron")
+        assert model.is_elec_conn(syn) is True
+
+
+class TestW2DModel:
+    """W2D 级 _W2DModel 测试。"""
+
+    @pytest.fixture()
+    def model(self):
+        m = create_model("W2D")
+        m.create_models()
+        return m
+
+    def test_create_models(self, model):
+        """create_models 成功。"""
+        assert model.generic_neuron_cell is not None
+
+    def test_generic_neuron_is_cellw2d(self, model):
+        """generic_neuron_cell 是 CellW2D。"""
+        from c302.parameters.custom_types import CellW2D
+        assert isinstance(model.generic_neuron_cell, CellW2D)
+
+    def test_exc_syn_nn(self, model):
+        """W2D 兴奋性突触为 OutputSynapse。"""
+        from c302.parameters.custom_types import OutputSynapse
+        syn = model.get_exc_syn("ADAL", "ADAR", "neuron_to_neuron")
+        assert isinstance(syn, OutputSynapse)
+
+    def test_inh_syn_nn(self, model):
+        """W2D 抑制性突触为 OutputSynapse。"""
+        from c302.parameters.custom_types import OutputSynapse
+        syn = model.get_inh_syn("ADAL", "ADAR", "neuron_to_neuron")
+        assert isinstance(syn, OutputSynapse)

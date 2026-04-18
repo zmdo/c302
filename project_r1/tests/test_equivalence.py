@@ -5,47 +5,29 @@
 #   细胞模型、突触模型等计数和值。
 #
 # 类与方法索引：
-#   _discover_baselines                  (L61)   — 自动发现所有可用基线文件，返回 (config, level) 列表
-#   _load_baseline                       (L75)   — 加载基线 JSON 文件
-#   _count_connections                   (L101)  — 统计 NeuroML 文档中的连接数，分化学/电/连续三类
-#   _count_stimuli                       (L124)  — 统计刺激输入数量
-#   _generate                            (L132)  — 使用新代码生成 NeuroML 网络文档
-#   TestGeneration                       (L147)  — 验证每个支持的组合能成功生成 NeuroML 文档
-#     test_generate_success              (L151)  — 生成不抛异常
-#     test_has_network                   (L157)  — 文档包含至少一个网络
-#     test_has_populations               (L163)  — 网络包含至少一个种群
-#   _mark_known_diffs                    (L173)  — 对已知配置差异的组合添加 xfail 标记
-#   TestPopulations                      (L196)  — 种群数量精确比对
-#     test_count_exact                   (L200)  — 种群数量与基线一致
-#   TestConnections                      (L208)  — 连接数精确比对
-#     test_total_exact                   (L212)  — 连接总数与基线一致
-#   TestStimuli                          (L226)  — 刺激数量精确比对
-#     test_count_exact                   (L230)  — 刺激输入数量与基线一致
-#   TestBioParameters                    (L238)  — 参数数量和逐值比对
-#     test_count_exact                   (L242)  — 参数数量与基线一致
-#     test_values_match                  (L249)  — 逐参数值比对
-#     test_level_matches                 (L267)  — 模型的 level 属性与请求一致
-#   TestCellModels                       (L273)  — 细胞模型计数精确比对
-#     test_iaf_count                     (L277)  — IAF 细胞数量与基线一致
-#     test_hh_count                      (L284)  — HH 导电细胞数量与基线一致
-#     test_level_d_has_muscle_cell_only  (L290)  — Level D 仅注册通用肌肉 Cell（神经元为 per-cell 文件）
-#     test_level_d1_has_muscle_cell_only (L296)  — Level D1 仅注册通用肌肉 Cell
-#   TestSynapseModels                    (L303)  — 突触模型类型计数精确比对
-#     test_exp_two_count                 (L307)  — ExpTwoSynapse 数量与基线一致
-#     test_gap_junction_count            (L314)  — GapJunction 数量与基线一致
-#     test_graded_synapse_count          (L321)  — GradedSynapse 数量与基线一致
-#     test_graded_synapse2_count         (L328)  — GradedSynapse2 数量与基线一致
-#     test_level_bc1_has_graded_synapses (L343)  — Level BC1 使用 GradedSynapse 化学突触 + GapJunction 电突触
+#   _discover_baselines                  (L62)   — 自动发现所有可用基线文件，返回 (config, level) 列表
+#   _load_baseline                       (L76)   — 加载基线 JSON 文件
+#   _count_connections                   (L135)  — 统计 NeuroML 文档中的连接数，分化学/电/连续三类
+#   _count_stimuli                       (L158)  — 统计刺激输入数量
+#   _generate                            (L166)  — 使用新代码生成 NeuroML 网络文档
+#   TestGeneration                       (L181)  — 验证每个支持的组合能成功生成 NeuroML 文档
+#   _mark_known_diffs                    (删除)  — 已替换为 BASELINE_PARAMS / BASELINE_PARAMS_VALUES / BASELINE_PARAMS_MUSCLES_STRUCT
+#   TestPopulations                      (L207)  — 种群数量精确比对
+#   TestConnections                      (L219)  — 连接数精确比对
+#   TestStimuli                          (L237)  — 刺激数量精确比对
+#   TestBioParameters                    (L249)  — 参数数量和逐值比对
+#   TestCellModels                       (L284)  — 细胞模型计数精确比对
+#   TestSynapseModels                    (L314)  — 突触模型类型计数精确比对
 #
 # 更新日志：
 #   2026-04-18  Copilot  计划3阶段八：新建等价性测试
 #   2026-04-19  Copilot  计划4阶段七：重写为基线驱动精确断言
+#   2026-04-19  Copilot  计划5阶段八：xfail 粒度细化（BASELINE_PARAMS / VALUES / MUSCLES_STRUCT）
 #
 # 当前维护者：Copilot
 # =============================================================================
 """等价性测试 — 基线驱动，验证新代码生成结果与原始代码完全一致。"""
 import json
-import os
 import tempfile
 from pathlib import Path
 
@@ -93,6 +75,39 @@ BASELINE_CASES = [c for c in ALL_BASELINES if c in _SUPPORTED_SET]
 # 原始代码与新代码的参数合并顺序不同，导致种群/连接/参数值产生差异。
 # factory 逻辑本身正确，差异仅来自 config 覆盖层。
 _KNOWN_CONFIG_DIFFS_CONFIGS = {"Muscles", "Oscillator"}
+
+# -- 精细化 xfail 参数列表 --
+
+# 无 xfail — 用于大多数测试方法
+BASELINE_PARAMS = [pytest.param(*c) for c in BASELINE_CASES]
+
+# Muscles + Oscillator xfail — 用于 test_values_match
+BASELINE_PARAMS_VALUES = [
+    pytest.param(
+        *c,
+        marks=pytest.mark.xfail(
+            reason=f"{c[0]} config 级参数覆盖差异",
+            strict=True,
+        ),
+    )
+    if c[0] in _KNOWN_CONFIG_DIFFS_CONFIGS
+    else pytest.param(*c)
+    for c in BASELINE_CASES
+]
+
+# 仅 Muscles xfail — 用于 test_count_exact (Populations) / test_total_exact (Connections)
+BASELINE_PARAMS_MUSCLES_STRUCT = [
+    pytest.param(
+        *c,
+        marks=pytest.mark.xfail(
+            reason=f"{c[0]} config 级参数覆盖导致种群/连接数差异",
+            strict=True,
+        ),
+    )
+    if c[0] == "Muscles"
+    else pytest.param(*c)
+    for c in BASELINE_CASES
+]
 
 
 # -- 辅助函数 --
@@ -170,33 +185,10 @@ class TestGeneration:
 # -- 基线精确比对测试 --
 
 
-def _mark_known_diffs(cases):
-    """对已知配置差异的组合添加 xfail 标记。"""
-    marked = []
-    for c in cases:
-        config_name = c[0]
-        if config_name in _KNOWN_CONFIG_DIFFS_CONFIGS:
-            marked.append(
-                pytest.param(
-                    *c,
-                    marks=pytest.mark.xfail(
-                        reason=f"{config_name} config 级参数覆盖差异",
-                        strict=False,
-                    ),
-                )
-            )
-        else:
-            marked.append(c)
-    return marked
-
-
-_BASELINE_MARKED = _mark_known_diffs(BASELINE_CASES)
-
-
 class TestPopulations:
     """种群数量精确比对。"""
 
-    @pytest.mark.parametrize("config,level", _BASELINE_MARKED)
+    @pytest.mark.parametrize("config,level", BASELINE_PARAMS_MUSCLES_STRUCT)
     def test_count_exact(self, config, level):
         """种群数量与基线一致。"""
         baseline = _load_baseline(config, level)
@@ -208,7 +200,7 @@ class TestPopulations:
 class TestConnections:
     """连接数精确比对。"""
 
-    @pytest.mark.parametrize("config,level", _BASELINE_MARKED)
+    @pytest.mark.parametrize("config,level", BASELINE_PARAMS_MUSCLES_STRUCT)
     def test_total_exact(self, config, level):
         """连接总数与基线一致。"""
         baseline = _load_baseline(config, level)
@@ -226,7 +218,7 @@ class TestConnections:
 class TestStimuli:
     """刺激数量精确比对。"""
 
-    @pytest.mark.parametrize("config,level", _BASELINE_MARKED)
+    @pytest.mark.parametrize("config,level", BASELINE_PARAMS)
     def test_count_exact(self, config, level):
         """刺激输入数量与基线一致。"""
         baseline = _load_baseline(config, level)
@@ -238,14 +230,14 @@ class TestStimuli:
 class TestBioParameters:
     """参数数量和逐值比对。"""
 
-    @pytest.mark.parametrize("config,level", _BASELINE_MARKED)
+    @pytest.mark.parametrize("config,level", BASELINE_PARAMS)
     def test_count_exact(self, config, level):
         """参数数量与基线一致。"""
         baseline = _load_baseline(config, level)
         _, _, _, model, _ = _generate(config, level)
         assert len(model.bioparameters) == baseline["bioparameters"]["count"]
 
-    @pytest.mark.parametrize("config,level", _BASELINE_MARKED)
+    @pytest.mark.parametrize("config,level", BASELINE_PARAMS_VALUES)
     def test_values_match(self, config, level):
         """逐参数值比对。"""
         baseline = _load_baseline(config, level)
@@ -273,14 +265,14 @@ class TestBioParameters:
 class TestCellModels:
     """细胞模型计数精确比对。"""
 
-    @pytest.mark.parametrize("config,level", _BASELINE_MARKED)
+    @pytest.mark.parametrize("config,level", BASELINE_PARAMS)
     def test_iaf_count(self, config, level):
         """IAF 细胞数量与基线一致。"""
         baseline = _load_baseline(config, level)
         nml_doc, _, _, _, _ = _generate(config, level)
         assert len(nml_doc.iaf_cells) == baseline["cell_models"]["iaf_cells"]
 
-    @pytest.mark.parametrize("config,level", _BASELINE_MARKED)
+    @pytest.mark.parametrize("config,level", BASELINE_PARAMS)
     def test_hh_count(self, config, level):
         """HH 导电细胞数量与基线一致。"""
         baseline = _load_baseline(config, level)
@@ -303,28 +295,28 @@ class TestCellModels:
 class TestSynapseModels:
     """突触模型类型计数精确比对。"""
 
-    @pytest.mark.parametrize("config,level", _BASELINE_MARKED)
+    @pytest.mark.parametrize("config,level", BASELINE_PARAMS)
     def test_exp_two_count(self, config, level):
         """ExpTwoSynapse 数量与基线一致。"""
         baseline = _load_baseline(config, level)
         nml_doc, _, _, _, _ = _generate(config, level)
         assert len(nml_doc.exp_two_synapses) == baseline["synapse_models"]["exp_two_synapses"]
 
-    @pytest.mark.parametrize("config,level", _BASELINE_MARKED)
+    @pytest.mark.parametrize("config,level", BASELINE_PARAMS)
     def test_gap_junction_count(self, config, level):
         """GapJunction 数量与基线一致。"""
         baseline = _load_baseline(config, level)
         nml_doc, _, _, _, _ = _generate(config, level)
         assert len(nml_doc.gap_junctions) == baseline["synapse_models"]["gap_junctions"]
 
-    @pytest.mark.parametrize("config,level", _BASELINE_MARKED)
+    @pytest.mark.parametrize("config,level", BASELINE_PARAMS)
     def test_graded_synapse_count(self, config, level):
         """GradedSynapse 数量与基线一致。"""
         baseline = _load_baseline(config, level)
         nml_doc, _, _, _, _ = _generate(config, level)
         assert len(nml_doc.graded_synapses) == baseline["synapse_models"]["graded_synapses"]
 
-    @pytest.mark.parametrize("config,level", _BASELINE_MARKED)
+    @pytest.mark.parametrize("config,level", BASELINE_PARAMS)
     def test_graded_synapse2_count(self, config, level):
         """GradedSynapse2 数量与基线一致。"""
         baseline = _load_baseline(config, level)

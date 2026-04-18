@@ -3,15 +3,16 @@
 #   参数集注册表，提供按层级名称查找参数配置的工厂函数。
 #   get_parameter_set 返回 c302ModelPrototype 实例（已加载 YAML 参数、
 #   具备 create_models / get_*_syn 等能力），可直接传递给 generate()。
-#   支持的层级：A, B, C, C0, C1, D, D1（可扩展 BC1, C2, W2D）。
+#   支持的层级：A, B, BC1, C, C0, C1, C2, D, D1, W2D。
 #
 # 类与方法索引：
-#   get_parameter_set                    (L34)   — 按层级名称创建参数化模型实例
-#   list_parameter_sets                  (L56)   — 列出所有可用的参数层级名称
+#   get_parameter_set                    (L35)   — 按层级名称创建参数化模型实例
+#   list_parameter_sets                  (L57)   — 列出所有可用的参数层级名称
 #
 # 更新日志：
 #   2026-04-17  Copilot  计划3阶段三：新建参数集注册表
 #   2026-04-18  Copilot  计划3阶段八：改为返回 c302ModelPrototype 实例
+#   2026-04-19  Copilot  计划5阶段七：factory.py 拆分为 factory/ 子包
 #
 # 当前维护者：Copilot
 # =============================================================================

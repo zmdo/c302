@@ -7,10 +7,11 @@
 #   register_config                      (L26)   — 配置注册装饰器
 #   get_config                           (L40)   — 按名称获取配置 setup 函数
 #   list_configs                         (L57)   — 列出所有已注册的配置名称
-#   _auto_import                         (L66)   — 自动导入所有配置模块以触发注册
+#   _auto_import                         (L66)   — 自动扫描并导入所有配置模块以触发注册
 #
 # 更新日志：
 #   2026-04-17  Copilot  计划3阶段五：新建
+#   2026-04-19  Copilot  计划5阶段九：_auto_import 改为 pkgutil.iter_modules 扫描
 #
 # 当前维护者：Copilot
 # =============================================================================
@@ -64,29 +65,17 @@ def list_configs() -> list[str]:
 
 
 def _auto_import() -> None:
-    """自动导入所有配置模块以触发注册。"""
-    import importlib
+    """自动导入所有配置模块以触发注册。
 
-    _modules = [
-        "c302.configs.full",
-        "c302.configs.fw",
-        "c302.configs.iclamp",
-        "c302.configs.iclamp_muscle",
-        "c302.configs.multi_syns",
-        "c302.configs.muscles",
-        "c302.configs.muscles_sine",
-        "c302.configs.muscle_test",
-        "c302.configs.oscillator",
-        "c302.configs.oscillator_m",
-        "c302.configs.pharyngeal",
-        "c302.configs.ria",
-        "c302.configs.social",
-        "c302.configs.syns",
-        "c302.configs.tap_withdrawal",
-        "c302.configs.target_muscle",
-    ]
-    for mod in _modules:
+    使用 pkgutil.iter_modules 扫描本包下所有子模块，
+    避免硬编码模块列表。
+    """
+    import importlib
+    import pkgutil
+
+    # 扫描 c302.configs 包下所有子模块
+    for finder, name, ispkg in pkgutil.iter_modules(__path__, __name__ + "."):
         try:
-            importlib.import_module(mod)
+            importlib.import_module(name)
         except ImportError:
             pass
