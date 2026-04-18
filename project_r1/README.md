@@ -45,11 +45,14 @@ cells, cells_total, params, muscles, nml_doc = setup(
 |------|------|---------|---------|--------|
 | A | IAF | IafCell | ExpTwoSynapse | ExpTwoSynapse |
 | B | IAF | IafActivityCell | ExpTwoSynapse | GapJunction |
+| BC1 | IAF | IafActivityCell | GradedSynapse | GapJunction |
 | C | HH | Cell (ca_boyle) | ExpTwoSynapse | GapJunction |
 | C0 | HH | Cell (ca_simple) | GradedSynapse2 | GapJunction |
 | C1 | HH | Cell (ca_boyle) | GradedSynapse | GapJunction |
+| C2 | HH | Cell (ca_boyle) | GradedSynapse | DelayedGapJunction |
 | D | HH 多室 | Cell (per-neuron) | ExpTwoSynapse | GapJunction |
 | D1 | HH 多室 | Cell (per-neuron) | GradedSynapse2 | GapJunction |
+| W2D | 偏置-增益 | CellW2D | OutputSynapse | GapJunction |
 
 ## 测试
 

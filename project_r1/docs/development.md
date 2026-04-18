@@ -21,9 +21,17 @@ project_r1/
 │   ├── parameters/          # 参数层
 │   │   ├── __init__.py      # get_parameter_set() / list_parameter_sets()
 │   │   ├── bioparameter.py  # BioParameter 数据类
-│   │   ├── factory.py       # 模型工厂 (create_model)
+│   │   ├── custom_types.py  # 自定义 NeuroML 组件类型
+│   │   ├── factory/         # 模型工厂子包
+│   │   │   ├── __init__.py  # create_model() + _LEVEL_TO_CLASS
+│   │   │   ├── base.py      # _ModelBase + _GradedSynapse2Mixin
+│   │   │   ├── iaf.py       # _IafModel / _IafActivityModel / _BC1Model
+│   │   │   ├── hh.py        # _HHModel / _HHC0Model / _HHC1Model
+│   │   │   ├── hh_multi.py  # _HHMultiCompModel / _HHGradedModel
+│   │   │   ├── c2.py        # _C2Model
+│   │   │   └── w2d.py       # _W2DModel
 │   │   ├── loader.py        # YAML 加载器
-│   │   ├── prototype.py     # c302ModelPrototype 基类
+│   │   ├── model.py         # c302ModelPrototype 基类
 │   │   └── registry.py      # 参数集注册表
 │   ├── simulation/          # 仿真执行
 │   │   └── runner.py        # 命令行 & Python API
@@ -97,14 +105,14 @@ pytest tests/ --cov=c302 --cov-report=term-missing
        certainty: "0.5"
    ```
 2. 如需继承，加 `inherits: level_c`。
-3. 在 `parameters/factory.py` 的 `_LEVEL_TO_CLASS` 注册对应模型类。
+3. 在 `parameters/factory/__init__.py` 的 `_LEVEL_TO_CLASS` 注册对应模型类。
 4. 在 `parameters/__init__.py` 的 `_LEVEL_REGISTRY` 添加级别名。
 5. 添加等价性测试用例到 `tests/test_equivalence.py`。
 
 ### 2. 添加新配置脚本
 
-1. 在 `c302/configs/` 下创建 `c302_{Name}.py`。
-2. 实现 `setup(parameter_set, generate_flag=False, **kwargs)` 函数。
+1. 在 `c302/configs/` 下创建 `{name}.py`。
+2. 使用 `@register_config("{Name}")` 装饰器注册 `setup()` 函数。
 3. 在 `tests/test_configs/` 下添加测试。
 
 ### 3. 修改生成引擎
@@ -128,11 +136,15 @@ pytest tests/test_equivalence.py -v
 _ModelBase (c302ModelPrototype)
 ├── _IafModel (A)          — IAF 细胞 + ExpTwoSynapse
 ├── _IafActivityModel (B)  — IafActivityCell + GapJunction
+│   └── _BC1Model (BC1)    — B + GradedSynapse
 ├── _HHModel (C)           — HH 细胞 (ca_boyle) + ExpTwoSynapse
-├── _HHC0Model (C0)        — HH 细胞 (ca_simple) + GradedSynapse2
-├── _HHC1Model (C1)        — HH 细胞 (ca_boyle) + GradedSynapse
+│   ├── _HHC1Model (C1)    — HH 细胞 (ca_boyle) + GradedSynapse
+│   └── _C2Model (C2)      — HH + GradedSynapse + 自定义缝隙连接
+├── _GradedSynapse2Mixin + _ModelBase
+│   └── _HHC0Model (C0)    — HH 细胞 (ca_simple) + GradedSynapse2
 ├── _HHMultiCompModel (D)  — HH 多室模型（每神经元独立形态）
-└── _HHGradedModel (D1)    — D + GradedSynapse2
+│   └── _HHGradedModel (D1) — D + GradedSynapse2
+└── _W2DModel (W2D)        — CellW2D 偏置-增益细胞 + OutputSynapse
 ```
 
 ## 代码规范

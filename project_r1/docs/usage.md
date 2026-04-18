@@ -51,18 +51,21 @@ nml_doc, cells, cells_total, conns, muscles = generate(
 |------|---------|------|
 | A    | IAF     | 积分-放电模型，最简单 |
 | B    | IAF+Activity | 带活动性的 IAF，GapJunction 电突触 |
+| BC1  | IAF+Activity | B + GradedSynapse 化学突触 |
 | C    | HH      | Hodgkin-Huxley 导电模型（ca_boyle 通道） |
 | C0   | HH      | HH 模型（ca_simple 通道，GradedSynapse2） |
 | C1   | HH      | HH 模型（ca_boyle 通道，GradedSynapse） |
+| C2   | HH      | HH 模型 + 自定义缝隙连接（DelayedGapJunction） |
 | D    | HH 多室  | 每个神经元有独立形态学数据 |
 | D1   | HH 多室  | D + GradedSynapse2 模拟突触 |
+| W2D  | 偏置-增益 | CellW2D 偏置-增益细胞 + OutputSynapse |
 
 ### 列出可用参数集
 
 ```python
 from c302.parameters import list_parameter_sets
 
-print(list_parameter_sets())  # ['A', 'B', 'C', 'C0', 'C1', 'D', 'D1']
+print(list_parameter_sets())  # ['A', 'B', 'BC1', 'C', 'C0', 'C1', 'C2', 'D', 'D1', 'W2D']
 ```
 
 ### 加载参数集
@@ -80,10 +83,16 @@ print(len(params.bioparameters))  # 38
 | 配置 | 说明 |
 |------|------|
 | IClamp      | 单细胞电流钳测试 |
+| IClampMuscle | 肌肉细胞电流钳测试 |
 | Syns        | 突触连接测试 |
+| MultiSyns   | 多突触连接测试 |
 | Social      | 社交行为回路 |
 | Oscillator  | 运动振荡回路 |
+| OscillatorM | 含肌肉的运动振荡回路 |
 | Muscles     | 含肌肉的网络 |
+| MusclesSine | 正弦波刺激肌肉网络 |
+| MuscleTest  | 肌肉测试回路 |
+| TargetMuscle | 目标肌肉回路 |
 | Full        | 完整 302 神经元网络 |
 | FW          | 前向运动回路 |
 | Pharyngeal  | 咽部神经回路 |
